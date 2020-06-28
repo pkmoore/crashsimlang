@@ -1,0 +1,33 @@
+Weird Filetypes (stat()/lstat())
+================================
+
+Preamble
+
+open($filename, ...) = $desc ->
+  o($filname, $desc)
+
+fstat($desc, {..., st_mode=$mode, ...} = $res ->
+  fs[$mode&S_IFREG == 0, $res = 0]($desc, $mode)
+
+
+
+
+Register Initialization
+
+filename = <user provided filename>
+
+
+
+
+Inspector
+
+.*; o(!filename, ?desc); .* fs[T, T](!desc, ?mode);
+
+
+
+
+Mutator
+
+mode &= S_IFLNK
+
+o(!filename, ?desc); .* fs[T, T](!desc, !mode);

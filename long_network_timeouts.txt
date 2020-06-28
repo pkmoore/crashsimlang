@@ -1,0 +1,36 @@
+Long Network Timeouts (Simple)
+================================
+
+Preamble
+
+socket(...) = $sock ->
+s[$sock != -1]($sock)
+
+connect($sock, ...) -> $res
+c[$res != -1]($sock)
+
+poll([{fd=$desc, ...}], ..., $timeout) = $res ->
+poll[$res != 0, $timeout != NULL]($desc, $timeout)
+
+
+Register Initialization
+
+
+
+
+
+Inspector
+
+.*; s[T](?sock); .* c[T](!sock); (.*; poll[T,T](!sock, ?timeout))+
+
+
+
+
+Mutator
+
+# The time remaining left in the timeout field is 
+timeout == 1
+
+
+s[T](?sock); .*; c[T](!sock); (.*; poll[T,T](!sock, !timeout))+
+

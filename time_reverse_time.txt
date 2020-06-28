@@ -1,0 +1,31 @@
+Reverse Time
+================================
+
+Preamble
+
+time(NULL) = $time ->
+t_n[$time != -1]($time)
+
+time($p_time) = $time ->
+t_p[$time != -1, $ptime != -1]($time, $ptime)
+
+
+
+
+Register Initialization
+
+None
+
+
+
+Inspector
+
+.*; (t_n[T](!time) | t_p[T,T](!time,!ptime))
+
+
+Mutator
+
+time -= 100
+ptime -= 100
+
+t_n(!time) | t_p(!time,!ptime)

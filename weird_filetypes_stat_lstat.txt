@@ -1,0 +1,32 @@
+Weird Filetypes (stat()/lstat())
+================================
+
+Preamble
+
+lstat($file, {..., st_mode=$mode, ...}) = $res ->
+  ls[$mode & S_IFREG == 0, $res == 0])($filename, $mode)
+
+stat($file, {..., st_mode=$mode, ...}) = $res ->
+  s[$mode & S_IFREG == 0, $res == 0])($filename, $mode)
+
+
+
+
+Register Initialization
+
+filename = <user provided filename>
+
+
+
+
+Inspector
+
+.*; (s[T,T](!filename, ?mode)|ls[T,T](!filename, ?mode)
+
+
+
+Mutator
+
+mode &= S_IFLNK
+
+(s(!filename, !mode)|ls[T,T](!filename, !mode)

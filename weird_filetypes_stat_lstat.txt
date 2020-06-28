@@ -27,6 +27,8 @@ Inspector
 
 Mutator
 
+# Specify expressions to modify stored register values here
 mode &= S_IFLNK
 
+# ! is used to write out values from register rather than matching
 (s(!filename, !mode)|ls[T,T](!filename, !mode)

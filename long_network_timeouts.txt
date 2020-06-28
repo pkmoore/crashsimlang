@@ -28,9 +28,13 @@ Inspector
 
 Mutator
 
-# The time remaining left in the timeout field is 
+# Specify expressions to modify stored register values here 
+
+# Timeout variable doubles as an output variable for
+# (timeout - time spent waiting)
 timeout == 1
 
 
+# ! is used to write out values from register rather than matching
 s[T](?sock); .*; c[T](!sock); (.*; poll[T,T](!sock, !timeout))+
 

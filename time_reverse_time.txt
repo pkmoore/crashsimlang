@@ -25,7 +25,9 @@ Inspector
 
 Mutator
 
+# Specify expressions to modify stored register values here
 time -= 100
 ptime -= 100
 
+# ! is used to write out values from register rather than matching
 t_n(!time) | t_p(!time,!ptime)

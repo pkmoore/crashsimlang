@@ -21,6 +21,9 @@ Register Initialization
 
 Inspector
 
+# Note repetition of .*; poll(xxx).  This is to capture ALL
+# of the poll calls we are interested in so we can modify them all
+
 .*; s[T](?sock); .* c[T](!sock); (.*; poll[T,T](!sock, ?timeout))+
 
 

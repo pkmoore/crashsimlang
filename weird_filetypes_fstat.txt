@@ -1,4 +1,4 @@
-Weird Filetypes (stat()/lstat())
+Weird Filetypes (fstat())
 ================================
 
 Preamble

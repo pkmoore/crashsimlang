@@ -1,35 +1,41 @@
 Weird Filetypes (fstat())
 ================================
 
+# Find open system call for readonly file, followed by an
+# fstat system call that identifies the file as "regular".
+# A close system call on the open's file descriptor cannot be between open
+# and fstat system calls
+
 Preamble
+========
+open($pathname, flags=O_RDONLY) = $fd ->
 
-open($filename, ...) = $desc ->
-  o($filname, $desc)
+    open[$fd>=0]($pathname, $fd)
 
-fstat($desc, {..., st_mode=$mode, ...} = $res ->
-  fs[$mode&S_IFREG == 0, $res = 0]($desc, $mode)
+fstat($fd, stat{..., st_mode=$stat_mode, ...} = $fstat_return_value ->
 
+    fstat[$stat_mode & S_IFMT == S_IFREG, $fstat_return_value == 0]($fd, $stat_mode)
 
-
-
-Register Initialization
-
-filename = <user provided filename>
-
+close($fd) = $close_return_value ->
+    
+    close[$close_return_value == 0]($fd)
 
 
 
-Inspector
 
-.*; o(!filename, ?desc); .* fs[T, T](!desc, ?mode);
+Inspector/Trigger
+=================
+.*; 
+open[T](?pathname, ?fd); 
+.*; 
+~close[T](!fd);
+.*;
+fstat[T, T](!fd, ?stat_mode);
 
 
 
 
 Mutator
-
-# Specify expressions to modify stored register values here
-mode &= S_IFLNK
-
-# ! is used to write out values from register rather than matching
-o(!filename, ?desc); .* fs[T, T](!desc, !mode);
+=======
+open(!pathname, !fd);               #unchanged 
+fstat(!fd, stat_mode &= S_IFLNK );  #stat_mode modified

@@ -1,0 +1,44 @@
+//Matches fstat64() calls similar to:
+// S_IFBLK 9245  open("/lib/i386-linux-gnu/libdl.so.2", O_RDONLY|O_CLOEXEC) = 3
+// 9245 someothercall("testparam", 111) = 0
+// 9245  fstat64(3, {st_dev=makedev(8, 1), st_ino=657024, st_mode=S_IFREG|0644, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=928, st_size=472368, st_atime=2018/0 3/25-23:14:03.740249366, st_mtime=2016/03/24-21:15:25, st_ctime=2017/09/14-13:17:10.051774076}) = 0
+
+        // Capture input value for mutation
+main := in_mode@in_val
+
+        // Capture the an open() call
+        pid open_start /.*/ syscall_return /\n/ /.*/
+
+        // Capture the next fstat64() call
+        // NOTE:  WE CANNOT ASSOCIATE THE RETURN VALUE FROM open() TO param1
+        // FROM THIS fstat64() CALL
+        pid fstat_start param1 /, / param2 syscall_return /\n/
+
+
+// symbol for "initializing" the register containing our desired mode
+in_val := /.*/ ~/ /
+
+pid := /[0-9]+  /
+
+open_start := /open\(/
+
+fstat_start := /fstat64\(/
+fstat_end := /\)/
+syscall_return := /\) = / /-|[0-9]/ /[0-9]*/
+
+
+
+// Param1 is a filename surrounded by quotes.
+param1 := /[0-9]+/
+
+// Param2 is a structure surrounded by curly-braces.  We simply echo anything
+// preceeding and following the st_mode field.  For st_mode we use param2_mode
+// to apply the mutation we want.
+param2 := /[{]/ /.*/ /st_mode=/ param2_mode /.*/ /[}]/
+
+// Matches EITHER a mode of the form S_IFREG or S_IFREG|DDD where D is a digit
+// in [0-9].  In the first case, we simply omit S_IFREG and write the value of
+// in_mode.  In the second, we push "|DDD" into oct_block, omit S_IFREG, and
+// then write in_mode followed by oct_block.
+param2_mode := (~/S_IFREG/ oct_block@/\|[0-9]+/ !in_mode !oct_block) | (~/S_IFREG/ !in_mode)
+

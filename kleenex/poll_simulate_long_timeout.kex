@@ -1,0 +1,54 @@
+//Matches poll() calls similar to:
+//9999 5514  socket(AF_INET, SOCK_STREAM, 0) = 3
+//5514  connect(3, {sa_family=AF_INET, sa_data=\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}) = 0
+//5514  poll([{fd=3, events=POLLIN}], 1, 10000) = 1 ([{fd=3, revents=POLLIN}])
+
+        // Capture input value for mutation
+main := in_timeout@in_val
+
+        // Capture the a socket() call
+        pid socket_start /.*/ syscall_return /\n/
+
+        /.*/
+
+        // Capture the next connect() call
+        // NOTE: WE CANNOT ASSOCIATE THE RETURN VALUE FROM THE ABOVE TO param1
+        // FROM THIS connect() CALL
+        pid connect_start /.*/ syscall_return /\n/
+
+        /.*/
+
+        // Capture the next poll() call
+        // NOTE:  WE CANNOT ASSOCIATE THE RETURN VALUE FROM open() TO param1
+        // FROM THIS poll() CALL
+        pid poll_start param1 /, / param2 /, / param3 syscall_return
+
+        /\n/
+
+
+// symbol for "initializing" the register containing our desired mode
+in_val := /.*/ ~/ /
+
+pid := /[0-9]+  /
+
+socket_start := /socket\(/
+
+connect_start := /connect\(/
+
+poll_start := /connect\(/
+
+fstat_start := /fstat64\(/
+fstat_end := /\)/
+
+// We want to ignore the return structure data behind the return value
+syscall_return := /\) = / /-|[0-9]/ /[0-9]*/ /.*/
+
+
+// param1 is a structure surrounded by {}'s.
+param1 := /[{].*[}]/
+
+// param2 is an integer
+param2 := /[0-9]+/
+
+// param3 is the timeout we want to modify
+param3 := ~/[0-0]+/ !in_timeout

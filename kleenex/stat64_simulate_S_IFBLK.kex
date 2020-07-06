@@ -1,0 +1,37 @@
+// Matches stat64 lines similar to the following
+// S_IFBLK 9245  stat64("test.txt", {st_dev=makedev(8, 1), st_ino=657024, st_mode=S_IFREG|0644, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=928, st_size=472368, st_atime=2018/0 3/25-23:14:03.740249366, st_mtime=2016/03/24-21:15:25, st_ctime=2017/09/14-13:17:10.051774076}) = 0
+
+
+// top level symbol.  Captures value to be substituted in for S_IFREG as the
+// first token coming in from the input line.
+main := in_mode@in_val pid  syscall_name syscall_open param1 param_sep param2
+syscall_close syscall_equals syscall_return /\n/
+
+// symbol for "initializing" the register containing our desired mode
+in_val := /.*/ ~/ /
+
+pid := /[0-9]+  /
+
+syscall_name := /stat64/
+syscall_open := /\(/
+syscall_close := /\)/
+syscall_equals := / = /
+syscall_return := /-|[0-9]/ /[0-9]*/
+
+
+param_sep := /, /
+
+// Param1 is a filename surrounded by quotes.
+param1 := /".*"/
+
+// Param2 is a structure surrounded by curly-braces.  We simply echo anything
+// preceeding and following the st_mode field.  For st_mode we use param2_mode
+// to apply the mutation we want.
+param2 := /[{]/ /.*/ /st_mode=/ param2_mode /.*/ /[}]/
+
+// Matches EITHER a mode of the form S_IFREG or S_IFREG|DDD where D is a digit
+// in [0-9].  In the first case, we simply omit S_IFREG and write the value of
+// in_mode.  In the second, we push "|DDD" into oct_block, omit S_IFREG, and
+// then write in_mode followed by oct_block.
+param2_mode := (~/S_IFREG/ oct_block@/\|[0-9]+/ !in_mode !oct_block) | (~/S_IFREG/ !in_mode)
+

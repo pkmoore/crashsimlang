@@ -1,0 +1,8 @@
+main := area num
+area := "(" digit{3} ")"
+num := front "-" back
+front := digit{3}
+back := digit{4}
+digit := /[0-9]/
+
+

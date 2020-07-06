@@ -1,0 +1,23 @@
+// Matches stat64 lines similar to the following
+// 3638  time(NULL) = 1522699410
+
+// top level symbol.  Captures value to be substituted in for S_IFREG as the
+// first token coming in from the input line.
+main := in_time@in_val pid time_open /NULL/ time_close syscall_return /\n/
+
+// symbol for "initializing" the register containing our desired mode
+// NOTE: We have to use a hardcoded value here rather than subtracting based off
+// of original time value
+in_val := /.*/ ~/ /
+
+pid := /[0-9]+  /
+
+time_open := /time\(/
+time_close := /\) = /
+
+// NOTE: Because we are mutating the return value, we do not want to match
+// negative return values here as these indicate failed calls
+// We match the existing successful return value, omit it, and write the value
+// of in_time
+syscall_return := ~/[0-9]+/ !in_time
+

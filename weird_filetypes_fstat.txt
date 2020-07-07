@@ -37,5 +37,5 @@ fstat[T, T](!fd, ?stat_mode);
 
 Mutator
 =======
-open(!pathname, !fd);               #unchanged 
-fstat(!fd, stat_mode &= S_IFLNK );  #stat_mode modified
+open[T](!pathname, !fd);               #unchanged 
+fstat[T,T](!fd, stat_mode &= S_IFLNK );  #stat_mode modified

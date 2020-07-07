@@ -25,7 +25,7 @@ Inspector/Trigger
 .*;
 ~open[T](?pathname) 
 .*;
-(stat[T,T](!pathname, ?stat_mode) + (lstat[T,T](!pathname, ?stat_mode))
+(stat[T,T](!pathname, ?stat_mode) | (lstat[T,T](!pathname, ?stat_mode))
 .*;
 
 
@@ -33,5 +33,5 @@ Inspector/Trigger
 
 Mutator
 =======
-(stat(!pathname, st_mode=!stat_mode & S_IFLINK) + 
-    (lstat[T,T](!pathname, st_mode=!stat_mode & S_IFLINK)
+(stat[T,T](!pathname, st_mode=!stat_mode & S_IFLINK)) | 
+    (lstat[T,T](!pathname, st_mode=!stat_mode & S_IFLINK))

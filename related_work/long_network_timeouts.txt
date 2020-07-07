@@ -1,36 +1,39 @@
 Long Network Timeouts (Simple)
 ================================
+# Find socket system calls that do not attempt to perform any sort of timeout check 
+# via the poll, select or setsockopt system calls.
 
 Preamble
+========
 
-socket(...) = $sock ->
-s[$sock != -1]($sock)
+socket(...) = $socket_fd ->
+   socket[$socket_fd != -1]($socket_fd)
 
-connect($sock, ...) -> $res
-c[$res != -1]($sock)
+connect($socket_fd, ...) = $connect_return_value ->
+   connect[$connect_return_value != -1]($socket_fd)
 
-poll([{fd=$desc, ...}], ..., $timeout) = $res ->
-poll[$res != 0, $timeout != NULL]($desc, $timeout)
-
-
-Register Initialization
-
+poll(pollfd{fd=$socket_fd, ...}, ..., $timeout) = $poll_return_value ->
+   poll[$poll_return_value != 0, $timeout != NULL]($desc, $timeout)
 
 
 
 
 Inspector
-
+=========
 # Note repetition of .*; poll(xxx).  This is to capture ALL
-# of the poll calls we are interested in so we can modify them all
+# of the poll system calls we are interested in so we can modify them all
 
-.*; s[T](?sock); .* c[T](!sock); (.*; poll[T,T](!sock, ?timeout))+
+.*; 
+socket[T](?socket_fd); 
+.* 
+connect[T](!socket_fd); 
+(.*; poll[T,T](!socket_fd, ?timeout);)+
 
 
 
 
 Mutator
-
+=======
 # Specify expressions to modify stored register values here 
 
 # Timeout variable doubles as an output variable for
@@ -39,5 +42,7 @@ timeout == 1
 
 
 # ! is used to write out values from register rather than matching
-s[T](?sock); .*; c[T](!sock); (.*; poll[T,T](!sock, !timeout))+
+socket[T](?sock);  # unchanged
+connect[T](!sock); # unchanged
+(.*; poll[T,T](!sock, !timeout))+
 

@@ -5,49 +5,51 @@ Long Network Timeouts (Simple - Indefinitely Waiting on Socket)
 # or select system call (by passing a NULL timeout -> yields infinite timeout)
 # For the select system call we only match on the read file descriptor array
 
+# Note we will likely need to augment the register automata with iterative pattern matching
+# or string pattern matching to be able to find the socket's file descriptor in the list 
+# of file descriptors passed to either poll or select system calls.
+
 Preamble
 ========
 
 socket(...) = $socket_fd ->
    socket[$socket_fd != -1]($socket_fd)
 
-connect($socket_fd, ...) = $connect_return_value ->
-   connect[$connect_return_value != -1]($socket_fd)
+connect($fd, ...) = $connect_return_value ->
+   connect[$connect_return_value != -1]($fd)
 
 poll($pollfd, $nfds, $timeout) = $poll_return_value ->
-   poll[exists x in $nfds such that $pollfd[x]->fd=$socket_fd, $poll_return_value != 0, $timeout < 0]($socket_fd)
+   poll[exists x in $nfds such that $pollfd[x]->fd==$socket_fd, $poll_return_value != -1, $timeout < 0]($poll_fd)
 
-select($nfds,$readfds,...,...,$timeout) ->
-   select[exists x in $nfds such that readfds[x]->fd=$socket_fd, $timeout==NULL]($socket_fd)
+select($nfds, $readfds,...,...,$timeout) = $select_return_value ->
+   select[exists x in $nfds such that $readfds[x]->fd=$socket_fd, $select_return_value != -1 $timeout==NULL]($readfds)
 
+read($fd,...,...) = read_return_value ->
+   read[read_return_value != -1]($fd)
 
+recv($sockfd,...,...,...) = $recv_return_value ->
+   recv[$recv_return_value != -1]($sockfd)
+
+recvfrom($sockfd,...,...,...,...,...) = $recvfrom_return_value ->
+   recvfrom[$recvfrom_return_value != -1]($sockfd)
+
+recvmsg($sockfd, ..., ...) = recvmsg_return_value ->
+   recvmsg[$recvmsg_return_value != -1]($sockfd)
 
 
 Inspector
 =========
-# Note repetition of .*; poll(xxx).  This is to capture ALL
-# of the poll system calls we are interested in so we can modify them all
-
 .*; 
 socket[T](?socket_fd); 
 .* 
-connect[T](!socket_fd); 
-(.*; (poll[T,T](!socket_fd) | select[T,T] (!socket_fd);))+
-
+connect[T](!socket_fd);
+.*; 
+(poll[T,T,T](!".*socket_fd.*"); | select[T,T,T] (!".*socket_fd.*");) .*;)+
+.*
+(read(!socket_fd); | recv(!socket_fd); | recvfrom(!socket_fd); | recvmsg(!socket_fd))  
 
 
 
 Mutator
 =======
-# Specify expressions to modify stored register values here 
-
-# Timeout variable doubles as an output variable for
-# (timeout - time spent waiting)
-timeout == 1
-
-
-# ! is used to write out values from register rather than matching
-socket[T](?sock);  # unchanged
-connect[T](!sock); # unchanged
-(.*; poll[T,T](!sock, !timeout))+
-
+Null Mutator - socket is vulnerable to long network timeout

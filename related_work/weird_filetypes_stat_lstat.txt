@@ -17,14 +17,19 @@ open($pathname, ...) = $fd ->
 
     open[$fd>=0]($pathname, $fd)
 
+openat(..., $pathname, flags=O_RDONLY) = $fd ->
+    openat[$fd>=0]($pathname,$fd)
+
 
 
 
 Inspector/Trigger
 =================
 .*;
-~open[T](?pathname) 
-.*;
+~(open[T](?pathname,?fd); | openat[T](?pathname,?fd);)
+
+(~close[T](!fd);)*
+
 (stat[T,T](!pathname, ?stat_mode) | (lstat[T,T](!pathname, ?stat_mode))
 .*;
 

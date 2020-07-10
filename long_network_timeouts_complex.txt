@@ -1,9 +1,6 @@
-Long Network Timeouts (Simple - Indefinitely Waiting on Socket)
+Long Network Timeouts (Complex - Modifying the timeout)
 ================================================================
-# Find socket system calls that wait indefinitely on a socket by utilizing the 
-# the poll system call (by passing a negative timeout -> yields infinite timeout)
-# or select system call (by passing a NULL timeout -> yields infinite timeout)
-# For the select system call we only match on the read file descriptor array
+
 
 Preamble
 ========

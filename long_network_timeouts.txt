@@ -36,16 +36,26 @@ recvfrom($sockfd,...,...,...,...,...) = $recvfrom_return_value ->
 recvmsg($sockfd, ..., ...) = recvmsg_return_value ->
    recvmsg[$recvmsg_return_value != -1]($sockfd)
 
+close($fd) = $close_return_value ->
+      close[$close_return_value == 0]($fd)
+
+
 
 Inspector
 =========
 .*; 
 socket[T](?socket_fd); 
-.* 
+
+(~close[T](!socket_fd);)*
+
 connect[T](!socket_fd);
-.*; 
+
+(~close[T](!socket_fd);)*
+
 (poll[T,T,T](!".*socket_fd.*"); | select[T,T,T] (!".*socket_fd.*");) .*;)+
-.*
+
+(~close[T](!socket_fd);)* 
+
 (read(!socket_fd); | recv(!socket_fd); | recvfrom(!socket_fd); | recvmsg(!socket_fd))  
 
 

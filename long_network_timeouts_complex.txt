@@ -1,6 +1,14 @@
 Long Network Timeouts (Complex - Modifying the timeout)
 ================================================================
+Find all select system calls that wait on a read socket desciptor for more than 1 minute - but does not specify infinite wait (that is the simple network timeout).
 
+Note poll system call does not modify the timeout argument. ppoll system call does but the man page states the following:
+   The Linux ppoll() system call modifies its tmo_p argument.  However,
+   the glibc wrapper function hides this behavior by using a local
+   variable for the timeout argument that is passed to the system call.
+   Thus, the glibc ppoll() function does not modify its tmo_p argument.
+
+On return only select (not pselect) modifies the timeout data that corresponds to the timeout reference. Note the man page states that most other (non-Linux) implementations of select do NOT modify timeout.
 
 # Note we will likely need to augment the register automata with iterative pattern matching
 # or string pattern matching to be able to find the socket's file descriptor in the list 
@@ -15,11 +23,13 @@ socket(...) = $socket_fd ->
 connect($fd, ...) = $connect_return_value ->
    connect[$connect_return_value != -1]($fd)
 
-poll($pollfd, $nfds, $timeout) = $poll_return_value ->
-   poll[exists x in $nfds such that $pollfd[x]->fd==$socket_fd, $poll_return_value != -1, $timeout < 0]($poll_fd)
-
 select($nfds, $readfds,...,...,$timeout) = $select_return_value ->
-   select[exists x in $nfds such that $readfds[x]->fd=$socket_fd, $select_return_value != -1 $timeout==NULL]($readfds)
+   select[exists x in $nfds such that $readfds[x]->fd=$socket_fd, $select_return_value != -1, (($timeout->tv_sec)+($timeout->tv_usec*1000000))/60 >=1]($readfds, $timeout->tv_sec, $timeout_tv_usec)
+
+# Note that select modifies the file descriptor sets (readfds, etc). Therefore we should check the post-execution value of readfds rather than the argument passed to select.
+
+# Only interested in select calls where the timeout is >= 1 minute (but not infinite) hence the
+# predicate ($timeout->tv_sec)+($timeout->tv_usec*1000000))/60 >=1
 
 read($fd,...,...) = read_return_value ->
    read[read_return_value != -1]($fd)
@@ -33,20 +43,41 @@ recvfrom($sockfd,...,...,...,...,...) = $recvfrom_return_value ->
 recvmsg($sockfd, ..., ...) = recvmsg_return_value ->
    recvmsg[$recvmsg_return_value != -1]($sockfd)
 
+close($fd) = $close_return_value ->
+      close[$close_return_value == 0]($fd)
+
+recvfrom($sockfd,...,...,...,...,...) = $recvfrom_return_value ->
+   recvfrom[$recvfrom_return_value != -1]($sockfd)
+
+recvmsg($sockfd, ..., ...) = recvmsg_return_value ->
+   recvmsg[$recvmsg_return_value != -1]($sockfd)
+
 
 Inspector
 =========
 .*; 
 socket[T](?socket_fd); 
-.* 
-connect[T](!socket_fd);
-.*; 
-(poll[T,T,T](!".*socket_fd.*"); | select[T,T,T] (!".*socket_fd.*");) .*;)+
-.*
-(read(!socket_fd); | recv(!socket_fd); | recvfrom(!socket_fd); | recvmsg(!socket_fd))  
 
+(~close[T](!socket_fd);)*
+
+connect[T](!socket_fd);
+
+(
+   (~close[T](!socket_fd);)*
+
+Null Mutator - socket is vulnerable to long network timeout
+=======
+   (select[T,T,T] (!".*socket_fd.*",?timeout);
+
+   (~close[T](!socket_fd);)* 
+
+   (read(!socket_fd); | recv(!socket_fd); | recvfrom(!socket_fd); | recvmsg(!socket_fd))+  
+)+
+close[T](!socket_fd);
 
 
 Mutator
 =======
-Null Mutator - socket is vulnerable to long network timeout
+Only modify the select system calls timeout to 1 microsecond - indicating that the socket descriptor is available but required all but one microsecond of the timeout
+
+(select[T,T,T] (!".*socket_fd.*",!timeout->tv_sec=0, !timeout->tv_usec=1);

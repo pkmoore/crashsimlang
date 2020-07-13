@@ -1,0 +1,86 @@
+Long Network Timeouts - fnctl or setsockopt version
+================================================================
+# Find read-related system calls that wait indefinitely on a socket by utilizing the 
+# the poll system call (by passing a negative timeout -> yields infinite timeout)
+# or select system call (by passing a NULL timeout -> yields infinite timeout)
+# For the select system call we only match on the read file descriptor array
+
+# Note we will likely need to augment the register automata with iterative pattern matching
+# or string pattern matching to be able to find the socket's file descriptor in the list 
+# of file descriptors passed to either poll or select system calls.
+
+Preamble
+========
+
+socket(...,$type,....) = $socket_fd ->
+   socket[$type & SOCK_NONBLOCK == 0, $socket_fd != -1]($socket_fd)
+# check that socket was not previously set to nonblocking. SOCK_NONBLOCK is a Linux-specific flag
+
+connect($fd, ...) = $connect_return_value ->
+   connect[$connect_return_value != -1]($fd)
+
+fcntl($fd, $cmd, $arg) = $fcntl_return_value ->
+   fcntl[$cmd=F_SETFL, $arg & O_NONBLOCK == 1, $fcntl_return_value != -1]($fd)
+
+setsockopt($socket, ..., $option_name,
+           $option_value, ...) = $setsockopt_return_value
+   setsockopt[$option_name & SO_RCVTIMEO == 1, ($option_value->tv_sec + $option_value->tv_usec * 1000000)/60<=1,$setsockopt_return_value != -1]($socket)
+
+# if timeval struct specifies, in setsockopt, specifies a timeval timeout value >=1 we may wish to
+# consider the associated read as a vulnerability.
+
+poll($fds, $nfds, $timeout) = $poll_return_value ->
+   poll[exists x in $nfds such that $fds[x]->fd==$socket_fd and fds[x]->revents & POLLIN >0 , $poll_return_value != -1, $timeout < 0]($fds)
+
+ppoll($fds, $nfds, $tmo_p, ...) = $ppoll_return_value ->
+   ppoll[exists x in $nfds such that $fds[x]->fd==$socket_fd and fds[x]->revents & POLLIN >0 , $ppoll_return_value != -1, $tmo_p==NULL]($fds)
+
+select($nfds, $readfds, ..., ..., $timeout) = $select_return_value ->
+   select[exists x in $nfds such that $readfds[x]->fd=$socket_fd, $select_return_value != -1, $timeout==NULL]($readfds)
+
+pselect($nfds, $readfds, ..., ..., $timeout, ...) = $pselect_return_value ->
+   pselect[exists x in $nfds such that $readfds[x]->fd=$socket_fd, $pselect_return_value != -1 $timeout==NULL]($readfds)
+
+# Note that select and pselect modifies the file descriptor sets (readfds, etc). Therefore we should check the post-execution value of readfds rather than the argument passed to select.
+
+read($fd,...,...) = read_return_value ->
+   read[read_return_value != -1]($fd)
+
+recv($sockfd,...,...,...) = $recv_return_value ->
+   recv[$recv_return_value != -1]($sockfd)
+
+recvfrom($sockfd,...,...,...,...,...) = $recvfrom_return_value ->
+   recvfrom[$recvfrom_return_value != -1]($sockfd)
+
+recvmsg($sockfd, ..., ...) = recvmsg_return_value ->
+   recvmsg[$recvmsg_return_value != -1]($sockfd)
+
+close($fd) = $close_return_value ->
+      close[$close_return_value == 0]($fd)
+
+
+
+Inspector
+=========
+.*; 
+socket[T,T](?socket_fd); 
+
+(~(close[T](!socket_fd); | fcntl[T,T,T](!socket_fd) | setsockopt[T,T,T](!socket_fd));)*
+
+connect[T](!socket_fd);
+
+(
+
+   (~(close[T](!socket_fd); | fcntl[T,T,T](!socket_fd); | setsockopt[T,T,T](!socket_fd));)*
+
+   (~(poll[T,T,T](!".*socket_fd.*"); | select[T,T,T] (!".*socket_fd.*"); | ppoll[T,T,T](!".*socket_fd.*"); | pselect[T,T,T] (!".*socket_fd.*");) .*;)+
+
+   (read(!socket_fd); | recv(!socket_fd); | recvfrom(!socket_fd); | recvmsg(!socket_fd))+
+)+
+
+close[T](!socket_fd);
+
+
+Mutator
+=======
+Null Mutator - socket is vulnerable to long network timeout

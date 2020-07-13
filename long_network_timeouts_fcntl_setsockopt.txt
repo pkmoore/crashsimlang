@@ -1,4 +1,4 @@
-Long Network Timeouts (Simple - Indefinitely Waiting on Socket)
+Long Network Timeouts - fnctl or setsockopt version
 ================================================================
 # Find read-related system calls that wait indefinitely on a socket by utilizing the 
 # the poll system call (by passing a negative timeout -> yields infinite timeout)
@@ -12,11 +12,22 @@ Long Network Timeouts (Simple - Indefinitely Waiting on Socket)
 Preamble
 ========
 
-socket(...) = $socket_fd ->
-   socket[$socket_fd != -1]($socket_fd)
+socket(...,$type,....) = $socket_fd ->
+   socket[$type & SOCK_NONBLOCK == 0, $socket_fd != -1]($socket_fd)
+# check that socket was not previously set to nonblocking. SOCK_NONBLOCK is a Linux-specific flag
 
 connect($fd, ...) = $connect_return_value ->
    connect[$connect_return_value != -1]($fd)
+
+fcntl($fd, $cmd, $arg) = $fcntl_return_value ->
+   fcntl[$cmd=F_SETFL, $arg & O_NONBLOCK == 1, $fcntl_return_value != -1]($fd)
+
+setsockopt($socket, ..., $option_name,
+           $option_value, ...) = $setsockopt_return_value
+   setsockopt[$option_name & SO_RCVTIMEO == 1, ($option_value->tv_sec + $option_value->tv_usec * 1000000)/60<=1,$setsockopt_return_value != -1]($socket)
+
+# if timeval struct specifies, in setsockopt, specifies a timeval timeout value >=1 we may wish to
+# consider the associated read as a vulnerability.
 
 poll($fds, $nfds, $timeout) = $poll_return_value ->
    poll[exists x in $nfds such that $fds[x]->fd==$socket_fd and fds[x]->revents & POLLIN >0 , $poll_return_value != -1, $timeout < 0]($fds)
@@ -52,19 +63,17 @@ close($fd) = $close_return_value ->
 Inspector
 =========
 .*; 
-socket[T](?socket_fd); 
+socket[T,T](?socket_fd); 
 
-(~close[T](!socket_fd);)*
+(~(close[T](!socket_fd); | fcntl[T,T,T](!socket_fd) | setsockopt[T,T,T](!socket_fd));)*
 
 connect[T](!socket_fd);
 
 (
 
-   (~close[T](!socket_fd);)*
+   (~(close[T](!socket_fd); | fcntl[T,T,T](!socket_fd); | setsockopt[T,T,T](!socket_fd));)*
 
-   ((poll[T,T,T](!".*socket_fd.*"); | select[T,T,T] (!".*socket_fd.*"); | ppoll[T,T,T](!".*socket_fd.*"); | pselect[T,T,T] (!".*socket_fd.*");) .*;)+
-
-   (~close[T](!socket_fd);)* 
+   (~(poll[T,T,T](!".*socket_fd.*"); | select[T,T,T] (!".*socket_fd.*"); | ppoll[T,T,T](!".*socket_fd.*"); | pselect[T,T,T] (!".*socket_fd.*");) .*;)+
 
    (read(!socket_fd); | recv(!socket_fd); | recvfrom(!socket_fd); | recvmsg(!socket_fd))+
 )+

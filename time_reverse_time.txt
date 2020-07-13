@@ -1,33 +1,29 @@
 Reverse Time
-================================
+============
+Modify the time returned by time-related system calls time and gettimeofday.
+
 
 Preamble
+==========================
 
-time(NULL) = $time ->
-t_n[$time != -1]($time)
-
-time($p_time) = $time ->
-t_p[$time != -1, $ptime != -1]($time, $ptime)
+time($tloc) = $time_return_value ->
+   time[$time_return_value!=-1]($time_return_value)
 
 
-
-
-Register Initialization
-
-None
+gettimeofday($tv, ...) = $gettimeofday_return_value ->
+   gettimeofday[gettimeofday_return_value==0]($tv->tv_sec)
 
 
 
 Inspector
-
-.*; (t_n[T](!time) | t_p[T,T](!time,!ptime))
+=========
+.*; (time[T](?time); | gettimeofday[T](?tv->tv_sec))+
 
 
 Mutator
-
+=======
 # Specify expressions to modify stored register values here
-time -= 100
-ptime -= 100
+$time -= 100
+$tv->tv_sec -= 100
 
-# ! is used to write out values from register rather than matching
-t_n(!time) | t_p(!time,!ptime)
+(time($time) | gettimeofday($tv->tv_sec))+

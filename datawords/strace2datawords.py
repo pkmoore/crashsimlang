@@ -27,6 +27,33 @@ class DataWord:
     return tmp
 
 
+  def get_mutated_strace(self):
+    tmp = ''
+    tmp += self.original_system_call.pid
+    tmp += '  '
+    tmp += self.original_system_call.name
+    tmp += '('
+
+    coalesced_args = [str(v) for v in list(self.original_system_call.args)]
+    args_without_name = [v for k, v in self.captured_arguments.iteritems()]
+    modified_ret = None
+    for i in args_without_name:
+      if i["arg_pos"] == "ret":
+        modified_ret = i
+        continue
+      coalesced_args[i["arg_pos"]] = i["value"].value
+    tmp += ', '.join(coalesced_args)
+    tmp += ')'
+    tmp += '  =  '
+
+    if modified_ret:
+      tmp += str(i["value"])
+    else:
+      tmp += str(self.original_system_call.ret[0])
+
+    return tmp
+
+
 
 
 class Preamble:
@@ -72,6 +99,7 @@ class Preamble:
 
 
 
+
 if __name__ == "__main__":
   t = Trace.Trace(sys.argv[1], "./syscall_definitions.pickle")
 
@@ -83,5 +111,6 @@ if __name__ == "__main__":
   pre.capture("read", "result", "ret")
 
   for i in t.syscalls:
-    print(pre.handle_syscall(i).captured_arguments)
+    print(pre.handle_syscall(i).get_dataword())
+    print(pre.handle_syscall(i).get_mutated_strace())
 

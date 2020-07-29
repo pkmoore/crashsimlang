@@ -1,9 +1,9 @@
-35388 open("test1.txt", O_RDONLY, 0) = 3
+35388 open("test.txt", O_RDONLY, 0) = 3
 35388 open("test2.txt", O_RDONLY, 0) = 4
 35388 open("test3.txt", O_RDONLY, 0) = 5
 35388 open("test4.txt", O_RDONLY, 0) = 6
-35388 open("test5.txt", O_RDONLY, 0) = 7
-35388 open("test6.txt", O_RDONLY, 0) = 8
+35388 open("test5.txt", O_RDONLY|O_WRONLY, 0) = 7
+35388 open("test6.txt", O_RDONLY|0644, 0) = 8
 35388 open("test7.txt", O_RDONLY, 0) = 9
 35388 open("test8.txt", O_RDONLY, 0) = 10
 35388 read(3, "test data\n", 128) = 10

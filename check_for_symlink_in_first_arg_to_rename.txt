@@ -1,0 +1,57 @@
+Rename Symlink to the file it is pointing to
+=============================================
+
+/********
+Check if it is possible for a symbolic link to be renamed to the file it points to - eg. rename("file.lnk","file")
+where "file.lnk" is a symbolic link to "file". This create a circular link - the rename system call does not follow links and would, after the rename system call, point to itself. 
+
+Note that the following system call rename("file", "file.lnk") is fine as "file.lnk" will cease
+be a symbolic link (it will be overwritten) assuming "file" was not itself a symbolic link.
+
+We may want to check that the "file" (first argument of rename) 
+is not the argument to an open system call that creates the "file" argument - hence
+it is obviously not a symbolic link. But leaving this out allows us to check for
+possible TOCTOU attack on the "file" argument.
+
+We first search for an lstat on the first argument of a rename system call - if none
+then program likely vulnerable to this anonmaly.
+********/
+
+Preamble
+========
+lstat($pathname, stat{..., st_ino=$stat_ino, st_mode=$stat_mode, ...}) = $lstat_return_value ->
+
+    lstat[$stat_mode & S_IFMT == S_IFLNK, $lstat_return_value == 0])($pathname, $stat_ino,$system_call_num)
+
+stat($pathname, stat{..., st_ino=$stat_ino, st_mode=$stat_mode, ...}) = $stat_return_value ->
+
+    stat[$stat_return_value == 0])($pathname, $stat_ino)
+
+rename($oldpath, $newpath) = $rename_return_value ->
+    rename[$rename_return_value==0]
+
+
+
+
+Inspector/Trigger
+=================
+# Check if first argument to lstat is not a sym link - if not we will mutate it
+.*;
+lstat[F,T](?oldpath,?inode,?system_call_num)
+.*;
+rename[T](!oldpath, ?newpath)
+.*;
+
+
+Mutator
+=======
+# Change first lstat to lstat[T,T](!oldpath,!inode,!system_call_num)
+
+
+Recognizer
+==========
+(lstat[T,T](!oldpath, !inode, !system_call_num);
+stat[T](!oldpath,?inode_old_path);
+stat[T](!newpath,?inode_new_path);) - any permutation of this is allowed.
+
+~rename()  #this is probably not needed since we are not modifying the inodes to simulate the condition

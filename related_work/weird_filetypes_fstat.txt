@@ -6,6 +6,14 @@ Weird Filetypes (fstat())
 # A close system call on the open's file descriptor cannot be between open
 # and fstat system calls.
 
+# Note that the open (and openat) system call always follows the symlink unless
+# O_NOFOLLOW or O_EXCL | O_CREAT specified
+# so the $fd (file descriptor) given to fstat will be the actual file (not the link)
+# 
+# This current test may not be useful as changing the fstat to a link in this context
+# may not make sense - perhaps replace fstat with lstat instead? It is also not clear
+# what to code for the recognizer.
+
 Preamble
 ========
 open($pathname, flags=O_RDONLY) = $fd ->

@@ -1,5 +1,7 @@
 from __future__ import print_function
 import sys
+import pickle
+import os
 
 from posix_omni_parser import Trace
 
@@ -101,6 +103,10 @@ class Preamble:
 
 
 if __name__ == "__main__":
+  strace_path_base = os.path.basename(sys.argv[1])
+  datawords_path = strace_path_base + ".dw"
+  pickle_path = strace_path_base + ".pickle"
+
   t = Trace.Trace(sys.argv[1], "./syscall_definitions.pickle")
 
   pre = Preamble()
@@ -110,7 +116,12 @@ if __name__ == "__main__":
   pre.predicate("read", lambda args: args["result"]["value"] == 10)
   pre.capture("read", "result", "ret")
 
-  for i in t.syscalls:
-    print(pre.handle_syscall(i).get_dataword())
-    print(pre.handle_syscall(i).get_mutated_strace())
+  datawords = []
+  with open(datawords_path, "w") as f:
+    for i in t.syscalls:
+      d = pre.handle_syscall(i)
+      f.write(d.get_dataword() + "\n")
+      datawords.append(d)
 
+  with open(pickle_path, "w") as f:
+    pickle.dump(datawords, f)

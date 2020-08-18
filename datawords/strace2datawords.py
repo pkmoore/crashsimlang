@@ -103,7 +103,7 @@ class Preamble:
 
 
 if __name__ == "__main__":
-  strace_path_base = os.path.basename(sys.argv[1])
+  strace_path_base = os.path.splitext(os.path.basename(sys.argv[1]))[0]
   datawords_path = strace_path_base + ".dw"
   pickle_path = strace_path_base + ".pickle"
 

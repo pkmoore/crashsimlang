@@ -83,8 +83,9 @@ class Preamble:
 
 
   def _apply_predicates(self):
-    for i in self.predicates[self._current_syscall.name]:
-      self._current_predicate_results.append(i(self._current_captured_args))
+    if self._current_syscall.name in self.predicates:
+      for i in self.predicates[self._current_syscall.name]:
+        self._current_predicate_results.append(i(self._current_captured_args))
 
 
   def _capture_args(self):

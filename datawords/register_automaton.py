@@ -16,20 +16,22 @@ class RegisterAutomaton:
 
 
   def match(self, incoming_dataword):
-    self.states[self.current_state].match(incoming_dataword)
+    to_state = self.states[self.current_state].match(incoming_dataword)
+    if to_state != -1:
+      self.current_state = to_state
 
 
 class State:
-  def __init__(self, name, index):
+  def __init__(self, name):
     self.name = name
-    self.index = index
     self.transitions = []
 
   def match(self, incoming_dataword):
     for i in self.transitions:
-      if i.match(incoming_dataword):
-        return True
-    return False
+      to_state = i.match(incoming_dataword)
+      if to_state != -1:
+        return to_state
+    return -1
 
   def __str__(self):
     tmp = ""
@@ -40,19 +42,21 @@ class State:
 
 
 class Transition:
-  def __init__(self, dataword_name):
+  def __init__(self, dataword_name, to_state):
     self.dataword_name = dataword_name
     self.register_requirements = {}
+    self.to_state = str(to_state)
 
   def __str__(self):
     tmp = ""
     tmp += "        dataword_name: " + self.dataword_name + "\n"
+    tmp += "        to_state: " + self.to_state + "\n"
     return tmp
 
   def match(self, current_dataword):
     if current_dataword.name == self.dataword_name:
-      return True
-    return False
+      return self.to_state
+    return -1
 
 
 # Matching with no registers -> Does the current data word name match the data

@@ -8,11 +8,16 @@ from posix_omni_parser import Trace
 
 
 
+
 class DataWord:
   def __init__(self, system_call, captured_arguments, predicate_results):
     self.original_system_call = system_call
     self.captured_arguments = captured_arguments
     self.predicate_results = predicate_results
+
+
+  def get_name(self):
+    return self.get_dataword().rsplit(']', 1)[1].split("(")[0]
 
 
   def get_dataword(self):

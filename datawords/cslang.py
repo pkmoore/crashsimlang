@@ -62,7 +62,7 @@ def p_dataword(p):
   # We encountered a new dataword so we make a new state
   automaton.states.append(State(p[1]))
   # We create a transition to this state on the previous state
-  automaton.states[-2].transitions.append(Transition(p[1]))
+  automaton.states[-2].transitions.append(Transition(p[1], len(automaton.states) - 1))
 
 
 def p_parameterlist(p):

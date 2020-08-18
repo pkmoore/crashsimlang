@@ -49,7 +49,7 @@ def p_expression(p):
 
 
 def p_registerassignment(p):
-  ''' registerassignment : IDENTIFIER ASSIGN  parameter
+  ''' registerassignment : IDENTIFIER ASSIGN parameter
   '''
 
   automaton.registers[p[1]] = p[3]

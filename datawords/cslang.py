@@ -59,10 +59,41 @@ def p_dataword(p):
   ''' dataword : IDENTIFIER LPAREN parameterlist RPAREN
   '''
 
+  register_matches = []
+  register_stores = []
+  for i, v in enumerate(p[3]):
+    if v[0] == "?":
+      # When we see the "?" operator it means in order to get into this state,
+      # the register name following "?" needs to have the same value as the
+      # captured argument in the same position in the data word.  For example:
+      #
+      # open(?filedesc);
+      #
+      # means that in order to transition to the next state, the current
+      # dataword must represent an open system call with captured argument 0
+      # matching the value in the filedesc register.  Captured argument order
+      # is important and comes from the order the captures are specified in the
+      # preamble
+      register_matches.append((i, v[1:]))
+    if v[0] == "!":
+
+
+      # When we see "!" it means take the value from the captured argument
+      # corresponding to this parameter's position in the current dataword and
+      # store it into the following register value.  We do this by specifying
+      # register_store tuple that looks like (<captured_arg_position>,
+      # <register_value>).  These register stores are performed whenever we
+      # transition into a new state so we give them to the new State being
+      # created below
+      register_stores.append((i, v[1:]))
+
   # We encountered a new dataword so we make a new state
-  automaton.states.append(State(p[1]))
+  automaton.states.append(State(p[1], register_stores=register_stores))
+
   # We create a transition to this state on the previous state
-  automaton.states[-2].transitions.append(Transition(p[1], len(automaton.states) - 1))
+  automaton.states[-2].transitions.append(Transition(p[1],
+                                          register_matches,
+                                          len(automaton.states) - 1))
 
 
 def p_parameterlist(p):

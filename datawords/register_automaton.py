@@ -16,22 +16,33 @@ class RegisterAutomaton:
 
 
   def match(self, incoming_dataword):
-    to_state = self.states[self.current_state].match(incoming_dataword)
+    to_state = self.states[self.current_state].match(incoming_dataword, self.registers)
     if to_state != -1:
       self.current_state = to_state
+      # We've moved into a new state so we need to "enter" it.
+      # This executes the register store operations required by the new state
+      self.states[self.current_state].enter(incoming_dataword, self.registers)
 
 
 class State:
-  def __init__(self, name):
+  def __init__(self, name, transitions=[], register_stores=[]):
     self.name = name
-    self.transitions = []
+    self.transitions = transitions
+    self.register_stores = register_stores
 
-  def match(self, incoming_dataword):
+  def match(self, incoming_dataword, registers):
     for i in self.transitions:
-      to_state = i.match(incoming_dataword)
+      to_state = i.match(incoming_dataword, registers)
       if to_state != -1:
         return to_state
     return -1
+
+  def enter(self, incoming_dataword, registers):
+    # incoming_dataword brought us into this state so its time to execute
+    # our register stores using the captured_arguments it contains
+    for i in self.register_stores:
+      cca = incoming_dataword.captured_arguments.items()[i[0]][1]
+      registers[i[1]] = str(cca["value"])
 
   def __str__(self):
     tmp = ""
@@ -42,21 +53,30 @@ class State:
 
 
 class Transition:
-  def __init__(self, dataword_name, to_state):
+  def __init__(self, dataword_name, register_matches, to_state):
     self.dataword_name = dataword_name
-    self.register_requirements = {}
+    self.register_matches = register_matches
     self.to_state = to_state
 
   def __str__(self):
     tmp = ""
     tmp += "        dataword_name: " + self.dataword_name + "\n"
+    tmp += "        register_matches: " + self.register_matches + "\n"
     tmp += "        to_state: " + str(self.to_state) + "\n"
     return tmp
 
-  def match(self, current_dataword):
-    if current_dataword.get_name() == self.dataword_name:
+  def match(self, current_dataword, registers):
+    if current_dataword.get_name() == self.dataword_name and self._pass_register_matches(current_dataword, registers):
       return self.to_state
     return -1
+
+  def _pass_register_matches(self, current_dataword, registers):
+    for i in self.register_matches:
+      cca = current_dataword.captured_arguments.items()[i[0]][1]
+      if str(cca["value"]) != registers[str(i[1])]:
+        print(str(cca["value"]) + "|" + registers[str(i[1])])
+        return False
+    return True
 
 
 # Matching with no registers -> Does the current data word name match the data

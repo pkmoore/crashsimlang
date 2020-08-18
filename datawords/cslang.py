@@ -1,6 +1,6 @@
 from ply import lex
-
 from ply import yacc
+import pickle
 
 class RegisterAutomaton:
   def __init__(self):
@@ -8,6 +8,7 @@ class RegisterAutomaton:
     self.states.append(State("startstate"))
     self.current_state = 0
     self.registers = {}
+
 
   def __str__(self):
     tmp = ""
@@ -144,8 +145,11 @@ def p_parameter(p):
 
 
 parser = yacc.yacc()
-parser.parse('reg1 <- flower; reg2 <- 3; open(!alpha); close(?alpha);')
-print(automaton)
+basename = os.path.basename(sys.argv[1])
+with open(sys.argv[1]), "r") as f:
+  parser.parse(f.read())
+with open(basename + ".auto", "w") as f:
+  pickle.dump(automaton, f)
 
 
 

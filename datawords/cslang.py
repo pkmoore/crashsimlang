@@ -27,7 +27,7 @@ t_ASSIGN = r"<-"
 t_RPAREN = r"\)"
 t_PARAMSEP = r",[\s]*"
 t_SEMI = r";"
-t_ignore = r" "
+t_ignore = " \t\n"
 
 def t_error(t):
   pass

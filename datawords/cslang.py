@@ -17,6 +17,11 @@ class RegisterAutomaton:
       tmp += "  State:\n" + str(i) + "\n"
     return tmp
 
+
+  def match(self, incoming_dataword):
+    self.states[self.current_state].match(incoming_dataword)
+
+
 class State:
   def __init__(self, name):
     self.name = name

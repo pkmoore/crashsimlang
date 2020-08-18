@@ -2,6 +2,7 @@ from __future__ import print_function
 import sys
 import pickle
 import os
+from collections import OrderedDict
 
 from posix_omni_parser import Trace
 
@@ -74,7 +75,7 @@ class Preamble:
 
   def handle_syscall(self, call):
     self._current_syscall = call
-    self._current_captured_args = {}
+    self._current_captured_args = OrderedDict()
     self._current_predicate_results = []
     self._capture_args()
     self._apply_predicates()

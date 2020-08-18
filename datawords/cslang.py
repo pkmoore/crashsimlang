@@ -32,6 +32,9 @@ t_ignore = " \t\n"
 def t_error(t):
   pass
 
+def t_COMMENT(t):
+  r'\#.*'
+
 lexer = lex.lex()
 
 automaton = RegisterAutomaton()

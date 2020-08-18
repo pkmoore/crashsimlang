@@ -45,16 +45,16 @@ class Transition:
   def __init__(self, dataword_name, to_state):
     self.dataword_name = dataword_name
     self.register_requirements = {}
-    self.to_state = str(to_state)
+    self.to_state = to_state
 
   def __str__(self):
     tmp = ""
     tmp += "        dataword_name: " + self.dataword_name + "\n"
-    tmp += "        to_state: " + self.to_state + "\n"
+    tmp += "        to_state: " + str(self.to_state) + "\n"
     return tmp
 
   def match(self, current_dataword):
-    if current_dataword.name == self.dataword_name:
+    if current_dataword.get_name() == self.dataword_name:
       return self.to_state
     return -1
 

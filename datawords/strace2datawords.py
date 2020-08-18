@@ -17,7 +17,7 @@ class DataWord:
 
 
   def get_name(self):
-    return self.get_dataword().rsplit(']', 1)[1].split("(")[0]
+    return self.original_system_call.name
 
 
   def get_dataword(self):

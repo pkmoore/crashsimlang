@@ -3,33 +3,57 @@ from ply import yacc
 from register_automaton import RegisterAutomaton
 from register_automaton import State
 from register_automaton import Transition
+from strace2datawords import Preamble
+from strace2datawords import DataWord
 import pickle
 import os
 import sys
 
 
+class CSlangError(Exception):
+  pass
 
-tokens = ("IDENTIFIER",
+
+reserved = {
+    'capture' : 'CAPTURE',
+    'as' : 'AS',
+    'ret' : 'RET'
+}
+
+tokens = ["IDENTIFIER",
           "LPAREN",
           "READOP",
           "WRITEOP",
           "ASSIGN",
+          "NUMERIC",
           "ASSIGNVALUE",
           "PARAMSEP",
           "RPAREN",
           "SEMI"
-)
+] + list(reserved.values())
 
-t_IDENTIFIER = r"[a-zA-Z0-9]+"
+
 t_LPAREN = r"\("
 t_READOP = r"\?"
 t_WRITEOP= r"\!"
 t_ASSIGN = r"<-"
+t_NUMERIC = r"[0-9][0-9]*"
 t_ASSIGNVALUE = "\".*\""
 t_RPAREN = r"\)"
 t_PARAMSEP = r",[\s]*"
 t_SEMI = r";"
 t_ignore = " \t\n"
+
+# We use a function to define this function for two reasons:
+# 1. Ply gives tokens defined by functions higher priority meaning this
+# rule will be used for ambiguous stuff that could be an identifier or
+# could be a keyword.
+# 2. We can define logic to figure out if something is a keyword rather
+# than an identifier and return the appropriate type
+def t_IDENTIFIER(t):
+  r"[A-Za-z_][a-zA-Z0-9]*"
+  t.type = reserved.get(t.value, 'IDENTIFIER')
+  return t
 
 def t_error(t):
   pass
@@ -40,9 +64,12 @@ def t_COMMENT(t):
 lexer = lex.lex()
 
 automaton = RegisterAutomaton()
+preamble = Preamble()
+in_preamble = True
 
 def p_error(p):
-  pass
+  print("Error with:")
+  print(p)
 
 def p_expressionlist(p):
   ''' expressionlist : expression  expressionlist
@@ -52,13 +79,33 @@ def p_expressionlist(p):
 def p_expression(p):
   ''' expression : dataword SEMI
                  | registerassignment SEMI
+                 | capturestmt SEMI
   '''
+
+
+def p_capturestmt(p):
+  ''' capturestmt : CAPTURE IDENTIFIER NUMERIC AS IDENTIFIER
+                  | CAPTURE IDENTIFIER RET AS IDENTIFIER
+  '''
+
+
+  global in_preamble
+  if in_preamble:
+    if p[3] == "ret":
+      preamble.capture(p[2], p[5], "ret")
+    else:
+      preamble.capture(p[2], p[5], p[3])
+  else:
+    raise CSlangError("Found preamble statement after preamble processing has ended")
 
 
 def p_registerassignment(p):
   ''' registerassignment : IDENTIFIER ASSIGN ASSIGNVALUE
   '''
 
+  global in_preamble
+  in_preamble = False
+  print(in_preamble)
   automaton.registers[p[1]] = p[3]
 
 
@@ -66,6 +113,8 @@ def p_dataword(p):
   ''' dataword : IDENTIFIER LPAREN parameterlist RPAREN
   '''
 
+  global in_preamble
+  in_preamble = False
   register_matches = []
   register_stores = []
   for i, v in enumerate(p[3]):

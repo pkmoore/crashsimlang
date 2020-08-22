@@ -14,6 +14,7 @@ tokens = ("IDENTIFIER",
           "READOP",
           "WRITEOP",
           "ASSIGN",
+          "ASSIGNVALUE",
           "PARAMSEP",
           "RPAREN",
           "SEMI"
@@ -24,6 +25,7 @@ t_LPAREN = r"\("
 t_READOP = r"\?"
 t_WRITEOP= r"\!"
 t_ASSIGN = r"<-"
+t_ASSIGNVALUE = "\".*\""
 t_RPAREN = r"\)"
 t_PARAMSEP = r",[\s]*"
 t_SEMI = r";"
@@ -39,20 +41,22 @@ lexer = lex.lex()
 
 automaton = RegisterAutomaton()
 
+def p_error(p):
+  pass
 
 def p_expressionlist(p):
-  ''' expressionlist : expression SEMI expressionlist
-                     | expression SEMI
+  ''' expressionlist : expression  expressionlist
+                     | expression
   '''
 
 def p_expression(p):
-  ''' expression : dataword
-                 | registerassignment
+  ''' expression : dataword SEMI
+                 | registerassignment SEMI
   '''
 
 
 def p_registerassignment(p):
-  ''' registerassignment : IDENTIFIER ASSIGN parameter
+  ''' registerassignment : IDENTIFIER ASSIGN ASSIGNVALUE
   '''
 
   automaton.registers[p[1]] = p[3]

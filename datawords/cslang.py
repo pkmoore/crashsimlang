@@ -16,6 +16,7 @@ class CSlangError(Exception):
 
 reserved = {
     'capture' : 'CAPTURE',
+    'predicate' : 'PREDICATE',
     'as' : 'AS',
     'ret' : 'RET'
 }
@@ -24,6 +25,7 @@ tokens = ["IDENTIFIER",
           "LPAREN",
           "READOP",
           "WRITEOP",
+          "EQUALSOP",
           "ASSIGN",
           "NUMERIC",
           "ASSIGNVALUE",
@@ -36,6 +38,7 @@ tokens = ["IDENTIFIER",
 t_LPAREN = r"\("
 t_READOP = r"\?"
 t_WRITEOP= r"\!"
+t_EQUALSOP = r"=="
 t_ASSIGN = r"<-"
 t_NUMERIC = r"[0-9][0-9]*"
 t_ASSIGNVALUE = "\".*\""
@@ -80,6 +83,7 @@ def p_expression(p):
   ''' expression : dataword SEMI
                  | registerassignment SEMI
                  | capturestmt SEMI
+                 | predicatestmt SEMI
   '''
 
 
@@ -96,7 +100,17 @@ def p_capturestmt(p):
     else:
       preamble.capture(p[2], p[5], p[3])
   else:
-    raise CSlangError("Found preamble statement after preamble processing has ended")
+    raise CSlangError("Found capture statement after preamble processing has ended")
+
+
+def p_predicatestmt(p):
+  ''' predicatestmt : PREDICATE IDENTIFIER IDENTIFIER EQUALSOP ASSIGNVALUE '''
+
+  global in_preamble
+  if in_preamble:
+    preamble.predicate(p[2], lambda args: args[p[3]]["value"].value == p[5])
+  else:
+    raise CSlangError("Found predicate statement after preamble processing has ended")
 
 
 def p_registerassignment(p):

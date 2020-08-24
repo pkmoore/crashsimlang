@@ -49,7 +49,7 @@ class DataWord:
       if i["arg_pos"] == "ret":
         modified_ret = i
         continue
-      coalesced_args[i["arg_pos"]] = i["value"].value
+      coalesced_args[int(i["arg_pos"])] = str(i["value"].value)
     tmp += ', '.join(coalesced_args)
     tmp += ')'
     tmp += '  =  '
@@ -92,7 +92,7 @@ class Preamble:
     for i in self.captures[self._current_syscall.name]:
       self._current_captured_args[i["arg_name"]] = {
         "arg_pos": i["arg_pos"],
-        "value": self._current_syscall.args[i["arg_pos"]] if i["arg_pos"] != "ret" else self._current_syscall.ret[0]}
+        "value": self._current_syscall.args[int(i["arg_pos"])] if i["arg_pos"] != "ret" else self._current_syscall.ret[0]}
 
 
   def capture(self, syscall_name, arg_name, arg_pos):
@@ -105,30 +105,3 @@ class Preamble:
     if syscall_name not in self.predicates:
       self.predicates[syscall_name] = []
     self.predicates[syscall_name].append(f)
-
-
-
-
-if __name__ == "__main__":
-  strace_path_base = os.path.splitext(os.path.basename(sys.argv[1]))[0]
-  datawords_path = strace_path_base + ".dw"
-  pickle_path = strace_path_base + ".pickle"
-
-  t = Trace.Trace(sys.argv[1], "./syscall_definitions.pickle")
-
-  pre = Preamble()
-  pre.predicate("open", lambda args: args["filename"]["value"].value == "\"test.txt\"")
-  pre.capture("open", "filename", 0)
-
-  pre.predicate("read", lambda args: args["result"]["value"] == 10)
-  pre.capture("read", "result", "ret")
-
-  datawords = []
-  with open(datawords_path, "w") as f:
-    for i in t.syscalls:
-      d = pre.handle_syscall(i)
-      f.write(d.get_dataword() + "\n")
-      datawords.append(d)
-
-  with open(pickle_path, "w") as f:
-    pickle.dump(datawords, f)

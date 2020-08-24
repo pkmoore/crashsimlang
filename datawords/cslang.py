@@ -5,6 +5,7 @@ from register_automaton import State
 from register_automaton import Transition
 from strace2datawords import Preamble
 from strace2datawords import DataWord
+from posix_omni_parser import Trace
 import pickle
 import os
 import sys
@@ -74,16 +75,16 @@ def p_error(p):
   print("Error with:")
   print(p)
 
-def p_expressionlist(p):
-  ''' expressionlist : expression  expressionlist
-                     | expression
+def p_statementlist(p):
+  ''' statementlist : statement  statementlist
+                    | statement
   '''
 
-def p_expression(p):
-  ''' expression : dataword SEMI
-                 | registerassignment SEMI
-                 | capturestmt SEMI
-                 | predicatestmt SEMI
+def p_statement(p):
+  ''' statement : dataword SEMI
+                | registerassignment SEMI
+                | capturestmt SEMI
+                | predicatestmt SEMI
   '''
 
 
@@ -103,12 +104,21 @@ def p_capturestmt(p):
     raise CSlangError("Found capture statement after preamble processing has ended")
 
 
+def p_expression(p):
+  ''' expression : IDENTIFIER EQUALSOP ASSIGNVALUE
+  '''
+
+  if p[2] == "==":
+    return lambda args: args[p[1]]["value"].value == p[3]
+
+
 def p_predicatestmt(p):
-  ''' predicatestmt : PREDICATE IDENTIFIER IDENTIFIER EQUALSOP ASSIGNVALUE '''
+  ''' predicatestmt : PREDICATE IDENTIFIER expression
+  '''
 
   global in_preamble
   if in_preamble:
-    preamble.predicate(p[2], lambda args: args[p[3]]["value"].value == p[5])
+    preamble.predicate(p[2], p[3])
   else:
     raise CSlangError("Found predicate statement after preamble processing has ended")
 
@@ -119,7 +129,6 @@ def p_registerassignment(p):
 
   global in_preamble
   in_preamble = False
-  print(in_preamble)
   automaton.registers[p[1]] = p[3]
 
 
@@ -191,9 +200,26 @@ def p_parameter(p):
 
 
 parser = yacc.yacc()
-basename = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 with open(sys.argv[1], "r") as f:
   parser.parse(f.read())
+
+basename = os.path.splitext(os.path.basename(sys.argv[1]))[0]
+strace_path = basename + ".strace"
+datawords_path = basename + ".dw"
+pickle_path = basename + ".pickle"
+
+t = Trace.Trace(strace_path, "./syscall_definitions.pickle")
+
+datawords = []
+with open(datawords_path, "w") as f:
+  for i in t.syscalls:
+    d = preamble.handle_syscall(i)
+    f.write(d.get_dataword() + "\n")
+    datawords.append(d)
+
+with open(pickle_path, "w") as f:
+  pickle.dump(datawords, f)
+
 with open(basename + ".auto", "w") as f:
   pickle.dump(automaton, f)
 

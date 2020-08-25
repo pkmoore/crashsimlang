@@ -89,10 +89,11 @@ class Preamble:
 
 
   def _capture_args(self):
-    for i in self.captures[self._current_syscall.name]:
-      self._current_captured_args[i["arg_name"]] = {
-        "arg_pos": i["arg_pos"],
-        "value": self._current_syscall.args[int(i["arg_pos"])] if i["arg_pos"] != "ret" else self._current_syscall.ret[0]}
+    if self._current_syscall.name in self.captures:
+      for i in self.captures[self._current_syscall.name]:
+        self._current_captured_args[i["arg_name"]] = {
+          "arg_pos": i["arg_pos"],
+          "value": self._current_syscall.args[int(i["arg_pos"])] if i["arg_pos"] != "ret" else self._current_syscall.ret[0]}
 
 
   def capture(self, syscall_name, arg_name, arg_pos):

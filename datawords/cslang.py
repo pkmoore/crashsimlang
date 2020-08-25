@@ -25,6 +25,7 @@ reserved = {
 tokens = ["IDENTIFIER",
           "LPAREN",
           "READOP",
+          "MATCHOP",
           "WRITEOP",
           "EQUALSOP",
           "ASSIGN",
@@ -38,11 +39,11 @@ tokens = ["IDENTIFIER",
 
 t_LPAREN = r"\("
 t_READOP = r"\?"
-t_WRITEOP= r"\!"
+t_MATCHOP = r"\!"
+t_WRITEOP = r"->"
 t_EQUALSOP = r"=="
 t_ASSIGN = r"<-"
 t_NUMERIC = r"[0-9][0-9]*"
-t_ASSIGNVALUE = "\".*\""
 t_RPAREN = r"\)"
 t_PARAMSEP = r",[\s]*"
 t_SEMI = r";"
@@ -57,6 +58,15 @@ t_ignore = " \t\n"
 def t_IDENTIFIER(t):
   r"[A-Za-z_][a-zA-Z0-9]*"
   t.type = reserved.get(t.value, 'IDENTIFIER')
+  return t
+
+def t_ASSIGNVALUE(t):
+  r"\".*\""
+  tmp = t.value
+  if tmp.startswith("\"") and tmp.endswith("\""):
+    tmp = tmp[1:-1]
+
+  t.value = tmp
   return t
 
 def t_error(t):
@@ -146,8 +156,9 @@ def p_dataword(p):
   in_preamble = False
   register_matches = []
   register_stores = []
+  register_writes = []
   for i, v in enumerate(p[3]):
-    if v[0] == "?":
+    if v.startswith("?"):
       # When we see the "?" operator it means in order to get into this state,
       # the register name following "?" needs to have the same value as the
       # captured argument in the same position in the data word.  For example:
@@ -160,9 +171,8 @@ def p_dataword(p):
       # is important and comes from the order the captures are specified in the
       # preamble
       register_matches.append((i, v[1:]))
-    if v[0] == "!":
 
-
+    if v.startswith("!"):
       # When we see "!" it means take the value from the captured argument
       # corresponding to this parameter's position in the current dataword and
       # store it into the following register value.  We do this by specifying
@@ -172,8 +182,13 @@ def p_dataword(p):
       # created below
       register_stores.append((i, v[1:]))
 
+    if v.startswith("->"):
+      register_writes.append((i, v[2:]))
+
   # We encountered a new dataword so we make a new state
-  automaton.states.append(State(p[1], register_stores=register_stores))
+  automaton.states.append(State(p[1],
+                          register_stores=register_stores,
+                          register_writes=register_writes))
 
   # We create a transition to this state on the previous state
   automaton.states[-2].transitions.append(Transition(p[1],
@@ -195,6 +210,7 @@ def p_parameterlist(p):
 
 def p_parameter(p):
   '''parameter : READOP IDENTIFIER
+               | MATCHOP IDENTIFIER
                | WRITEOP IDENTIFIER
                | IDENTIFIER
   '''

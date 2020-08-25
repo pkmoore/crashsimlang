@@ -25,10 +25,11 @@ class RegisterAutomaton:
 
 
 class State:
-  def __init__(self, name, transitions=[], register_stores=[]):
+  def __init__(self, name, transitions=[], register_stores=[], register_writes=[]):
     self.name = name
     self.transitions = transitions
     self.register_stores = register_stores
+    self.register_writes = register_writes
 
   def match(self, incoming_dataword, registers):
     for i in self.transitions:
@@ -43,6 +44,12 @@ class State:
     for i in self.register_stores:
       cca = incoming_dataword.captured_arguments.items()[i[0]][1]
       registers[i[1]] = str(cca["value"])
+
+    for i in self.register_writes:
+      cca = incoming_dataword
+      cca = incoming_dataword.captured_arguments.items()[i[0]][1]
+      cca["value"] = registers[i[1]]
+
 
   def __str__(self):
     tmp = ""

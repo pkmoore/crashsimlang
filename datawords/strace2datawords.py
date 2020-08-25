@@ -10,11 +10,15 @@ from posix_omni_parser import Trace
 
 
 
-class DataWord:
+class DataWord(object):
   def __init__(self, system_call, captured_arguments, predicate_results):
     self.original_system_call = system_call
     self.captured_arguments = captured_arguments
     self.predicate_results = predicate_results
+
+
+  def is_interesting(self):
+    return True
 
 
   def get_name(self):
@@ -64,6 +68,17 @@ class DataWord:
 
 
 
+
+class UninterestingDataWord(DataWord):
+  def __init__(self, system_call):
+    super(UninterestingDataWord, self).__init__(system_call, {}, [])
+
+  def is_interesting(self):
+    return False
+
+
+
+
 class Preamble:
   def __init__(self):
     self.predicates = {}
@@ -79,7 +94,12 @@ class Preamble:
     self._current_predicate_results = []
     self._capture_args()
     self._apply_predicates()
-    return DataWord(self._current_syscall, self._current_captured_args, self._current_predicate_results)
+    if len(self._current_captured_args) == 0:
+      # Right now, we define a system call we aren't interested in as
+      # any system call with no captured arguments
+      return UninterestingDataWord(self._current_syscall)
+    else:
+      return DataWord(self._current_syscall, self._current_captured_args, self._current_predicate_results)
 
 
   def _apply_predicates(self):

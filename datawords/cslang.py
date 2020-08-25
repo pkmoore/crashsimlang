@@ -5,6 +5,7 @@ from register_automaton import State
 from register_automaton import Transition
 from strace2datawords import Preamble
 from strace2datawords import DataWord
+from strace2datawords import UninterestingDataWord
 from posix_omni_parser import Trace
 import pickle
 import os

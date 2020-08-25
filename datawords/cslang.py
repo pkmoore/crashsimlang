@@ -109,7 +109,13 @@ def p_expression(p):
   '''
 
   if p[2] == "==":
-    return lambda args: args[p[1]]["value"].value == p[3]
+    # Form a closure over p[1] and p[3] using new names i and v so copies of these
+    # values are available when the predicate is called elsewhere during evaluation
+    i = p[1]
+    v = p[3]
+    def equalsexpression(args):
+      return args[i]["value"].value == v
+    p[0] = equalsexpression
 
 
 def p_predicatestmt(p):

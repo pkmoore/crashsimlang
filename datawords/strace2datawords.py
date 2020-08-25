@@ -61,7 +61,7 @@ class DataWord(object):
     if modified_ret:
       tmp += str(i["value"])
     else:
-      tmp += str(self.original_system_call.ret[0])
+      tmp += " ".join([str(x) for x in self.original_system_call.ret if x])
 
     return tmp
 

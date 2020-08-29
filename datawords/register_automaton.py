@@ -68,7 +68,7 @@ class Transition:
   def __str__(self):
     tmp = ""
     tmp += "        dataword_name: " + self.dataword_name + "\n"
-    tmp += "        register_matches: " + self.register_matches + "\n"
+    tmp += "        register_matches: " + str(self.register_matches) + "\n"
     tmp += "        to_state: " + str(self.to_state) + "\n"
     return tmp
 

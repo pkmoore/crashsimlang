@@ -26,7 +26,7 @@ reserved = {
 tokens = ["IDENTIFIER",
           "LPAREN",
           "READOP",
-          "MATCHOP",
+          "STOREOP",
           "WRITEOP",
           "EQUALSOP",
           "ASSIGN",
@@ -40,7 +40,7 @@ tokens = ["IDENTIFIER",
 
 t_LPAREN = r"\("
 t_READOP = r"\?"
-t_MATCHOP = r"\!"
+t_STOREOP = r"\!"
 t_WRITEOP = r"->"
 t_EQUALSOP = r"=="
 t_ASSIGN = r"<-"
@@ -211,7 +211,7 @@ def p_parameterlist(p):
 
 def p_parameter(p):
   '''parameter : READOP IDENTIFIER
-               | MATCHOP IDENTIFIER
+               | STOREOP IDENTIFIER
                | WRITEOP IDENTIFIER
                | IDENTIFIER
   '''

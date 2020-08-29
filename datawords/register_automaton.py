@@ -73,7 +73,11 @@ class Transition:
     return tmp
 
   def match(self, current_dataword, registers):
-    if current_dataword.get_name() == self.dataword_name and self._pass_register_matches(current_dataword, registers):
+    if self.dataword_name.startswith("NOT "):
+      matching_name = self.dataword_name[4:]
+    else:
+      matching_name = self.dataword_name
+    if current_dataword.get_name() == matching_name and self._pass_register_matches(current_dataword, registers):
       return self.to_state
     return -1
 

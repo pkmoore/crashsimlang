@@ -19,6 +19,7 @@ class CSlangError(Exception):
 reserved = {
     'capture' : 'CAPTURE',
     'predicate' : 'PREDICATE',
+    'NOT' : 'NOT',
     'as' : 'AS',
     'ret' : 'RET'
 }
@@ -150,15 +151,25 @@ def p_registerassignment(p):
 
 
 def p_dataword(p):
-  ''' dataword : IDENTIFIER LPAREN parameterlist RPAREN
+  ''' dataword : NOT IDENTIFIER LPAREN parameterlist RPAREN
+               | IDENTIFIER LPAREN parameterlist RPAREN
   '''
 
   global in_preamble
   in_preamble = False
+  if p[1] == "NOT":
+    not_dataword = True
+    syscall_name = p[2]
+    params = p[4]
+  else:
+    not_dataword = False
+    syscall_name = p[1]
+    params = p[3]
+
   register_matches = []
   register_stores = []
   register_writes = []
-  for i, v in enumerate(p[3]):
+  for i, v in enumerate(params):
     if v.startswith("?"):
       # When we see the "?" operator it means in order to get into this state,
       # the register name following "?" needs to have the same value as the
@@ -174,6 +185,8 @@ def p_dataword(p):
       register_matches.append((i, v[1:]))
 
     if v.startswith("!"):
+      if not_dataword:
+        raise CSlangError("Register stores are illegal in NOT datawords")
       # When we see "!" it means take the value from the captured argument
       # corresponding to this parameter's position in the current dataword and
       # store it into the following register value.  We do this by specifying
@@ -184,17 +197,40 @@ def p_dataword(p):
       register_stores.append((i, v[1:]))
 
     if v.startswith("->"):
+      if not_dataword:
+        raise CSlangError("Write operations are illegal in NOT datawords")
       register_writes.append((i, v[2:]))
 
-  # We encountered a new dataword so we make a new state
-  automaton.states.append(State(p[1],
-                          register_stores=register_stores,
-                          register_writes=register_writes))
+  if not_dataword:
+    #  This is a not dataword so we create our NOT state
+    automaton.states.append(State("NOT " + syscall_name, transitions=[]))
 
-  # We create a transition to this state on the previous state
-  automaton.states[-2].transitions.append(Transition(p[1],
-                                          register_matches,
-                                          len(automaton.states) - 1))
+    # And make a transition to it with appropriate register_matches
+    automaton.states[-2].transitions.append(Transition("NOT " + syscall_name,
+                                            register_matches,
+                                            len(automaton.states) - 1))
+
+  else:
+    # We encountered a new dataword so we make a new state
+    automaton.states.append(State(syscall_name,
+                            transitions=[],
+                            register_stores=register_stores,
+                            register_writes=register_writes))
+
+    # We create a transition to this state on the previous state
+
+    # The state we just added is in automaton.states[-1] so we need to start
+    # with automaton.states[-2] and keep searching back until we hit a non-NOT
+    # state.  This is the state to which we will add a transition to the new state
+    # we just added.
+
+    neg_index = -2
+    while automaton.states[neg_index].name.startswith("NOT"):
+      neg_index -= 1
+
+    automaton.states[neg_index].transitions.append(Transition(syscall_name,
+                                                              register_matches,
+                                                              len(automaton.states) - 1))
 
 
 def p_parameterlist(p):

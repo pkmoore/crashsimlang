@@ -203,17 +203,16 @@ def p_dataword(p):
 
   if not_dataword:
     #  This is a not dataword so we create our NOT state
-    automaton.states.append(State("NOT " + syscall_name, transitions=[]))
+    automaton.states.append(State(syscall_name, tags=["NOT"]))
 
     # And make a transition to it with appropriate register_matches
-    automaton.states[-2].transitions.append(Transition("NOT " + syscall_name,
+    automaton.states[-2].transitions.append(Transition(syscall_name,
                                             register_matches,
                                             len(automaton.states) - 1))
 
   else:
     # We encountered a new dataword so we make a new state
     automaton.states.append(State(syscall_name,
-                            transitions=[],
                             register_stores=register_stores,
                             register_writes=register_writes))
 
@@ -225,7 +224,7 @@ def p_dataword(p):
     # we just added.
 
     neg_index = -2
-    while automaton.states[neg_index].name.startswith("NOT"):
+    while "NOT" in automaton.states[neg_index].tags:
       neg_index -= 1
 
     automaton.states[neg_index].transitions.append(Transition(syscall_name,

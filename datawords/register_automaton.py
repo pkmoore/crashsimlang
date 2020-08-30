@@ -25,11 +25,12 @@ class RegisterAutomaton:
 
 
 class State:
-  def __init__(self, name, transitions=[], register_stores=[], register_writes=[]):
+  def __init__(self, name, transitions=None, register_stores=None, register_writes=None, tags=None):
     self.name = name
-    self.transitions = transitions
-    self.register_stores = register_stores
-    self.register_writes = register_writes
+    self.transitions = transitions if transitions is not None else []
+    self.register_stores = register_stores if register_stores is not None else []
+    self.register_writes = register_writes if register_writes is not None else []
+    self.tags = tags if tags is not None else []
 
   def match(self, incoming_dataword, registers):
     for i in self.transitions:
@@ -54,6 +55,10 @@ class State:
   def __str__(self):
     tmp = ""
     tmp += "    Name: " + self.name + "\n"
+    tmp += "    Tags: "
+    for i in self.tags:
+      tmp += i
+    tmp += "\n"
     for i in self.transitions:
       tmp += "      Transition:\n" + str(i) + "\n"
     return tmp
@@ -73,11 +78,7 @@ class Transition:
     return tmp
 
   def match(self, current_dataword, registers):
-    if self.dataword_name.startswith("NOT "):
-      matching_name = self.dataword_name[4:]
-    else:
-      matching_name = self.dataword_name
-    if current_dataword.get_name() == matching_name and self._pass_register_matches(current_dataword, registers):
+    if current_dataword.get_name() == self.dataword_name and self._pass_register_matches(current_dataword, registers):
       return self.to_state
     return -1
 

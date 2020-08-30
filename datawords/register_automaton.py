@@ -24,10 +24,15 @@ class RegisterAutomaton:
       self.states[self.current_state].enter(incoming_dataword, self.registers)
 
 
+  def is_accepting(self):
+    return self.states[self.current_state].is_accepting
+
+
 class State:
-  def __init__(self, name, transitions=None, register_stores=None, register_writes=None, tags=None):
+  def __init__(self, name, transitions=None, is_accepting=False, register_stores=None, register_writes=None, tags=None):
     self.name = name
     self.transitions = transitions if transitions is not None else []
+    self.is_accepting = is_accepting
     self.register_stores = register_stores if register_stores is not None else []
     self.register_writes = register_writes if register_writes is not None else []
     self.tags = tags if tags is not None else []

@@ -91,6 +91,7 @@ def p_statementlist(p):
   ''' statementlist : statement  statementlist
                     | statement
   '''
+  automaton.states[-1].is_accepting = True
 
 def p_statement(p):
   ''' statement : dataword SEMI

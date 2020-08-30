@@ -38,6 +38,9 @@ if __name__ == "__main__":
   # Some print goes here
   print("Automaton ended in state: " + str(automaton.current_state))
   print("With registers: " + str(automaton.registers))
+  print("Automaton is accepting: " + str(automaton.states[automaton.current_state].is_accepting))
+
+  print("Mutated strace: ")
 
   for i in dataword_objs:
     print(i.get_mutated_strace())

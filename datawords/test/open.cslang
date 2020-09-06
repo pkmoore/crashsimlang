@@ -1,0 +1,11 @@
+#
+capture open 0 as filename;
+capture open ret as filedesc;
+#predicate open filename == "test.txt";
+
+
+#
+## Match an open call, store the file name and returned file descriptors
+## to the 'filename' and 'filedesc' registers respectively
+#
+open(!filename, !filedesc);

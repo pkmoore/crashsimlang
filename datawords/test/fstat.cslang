@@ -1,0 +1,3 @@
+capture fstat 1 as filedesc;
+
+fstat(!filedesc);

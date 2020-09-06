@@ -7,22 +7,30 @@ from register_automaton import RegisterAutomaton
 from register_automaton import State
 from register_automaton import Transition
 
-if __name__ == "__main__":
-  basename = os.path.basename(sys.argv[1])
+
+
+
+
+def main(name):
+  basename = os.path.splitext(os.path.basename(name))[0]
+  dirname = os.path.dirname(name)
+  datawords_path = os.path.join(dirname, basename + ".dw")
+  pickle_path = os.path.join(dirname, basename + ".pickle")
+  automaton_path = os.path.join(dirname, basename + ".auto")
 
   # Load in the dataword list (we might not even use this)
   # dataword list is in the .dw file
-  with open(basename + ".dw", "r") as f:
+  with open(datawords_path, "r") as f:
     datawords = f.readlines()
 
 
   # Load in the List of dataword objects (we might just use this)
-  with open(basename + ".pickle", "r") as f:
+  with open(pickle_path, "r") as f:
     dataword_objs = pickle.load(f)
 
 
   # Load in the automaton
-  with open(basename + ".auto", "r") as f:
+  with open(automaton_path, "r") as f:
     automaton = pickle.load(f)
 
 
@@ -38,9 +46,15 @@ if __name__ == "__main__":
   # Some print goes here
   print("Automaton ended in state: " + str(automaton.current_state))
   print("With registers: " + str(automaton.registers))
-  print("Automaton is accepting: " + str(automaton.states[automaton.current_state].is_accepting))
-
-  print("Mutated strace: ")
 
   for i in dataword_objs:
     print(i.get_mutated_strace())
+
+  return automaton
+
+
+
+
+
+if __name__ == "__main__":
+  main(sys.argv[1])

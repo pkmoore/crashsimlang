@@ -16,40 +16,6 @@ class CSlangError(Exception):
   pass
 
 
-reserved = {
-    'capture' : 'CAPTURE',
-    'predicate' : 'PREDICATE',
-    'NOT' : 'NOT',
-    'as' : 'AS',
-    'ret' : 'RET'
-}
-
-tokens = ["IDENTIFIER",
-          "LPAREN",
-          "READOP",
-          "STOREOP",
-          "WRITEOP",
-          "EQUALSOP",
-          "ASSIGN",
-          "NUMERIC",
-          "ASSIGNVALUE",
-          "PARAMSEP",
-          "RPAREN",
-          "SEMI"
-] + list(reserved.values())
-
-
-t_LPAREN = r"\("
-t_READOP = r"\?"
-t_STOREOP = r"\!"
-t_WRITEOP = r"->"
-t_EQUALSOP = r"=="
-t_ASSIGN = r"<-"
-t_NUMERIC = r"[0-9][0-9]*"
-t_RPAREN = r"\)"
-t_PARAMSEP = r",[\s]*"
-t_SEMI = r";"
-t_ignore = " \t\n"
 
 # We use a function to define this function for two reasons:
 # 1. Ply gives tokens defined by functions higher priority meaning this
@@ -77,11 +43,6 @@ def t_error(t):
 def t_COMMENT(t):
   r'\#.*'
 
-lexer = lex.lex()
-
-automaton = RegisterAutomaton()
-preamble = Preamble()
-in_preamble = True
 
 def p_error(p):
   print("Error with:")
@@ -258,29 +219,105 @@ def p_parameter(p):
 
 
 
-parser = yacc.yacc()
-with open(sys.argv[1], "r") as f:
-  parser.parse(f.read())
 
-basename = os.path.splitext(os.path.basename(sys.argv[1]))[0]
-strace_path = basename + ".strace"
-datawords_path = basename + ".dw"
-pickle_path = basename + ".pickle"
+def main(name):
+  global t_LPAREN
+  t_LPAREN = r"\("
 
-t = Trace.Trace(strace_path, "./syscall_definitions.pickle")
+  global t_READOP
+  t_READOP = r"\?"
 
-datawords = []
-with open(datawords_path, "w") as f:
-  for i in t.syscalls:
-    d = preamble.handle_syscall(i)
-    f.write(d.get_dataword() + "\n")
-    datawords.append(d)
+  global t_STOREOP
+  t_STOREOP = r"\!"
 
-with open(pickle_path, "w") as f:
-  pickle.dump(datawords, f)
+  global t_WRITEOP
+  t_WRITEOP = r"->"
 
-with open(basename + ".auto", "w") as f:
-  pickle.dump(automaton, f)
+  global t_EQUALSOP
+  t_EQUALSOP = r"=="
+
+  global t_ASSIGN
+  t_ASSIGN = r"<-"
+
+  global t_NUMERIC
+  t_NUMERIC = r"[0-9][0-9]*"
+
+  global t_RPAREN
+  t_RPAREN = r"\)"
+
+  global t_PARAMSEP
+  t_PARAMSEP = r",[\s]*"
+
+  global t_SEMI
+  t_SEMI = r";"
+
+  global t_ignore
+  t_ignore = " \t\n"
+
+  global reserved
+  reserved = {
+      'capture' : 'CAPTURE',
+      'predicate' : 'PREDICATE',
+      'NOT' : 'NOT',
+      'as' : 'AS',
+      'ret' : 'RET'
+  }
+
+  global tokens
+  tokens = ["IDENTIFIER",
+            "LPAREN",
+            "READOP",
+            "STOREOP",
+            "WRITEOP",
+            "EQUALSOP",
+            "ASSIGN",
+            "NUMERIC",
+            "ASSIGNVALUE",
+            "PARAMSEP",
+            "RPAREN",
+            "SEMI"
+  ] + list(reserved.values())
+
+  global in_preamble
+  in_preamble = True
+
+  global lexer
+  lexer = lex.lex()
+
+  global parser
+  parser = yacc.yacc()
+
+  global automaton
+  automaton = RegisterAutomaton()
+
+  global preamble
+  preamble = Preamble()
+
+
+  with open(name, "r") as f:
+    parser.parse(f.read())
+
+  basename = os.path.splitext(os.path.basename(name))[0]
+  dirname = os.path.dirname(name)
+  strace_path = os.path.join(dirname, basename + ".strace")
+  datawords_path = os.path.join(dirname, basename + ".dw")
+  pickle_path = os.path.join(dirname, basename + ".pickle")
+  automaton_path = os.path.join(dirname, basename + ".auto")
+
+  t = Trace.Trace(strace_path, "./syscall_definitions.pickle")
+
+  datawords = []
+  with open(datawords_path, "w") as f:
+    for i in t.syscalls:
+      d = preamble.handle_syscall(i)
+      f.write(d.get_dataword() + "\n")
+      datawords.append(d)
+
+  with open(pickle_path, "w") as f:
+    pickle.dump(datawords, f)
+
+  with open(automaton_path, "w") as f:
+    pickle.dump(automaton, f)
 
 
 
@@ -295,3 +332,8 @@ with open(basename + ".auto", "w") as f:
 
 
 # The "choice" operatior "|" would be a case where we have a branch in the automaton.
+
+
+if __name__ == "__main__":
+  main(sys.argv[1])
+

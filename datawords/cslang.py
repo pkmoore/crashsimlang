@@ -26,22 +26,22 @@ reserved = {
 }
 
 tokens = ["IDENTIFIER",
-          "LPAREN",
           "READOP",
           "STOREOP",
           "WRITEOP",
           "EQUALSOP",
-          "ASSIGN",
+          "ASSIGNOP",
           "NUMERIC",
-          "ASSIGNVALUE",
-          "PARAMSEP",
-          "RPAREN",
-          "SEMI"
 ] + list(reserved.values())
 
+literals = ['-', '+', ';',',','(', ')' ]
 
-def t_LPAREN(t):
-  r"\("
+def t_ASSIGNOP(t):
+  r"<-"
+  return t
+
+def t_EQUALSOP(t):
+  r"=="
   return t
 
 def t_READOP(t):
@@ -56,28 +56,8 @@ def t_WRITEOP(t):
   r"->"
   return t
 
-def t_EQUALSOP(t):
-  r"=="
-  return t
-
-def t_ASSIGN(t):
-  r"<-"
-  return t
-
 def t_NUMERIC(t):
   r"[0-9][0-9]*"
-  return t
-
-def t_RPAREN(t):
-  r"\)"
-  return t
-
-def t_PARAMSEP(t):
-  r",[\s]*"
-  return t
-
-def t_SEMI(t):
-  r";"
   return t
 
 t_ignore = " \t\n"
@@ -95,17 +75,9 @@ def t_IDENTIFIER(t):
   t.type = reserved.get(t.value, 'IDENTIFIER')
   return t
 
-def t_ASSIGNVALUE(t):
-  r"\".*\""
-  tmp = t.value
-  if tmp.startswith("\"") and tmp.endswith("\""):
-    tmp = tmp[1:-1]
-
-  t.value = tmp
-  return t
-
 def t_error(t):
-  pass
+  print("Error with:")
+  print(t)
 
 def t_COMMENT(t):
   r'\#.*'
@@ -127,17 +99,17 @@ def p_statement(p):
   '''
 
 def p_preamblestatement(p):
-  ''' preamblestatement : predicatestmt SEMI
-                        | capturestmt SEMI
-                        | definestmt SEMI
+  ''' preamblestatement : predicatestmt ';'
+                        | capturestmt ';'
+                        | definestmt ';'
   '''
   global in_preamble
   if not in_preamble:
     raise CSlangError("Found preamble statment after preamble processing has ended")
 
 def p_bodystatement(p):
-  ''' bodystatement : dataword SEMI
-                    | registerassignment SEMI
+  ''' bodystatement : dataword ';'
+                    | registerassignment ';'
   '''
   global in_preamble
   global preamble
@@ -145,7 +117,7 @@ def p_bodystatement(p):
   # This means we have seen all the type definitions we are going to see
   # and it is time for the preamble object to read through the generated
   # data structure and figure out what stuff it needs to capture
-  if in_preamble
+  if in_preamble:
     in_preamble = False
 
 def p_type(p):
@@ -159,7 +131,7 @@ def p_type(p):
 
 
 def p_typelist(p):
-  ''' typelist : type PARAMSEP typelist
+  ''' typelist : type ',' typelist
                | type
   '''
 
@@ -191,8 +163,8 @@ def p_capturestmt(p):
     preamble.capture(p[2], p[5], p[3])
 
 
-def p_expression(p):
-  ''' expression : IDENTIFIER EQUALSOP ASSIGNVALUE
+def p_predexpression(p):
+  ''' predexpression : IDENTIFIER EQUALSOP NUMERIC
   '''
 
   if p[2] == "==":
@@ -206,7 +178,7 @@ def p_expression(p):
 
 
 def p_predicatestmt(p):
-  ''' predicatestmt : PREDICATE IDENTIFIER expression
+  ''' predicatestmt : PREDICATE IDENTIFIER predexpression
   '''
 
   global preamble
@@ -214,17 +186,62 @@ def p_predicatestmt(p):
 
 
 def p_registerassignment(p):
-  ''' registerassignment : IDENTIFIER ASSIGN ASSIGNVALUE
+  ''' registerassignment : IDENTIFIER ASSIGNOP NUMERIC
+                         | IDENTIFIER ASSIGNOP registerexp
   '''
 
-  global preamble
   global automaton
-  automaton.registers[p[1]] = p[3]
+  automaton.registers[p[1]] = int(p[3])
+
+def p_registerexp(p):
+  ''' registerexp : registeradd
+                  | registersub
+  '''
+
+  p[0] = p[1]
+
+def p_registeradd(p):
+  ''' registeradd : IDENTIFIER '+' IDENTIFIER
+                  | IDENTIFIER '+' NUMERIC
+                  | NUMERIC '+' IDENTIFIER
+                  | NUMERIC '+' NUMERIC
+  '''
+
+  if p[1] in automaton.registers:
+    lhs = automaton.registers[p[1]]
+  else:
+    lhs = p[1]
+
+  if p[3] in automaton.registers:
+    rhs = automaton.registers[p[3]]
+  else:
+    rhs = p[3]
+
+  p[0] = int(lhs) + int(rhs)
+
+def p_registersub(p):
+  ''' registersub : IDENTIFIER '-' IDENTIFIER
+                  | IDENTIFIER '-' NUMERIC
+                  | NUMERIC '-' IDENTIFIER
+                  | NUMERIC '-' NUMERIC
+  '''
+
+  if p[1] in automaton.registers:
+    lhs = automaton.registers[p[1]]
+  else:
+    lhs = p[1]
+
+  if p[3] in automaton.registers:
+    rhs = automaton.registers[p[3]]
+  else:
+    rhs = p[3]
+
+  p[0] = int(lhs) - int(rhs)
 
 
 def p_dataword(p):
-  ''' dataword : NOT IDENTIFIER LPAREN parameterlist RPAREN
-               | IDENTIFIER LPAREN parameterlist RPAREN
+  ''' dataword : NOT IDENTIFIER '(' parameterlist ')'
+               | IDENTIFIER '(' parameterlist ')'
   '''
 
   global preamble
@@ -305,7 +322,7 @@ def p_dataword(p):
 
 
 def p_parameterlist(p):
-  '''parameterlist : parameter PARAMSEP parameterlist
+  '''parameterlist : parameter ',' parameterlist
                    | parameter
   '''
 

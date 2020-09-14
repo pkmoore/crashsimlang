@@ -6,11 +6,6 @@ from cslang import containerbuilder
 
 class TestOpen():
 
-  def teardown(self):
-    os.system("rm test/*.dw")
-    os.system("rm test/*.pickle")
-    os.system("rm test/*.auto")
-
   def test_define(self):
     # Hack: Global
     global containerbuilder

@@ -1,0 +1,8 @@
+tmp <- 2;
+
+numnum <- 3 + 4;
+regnum <- tmp + 4;
+numreg <- 4 + tmp;
+regreg <- tmp + tmp;
+
+

@@ -1,0 +1,2 @@
+class CSlangError(Exception):
+  pass

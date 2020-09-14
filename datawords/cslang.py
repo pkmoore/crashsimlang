@@ -7,13 +7,80 @@ from strace2datawords import Preamble
 from strace2datawords import DataWord
 from strace2datawords import UninterestingDataWord
 from posix_omni_parser import Trace
+from adt import ContainerBuilder
+from cslang_error import CSlangError
 import pickle
 import os
 import sys
 
 
-class CSlangError(Exception):
-  pass
+reserved = {
+    'capture' : 'CAPTURE',
+    'predicate' : 'PREDICATE',
+    'NOT' : 'NOT',
+    'as' : 'AS',
+    'ret' : 'RET',
+    'define' : 'DEFINE',
+    'Int' : 'INT',
+    'String' : 'STRING'
+}
+
+tokens = ["IDENTIFIER",
+          "LPAREN",
+          "READOP",
+          "STOREOP",
+          "WRITEOP",
+          "EQUALSOP",
+          "ASSIGN",
+          "NUMERIC",
+          "ASSIGNVALUE",
+          "PARAMSEP",
+          "RPAREN",
+          "SEMI"
+] + list(reserved.values())
+
+
+def t_LPAREN(t):
+  r"\("
+  return t
+
+def t_READOP(t):
+  r"\?"
+  return t
+
+def t_STOREOP(t):
+  r"\!"
+  return t
+
+def t_WRITEOP(t):
+  r"->"
+  return t
+
+def t_EQUALSOP(t):
+  r"=="
+  return t
+
+def t_ASSIGN(t):
+  r"<-"
+  return t
+
+def t_NUMERIC(t):
+  r"[0-9][0-9]*"
+  return t
+
+def t_RPAREN(t):
+  r"\)"
+  return t
+
+def t_PARAMSEP(t):
+  r",[\s]*"
+  return t
+
+def t_SEMI(t):
+  r";"
+  return t
+
+t_ignore = " \t\n"
 
 
 
@@ -57,9 +124,43 @@ def p_statementlist(p):
 def p_statement(p):
   ''' statement : dataword SEMI
                 | registerassignment SEMI
-                | capturestmt SEMI
                 | predicatestmt SEMI
+                | capturestmt SEMI
+                | definestmt SEMI
   '''
+
+def p_type(p):
+  ''' type : INT NUMERIC AS IDENTIFIER
+           | INT RET AS IDENTIFIER
+           | STRING NUMERIC AS IDENTIFIER
+           | STRING RET AS IDENTIFIER
+  '''
+
+  p[0] = (p[1], p[2], p[4])
+
+
+def p_typelist(p):
+  ''' typelist : type PARAMSEP typelist
+               | type
+  '''
+
+  if len(p) == 4:
+    p[0] = [p[1]] + p[3]
+  else:
+    p[0] = [p[1]]
+
+
+def p_definestmt(p):
+  ''' definestmt : DEFINE IDENTIFIER typelist
+
+  '''
+
+  global in_preamble
+  global containerbuilder
+  if in_preamble:
+    containerbuilder.define_type(p[2], p[3])
+  else:
+    raise CSlangError("Found define statment after preamble processing has ended")
 
 
 def p_capturestmt(p):
@@ -69,6 +170,7 @@ def p_capturestmt(p):
 
 
   global in_preamble
+  global preamble
   if in_preamble:
     if p[3] == "ret":
       preamble.capture(p[2], p[5], "ret")
@@ -97,6 +199,7 @@ def p_predicatestmt(p):
   '''
 
   global in_preamble
+  global preamble
   if in_preamble:
     preamble.predicate(p[2], p[3])
   else:
@@ -108,6 +211,9 @@ def p_registerassignment(p):
   '''
 
   global in_preamble
+  global preamble
+  global automaton
+  print("reg")
   in_preamble = False
   automaton.registers[p[1]] = p[3]
 
@@ -118,6 +224,9 @@ def p_dataword(p):
   '''
 
   global in_preamble
+  global preamble
+  global automaton
+  print("dataword")
   in_preamble = False
   if p[1] == "NOT":
     not_dataword = True
@@ -220,119 +329,80 @@ def p_parameter(p):
 
 
 
-def main(name):
+def main(name, parse_only=False):
   global t_LPAREN
-  t_LPAREN = r"\("
-
   global t_READOP
-  t_READOP = r"\?"
-
   global t_STOREOP
-  t_STOREOP = r"\!"
-
   global t_WRITEOP
-  t_WRITEOP = r"->"
-
   global t_EQUALSOP
-  t_EQUALSOP = r"=="
-
   global t_ASSIGN
-  t_ASSIGN = r"<-"
-
   global t_NUMERIC
-  t_NUMERIC = r"[0-9][0-9]*"
-
   global t_RPAREN
-  t_RPAREN = r"\)"
-
   global t_PARAMSEP
-  t_PARAMSEP = r",[\s]*"
-
   global t_SEMI
-  t_SEMI = r";"
-
   global t_ignore
-  t_ignore = " \t\n"
-
   global reserved
-  reserved = {
-      'capture' : 'CAPTURE',
-      'predicate' : 'PREDICATE',
-      'NOT' : 'NOT',
-      'as' : 'AS',
-      'ret' : 'RET'
-  }
-
   global tokens
-  tokens = ["IDENTIFIER",
-            "LPAREN",
-            "READOP",
-            "STOREOP",
-            "WRITEOP",
-            "EQUALSOP",
-            "ASSIGN",
-            "NUMERIC",
-            "ASSIGNVALUE",
-            "PARAMSEP",
-            "RPAREN",
-            "SEMI"
-  ] + list(reserved.values())
-
   global in_preamble
-  in_preamble = True
-
   global lexer
-  lexer = lex.lex()
-
   global parser
-  parser = yacc.yacc()
-
   global automaton
-  automaton = RegisterAutomaton()
-
   global preamble
+  global containerbuilder
+
+
+  in_preamble = True
+  lexer = lex.lex()
+  parser = yacc.yacc()
+  automaton = RegisterAutomaton()
   preamble = Preamble()
-
-
+  containerbuilder = ContainerBuilder()
   with open(name, "r") as f:
     parser.parse(f.read())
 
-  basename = os.path.splitext(os.path.basename(name))[0]
-  dirname = os.path.dirname(name)
-  strace_path = os.path.join(dirname, basename + ".strace")
-  datawords_path = os.path.join(dirname, basename + ".dw")
-  pickle_path = os.path.join(dirname, basename + ".pickle")
-  automaton_path = os.path.join(dirname, basename + ".auto")
+  if not parse_only:
+    basename = os.path.splitext(os.path.basename(name))[0]
+    dirname = os.path.dirname(name)
+    strace_path = os.path.join(dirname, basename + ".strace")
+    datawords_path = os.path.join(dirname, basename + ".dw")
+    pickle_path = os.path.join(dirname, basename + ".pickle")
+    automaton_path = os.path.join(dirname, basename + ".auto")
 
-  t = Trace.Trace(strace_path, "./syscall_definitions.pickle")
+    t = Trace.Trace(strace_path, "./syscall_definitions.pickle")
 
-  datawords = []
-  with open(datawords_path, "w") as f:
-    for i in t.syscalls:
-      d = preamble.handle_syscall(i)
-      f.write(d.get_dataword() + "\n")
-      datawords.append(d)
+    datawords = []
+    with open(datawords_path, "w") as f:
+      for i in t.syscalls:
+        d = preamble.handle_syscall(i)
+        f.write(d.get_dataword() + "\n")
+        datawords.append(d)
 
-  with open(pickle_path, "w") as f:
-    pickle.dump(datawords, f)
+    with open(pickle_path, "w") as f:
+      pickle.dump(datawords, f)
 
-  with open(automaton_path, "w") as f:
-    pickle.dump(automaton, f)
-
-
-
+    with open(automaton_path, "w") as f:
+      pickle.dump(automaton, f)
 
 
-# This is to parse the program that is going to read the datawords that will be incoming from the preprocessor
-# each dataword parsed defines the transition requirements from the current state to the next
-#  the datawords being generated will have data in them.  The program will only have identifiers
-# This thing needs to generate instructions or whatever to do the transitioning and reading registers and all that
-# output an automaton object
+
+
+
+  # This is to parse the program that is going to read the datawords that will be incoming from the preprocessor
+  # each dataword parsed defines the transition requirements from the current state to the next
+  #  the datawords being generated will have data in them.  The program will only have identifiers
+  # This thing needs to generate instructions or whatever to do the transitioning and reading registers and all that
+  # output an automaton object
 
 
 
 # The "choice" operatior "|" would be a case where we have a branch in the automaton.
 
+in_preamble = None
+lexer = None
+parser = None
+automaton = None
+preamble = None
+containerbuilder = None
 
 if __name__ == "__main__":
   main(sys.argv[1])

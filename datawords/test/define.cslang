@@ -1,0 +1,1 @@
+define fstat Int 0 as filename;

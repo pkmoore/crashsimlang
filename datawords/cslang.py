@@ -122,12 +122,31 @@ def p_statementlist(p):
   automaton.states[-1].is_accepting = True
 
 def p_statement(p):
-  ''' statement : dataword SEMI
-                | registerassignment SEMI
-                | predicatestmt SEMI
-                | capturestmt SEMI
-                | definestmt SEMI
+  ''' statement : preamblestatement
+                | bodystatement
   '''
+
+def p_preamblestatement(p):
+  ''' preamblestatement : predicatestmt SEMI
+                        | capturestmt SEMI
+                        | definestmt SEMI
+  '''
+  global in_preamble
+  if not in_preamble:
+    raise CSlangError("Found preamble statment after preamble processing has ended")
+
+def p_bodystatement(p):
+  ''' bodystatement : dataword SEMI
+                    | registerassignment SEMI
+  '''
+  global in_preamble
+  global preamble
+  # If this is true, we have encountered our first body statement.
+  # This means we have seen all the type definitions we are going to see
+  # and it is time for the preamble object to read through the generated
+  # data structure and figure out what stuff it needs to capture
+  if in_preamble
+    in_preamble = False
 
 def p_type(p):
   ''' type : INT NUMERIC AS IDENTIFIER
@@ -155,12 +174,8 @@ def p_definestmt(p):
 
   '''
 
-  global in_preamble
   global containerbuilder
-  if in_preamble:
-    containerbuilder.define_type(p[2], p[3])
-  else:
-    raise CSlangError("Found define statment after preamble processing has ended")
+  containerbuilder.define_type(p[2], p[3])
 
 
 def p_capturestmt(p):
@@ -169,15 +184,11 @@ def p_capturestmt(p):
   '''
 
 
-  global in_preamble
   global preamble
-  if in_preamble:
-    if p[3] == "ret":
-      preamble.capture(p[2], p[5], "ret")
-    else:
-      preamble.capture(p[2], p[5], p[3])
+  if p[3] == "ret":
+    preamble.capture(p[2], p[5], "ret")
   else:
-    raise CSlangError("Found capture statement after preamble processing has ended")
+    preamble.capture(p[2], p[5], p[3])
 
 
 def p_expression(p):
@@ -198,23 +209,16 @@ def p_predicatestmt(p):
   ''' predicatestmt : PREDICATE IDENTIFIER expression
   '''
 
-  global in_preamble
   global preamble
-  if in_preamble:
-    preamble.predicate(p[2], p[3])
-  else:
-    raise CSlangError("Found predicate statement after preamble processing has ended")
+  preamble.predicate(p[2], p[3])
 
 
 def p_registerassignment(p):
   ''' registerassignment : IDENTIFIER ASSIGN ASSIGNVALUE
   '''
 
-  global in_preamble
   global preamble
   global automaton
-  print("reg")
-  in_preamble = False
   automaton.registers[p[1]] = p[3]
 
 
@@ -223,11 +227,8 @@ def p_dataword(p):
                | IDENTIFIER LPAREN parameterlist RPAREN
   '''
 
-  global in_preamble
   global preamble
   global automaton
-  print("dataword")
-  in_preamble = False
   if p[1] == "NOT":
     not_dataword = True
     syscall_name = p[2]

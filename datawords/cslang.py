@@ -330,16 +330,6 @@ def p_parameter(p):
 
 
 def main(name, parse_only=False):
-  global t_LPAREN
-  global t_READOP
-  global t_STOREOP
-  global t_WRITEOP
-  global t_EQUALSOP
-  global t_ASSIGN
-  global t_NUMERIC
-  global t_RPAREN
-  global t_PARAMSEP
-  global t_SEMI
   global t_ignore
   global reserved
   global tokens

@@ -26,3 +26,25 @@ class TestRegisterExpressions():
     assert automaton.registers["numreg"] == 1
     assert automaton.registers["regreg"] == 0
 
+
+  def test_multiply(self):
+    global automaton
+    test_file = "test/registermul.cslang"
+    cslang_main(test_file)
+    automaton = runner_main(test_file)
+    assert automaton.registers["numnum"] == 12
+    assert automaton.registers["regnum"] == 8
+    assert automaton.registers["numreg"] == 8
+    assert automaton.registers["regreg"] == 4
+
+  def test_divide(self):
+    global automaton
+    test_file = "test/registerdiv.cslang"
+    cslang_main(test_file)
+    automaton = runner_main(test_file)
+    assert automaton.registers["numnum"] == 3
+    assert automaton.registers["regnum"] == 1
+    assert automaton.registers["numreg"] == 1
+    assert automaton.registers["regreg"] == 1
+    assert automaton.registers["floordiv1"] == 1
+    assert automaton.registers["floordiv2"] == 0

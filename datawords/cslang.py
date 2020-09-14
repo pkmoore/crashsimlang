@@ -34,7 +34,7 @@ tokens = ["IDENTIFIER",
           "NUMERIC",
 ] + list(reserved.values())
 
-literals = ['-', '+', ';',',','(', ')' ]
+literals = ['/', '*', '-', '+', ';',',','(', ')' ]
 
 def t_ASSIGNOP(t):
   r"<-"
@@ -196,6 +196,8 @@ def p_registerassignment(p):
 def p_registerexp(p):
   ''' registerexp : registeradd
                   | registersub
+                  | registermul
+                  | registerdiv
   '''
 
   p[0] = p[1]
@@ -237,6 +239,44 @@ def p_registersub(p):
     rhs = p[3]
 
   p[0] = int(lhs) - int(rhs)
+
+def p_registermul(p):
+  ''' registermul : IDENTIFIER '*' IDENTIFIER
+                  | IDENTIFIER '*' NUMERIC
+                  | NUMERIC '*' IDENTIFIER
+                  | NUMERIC '*' NUMERIC
+  '''
+
+  if p[1] in automaton.registers:
+    lhs = automaton.registers[p[1]]
+  else:
+    lhs = p[1]
+
+  if p[3] in automaton.registers:
+    rhs = automaton.registers[p[3]]
+  else:
+    rhs = p[3]
+
+  p[0] = int(lhs) * int(rhs)
+
+def p_registerdiv(p):
+  ''' registerdiv : IDENTIFIER '/' IDENTIFIER
+                  | IDENTIFIER '/' NUMERIC
+                  | NUMERIC '/' IDENTIFIER
+                  | NUMERIC '/' NUMERIC
+  '''
+
+  if p[1] in automaton.registers:
+    lhs = automaton.registers[p[1]]
+  else:
+    lhs = p[1]
+
+  if p[3] in automaton.registers:
+    rhs = automaton.registers[p[3]]
+  else:
+    rhs = p[3]
+
+  p[0] = int(lhs) / int(rhs)
 
 
 def p_dataword(p):

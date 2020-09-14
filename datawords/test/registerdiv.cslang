@@ -1,0 +1,10 @@
+tmp <- 4;
+
+numnum <- 6 / 2;
+regnum <- tmp / 4;
+numreg <- 4 / tmp;
+regreg <- tmp / tmp;
+
+floordiv1 <- 4 / 3;
+floordiv2 <- 3 / 4;
+

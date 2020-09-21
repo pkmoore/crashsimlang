@@ -87,16 +87,13 @@ def t_IDENTIFIER(t):
   return t
 
 def t_error(t):
-  print("Error with:")
-  print(t)
+  raise CSlangError("Lex error with: {}".format(t))
 
 def t_COMMENT(t):
   r'\#.*'
 
-
 def p_error(p):
-  print("Error with:")
-  print(p)
+  raise CSlangError("Parse error with: {}".format(p))
 
 def p_statementlist(p):
   ''' statementlist : statement  statementlist

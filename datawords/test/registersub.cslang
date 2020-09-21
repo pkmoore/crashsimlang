@@ -1,7 +1,13 @@
 tmp <- 2;
+ftmp <- 2.5;
 
 tmp <- 5;
 numnum <- 4 - 3;
 regnum <- tmp - 4;
 numreg <- 6 - tmp;
 regreg <- tmp - tmp;
+
+fnumnum <- 3.5 - 3.5;
+fregnum <- ftmp - 2.5;
+fnumreg <- 2.5 - ftmp;
+fregreg <- ftmp - ftmp;

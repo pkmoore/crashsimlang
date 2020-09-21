@@ -1,6 +1,12 @@
 tmp <- 2;
+ftmp <- 2.5;
 
 numnum <- 3 * 4;
 regnum <- tmp * 4;
 numreg <- 4 * tmp;
 regreg <- tmp * tmp;
+
+fnumnum <- 3.5 * 2;
+fregnum <- ftmp * 2;
+fnumreg <- 2 * ftmp;
+fregreg <- ftmp * ftmp;

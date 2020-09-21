@@ -25,6 +25,12 @@ class TestRegisterExpressions():
     assert automaton.registers["numreg"] == 6
     assert automaton.registers["regreg"] == 4
 
+    assert automaton.registers["fnumnum"] == 7
+    assert automaton.registers["fregnum"] == 5
+    assert automaton.registers["fnumreg"] == 5
+    assert automaton.registers["fregreg"] == 4.6
+
+
 
   def test_subtract(self):
     global automaton
@@ -35,6 +41,11 @@ class TestRegisterExpressions():
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1
     assert automaton.registers["regreg"] == 0
+
+    assert automaton.registers["fnumnum"] == 0
+    assert automaton.registers["fregnum"] == 0
+    assert automaton.registers["fnumreg"] == 0
+    assert automaton.registers["fregreg"] == 0
 
 
   def test_multiply(self):
@@ -47,6 +58,11 @@ class TestRegisterExpressions():
     assert automaton.registers["numreg"] == 8
     assert automaton.registers["regreg"] == 4
 
+    assert automaton.registers["fnumnum"] == 7
+    assert automaton.registers["fregnum"] == 5
+    assert automaton.registers["fnumreg"] == 5
+    assert automaton.registers["fregreg"] == 6.25
+
   def test_divide(self):
     global automaton
     test_file = "test/registerdiv.cslang"
@@ -56,5 +72,8 @@ class TestRegisterExpressions():
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1
     assert automaton.registers["regreg"] == 1
-    assert automaton.registers["floordiv1"] == 1
-    assert automaton.registers["floordiv2"] == 0
+
+    assert automaton.registers["fnumnum"] == 3.5
+    assert automaton.registers["fregnum"] == 1.75
+    assert automaton.registers["fnumreg"] == 3.125
+    assert automaton.registers["fregreg"] == 1

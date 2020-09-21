@@ -68,7 +68,7 @@ def t_WRITEOP(t):
   return t
 
 def t_NUMERIC(t):
-  r"[0-9][0-9]*"
+  r"[0-9][0-9]*(\.[0-9]+)?"
   t.value = ("NUMERIC", t.value)
   return t
 
@@ -216,7 +216,7 @@ def p_registerassignment(p):
     raise CSLangError("Bad type for register name: {}".format(p[1]))
   register_name = p[1][1]
   if p[3][0] == 'NUMERIC':
-    automaton.registers[register_name] = int(p[3][1])
+    automaton.registers[register_name] = float(p[3][1])
   elif p[3][0] == 'STRING':
     automaton.registers[register_name] = str(p[3][1])
   else:
@@ -277,7 +277,7 @@ def p_registeradd(p):
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = ('NUMERIC', int(lhs) + int(rhs))
+  p[0] = ('NUMERIC', float(lhs) + float(rhs))
 
 def p_registersub(p):
   ''' registersub : IDENTIFIER '-' IDENTIFIER
@@ -300,7 +300,7 @@ def p_registersub(p):
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = ('NUMERIC', int(lhs) - int(rhs))
+  p[0] = ('NUMERIC', float(lhs) - float(rhs))
 
 def p_registermul(p):
   ''' registermul : IDENTIFIER '*' IDENTIFIER
@@ -323,7 +323,7 @@ def p_registermul(p):
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = ('NUMERIC', int(lhs) * int(rhs))
+  p[0] = ('NUMERIC', float(lhs) * float(rhs))
 
 def p_registerdiv(p):
   ''' registerdiv : IDENTIFIER '/' IDENTIFIER
@@ -345,7 +345,7 @@ def p_registerdiv(p):
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = ('NUMERIC', int(lhs) / int(rhs))
+  p[0] = ('NUMERIC', float(lhs) / float(rhs))
 
 
 def p_dataword(p):

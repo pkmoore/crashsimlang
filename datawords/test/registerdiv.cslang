@@ -1,10 +1,13 @@
 tmp <- 4;
+ftmp <- 3.5;
+ftmp2 <- 3.2;
 
 numnum <- 6 / 2;
 regnum <- tmp / 4;
 numreg <- 4 / tmp;
 regreg <- tmp / tmp;
 
-floordiv1 <- 4 / 3;
-floordiv2 <- 3 / 4;
-
+fnumnum <- 7 / 2;
+fregnum <- ftmp / 2;
+fnumreg <- 10 / ftmp2;
+fregreg <- tmp / tmp;

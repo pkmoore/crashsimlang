@@ -44,31 +44,37 @@ precedence = (
 
 def t_ASSIGNOP(t):
   r"<-"
+  t.value = ("OPERATOR", t.value)
   return t
 
 def t_EQUALSOP(t):
   r"=="
+  t.value = ("OPERATOR", t.value)
   return t
 
 def t_READOP(t):
   r"\?"
+  t.value = ("OPERATOR", t.value)
   return t
 
 def t_STOREOP(t):
   r"\!"
+  t.value = ("OPERATOR", t.value)
   return t
 
 def t_WRITEOP(t):
   r"->"
+  t.value = ("OPERATOR", t.value)
   return t
 
 def t_NUMERIC(t):
   r"[0-9][0-9]*"
+  t.value = ("NUMERIC", t.value)
   return t
 
 def t_STRING(t):
   "\"[^\"]+\""
-  t.value = t.value[1:-1]
+  t.value = ("STRING", t.value[1:-1])
   return t
 
 t_ignore = " \t\n"
@@ -83,7 +89,12 @@ t_ignore = " \t\n"
 # than an identifier and return the appropriate type
 def t_IDENTIFIER(t):
   r"[A-Za-z_][a-zA-Z0-9]*"
-  t.type = reserved.get(t.value, 'IDENTIFIER')
+  if t.value in reserved:
+    t.type = reserved[t.value]
+    t.value = ("RESERVED", t.value)
+  else:
+    t.type = "IDENTIFIER"
+    t.value = ("IDENTIFIER", t.value)
   return t
 
 def t_error(t):
@@ -135,7 +146,7 @@ def p_type(p):
            | STRING RET AS IDENTIFIER
   '''
 
-  p[0] = (p[1], p[2], p[4])
+  p[0] = (p[1][1], p[2][1], p[4][1])
 
 
 def p_typelist(p):
@@ -155,7 +166,7 @@ def p_definestmt(p):
   '''
 
   global containerbuilder
-  containerbuilder.define_type(p[2], p[3])
+  containerbuilder.define_type(p[2][1], p[3])
 
 
 def p_capturestmt(p):
@@ -201,10 +212,15 @@ def p_registerassignment(p):
   '''
 
   global automaton
-  try:
-    automaton.registers[p[1]] = int(p[3])
-  except ValueError:
-    automaton.registers[p[1]] = p[3]
+  if p[1][0] != 'IDENTIFIER':
+    raise CSLangError("Bad type for register name: {}".format(p[1]))
+  register_name = p[1][1]
+  if p[3][0] == 'NUMERIC':
+    automaton.registers[register_name] = int(p[3][1])
+  elif p[3][0] == 'STRING':
+    automaton.registers[register_name] = str(p[3][1])
+  else:
+    raise CSlangError("Bad type in register assignment: {}".format(p[3]))
 
 def p_registerexp(p):
   ''' registerexp : registeradd
@@ -223,16 +239,21 @@ def p_registerconcat(p):
                      | STRING '.' STRING
   '''
 
-  if p[1] in automaton.registers:
-    lhs = automaton.registers[p[1]]
+  if p[1][0] == "IDENTIFIER":
+    lhs = automaton.registers[p[1][1]]
+  elif p[1][0] == "STRING":
+    lhs = p[1][1]
   else:
-    lhs = p[1]
+    raise CSlangError("Bad type in string concatenation: {}".format(p[1]))
 
-  if p[3] in automaton.registers:
-    rhs = automaton.registers[p[3]]
+  if p[3][0] == "IDENTIFIER":
+    rhs = automaton.registers[p[3][1]]
+  elif p[3][0] == "STRING":
+    rhs = p[3][1]
   else:
-    rhs = p[3]
-  p[0] = str(lhs) + str(rhs)
+    raise CSlangError("Bad type in string concatenation: {}".format(p[1]))
+
+  p[0] = ('STRING', str(lhs) + str(rhs))
 
 
 def p_registeradd(p):
@@ -242,17 +263,21 @@ def p_registeradd(p):
                   | NUMERIC '+' NUMERIC
   '''
 
-  if p[1] in automaton.registers:
-    lhs = automaton.registers[p[1]]
+  if p[1][0] == 'IDENTIFIER':
+    lhs = automaton.registers[p[1][1]]
+  elif p[1][0] == 'NUMERIC':
+    lhs = p[1][1]
   else:
-    lhs = p[1]
+    raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
-  if p[3] in automaton.registers:
-    rhs = automaton.registers[p[3]]
+  if p[3][0] == 'IDENTIFIER':
+    rhs = automaton.registers[p[3][1]]
+  elif p[3][0] == 'NUMERIC':
+    rhs = p[3][1]
   else:
-    rhs = p[3]
+    raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = int(lhs) + int(rhs)
+  p[0] = ('NUMERIC', int(lhs) + int(rhs))
 
 def p_registersub(p):
   ''' registersub : IDENTIFIER '-' IDENTIFIER
@@ -261,17 +286,21 @@ def p_registersub(p):
                   | NUMERIC '-' NUMERIC
   '''
 
-  if p[1] in automaton.registers:
-    lhs = automaton.registers[p[1]]
+  if p[1][0] == 'IDENTIFIER':
+    lhs = automaton.registers[p[1][1]]
+  elif p[1][0] == 'NUMERIC':
+    lhs = p[1][1]
   else:
-    lhs = p[1]
+    raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
-  if p[3] in automaton.registers:
-    rhs = automaton.registers[p[3]]
+  if p[3][0] == 'IDENTIFIER':
+    rhs = automaton.registers[p[3][1]]
+  elif p[3][0] == 'NUMERIC':
+    rhs = p[3][1]
   else:
-    rhs = p[3]
+    raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = int(lhs) - int(rhs)
+  p[0] = ('NUMERIC', int(lhs) - int(rhs))
 
 def p_registermul(p):
   ''' registermul : IDENTIFIER '*' IDENTIFIER
@@ -280,17 +309,21 @@ def p_registermul(p):
                   | NUMERIC '*' NUMERIC
   '''
 
-  if p[1] in automaton.registers:
-    lhs = automaton.registers[p[1]]
+  if p[1][0] == 'IDENTIFIER':
+    lhs = automaton.registers[p[1][1]]
+  elif p[1][0] == 'NUMERIC':
+    lhs = p[1][1]
   else:
-    lhs = p[1]
+    raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
-  if p[3] in automaton.registers:
-    rhs = automaton.registers[p[3]]
+  if p[3][0] == 'IDENTIFIER':
+    rhs = automaton.registers[p[3][1]]
+  elif p[3][0] == 'NUMERIC':
+    rhs = p[3][1]
   else:
-    rhs = p[3]
+    raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = int(lhs) * int(rhs)
+  p[0] = ('NUMERIC', int(lhs) * int(rhs))
 
 def p_registerdiv(p):
   ''' registerdiv : IDENTIFIER '/' IDENTIFIER
@@ -298,18 +331,21 @@ def p_registerdiv(p):
                   | NUMERIC '/' IDENTIFIER
                   | NUMERIC '/' NUMERIC
   '''
-
-  if p[1] in automaton.registers:
-    lhs = automaton.registers[p[1]]
+  if p[1][0] == 'IDENTIFIER':
+    lhs = automaton.registers[p[1][1]]
+  elif p[1][0] == 'NUMERIC':
+    lhs = p[1][1]
   else:
-    lhs = p[1]
+    raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
-  if p[3] in automaton.registers:
-    rhs = automaton.registers[p[3]]
+  if p[3][0] == 'IDENTIFIER':
+    rhs = automaton.registers[p[3][1]]
+  elif p[3][0] == 'NUMERIC':
+    rhs = p[3][1]
   else:
-    rhs = p[3]
+    raise CSlangError("Bad type in substraction: {}".format(p[3]))
 
-  p[0] = int(lhs) / int(rhs)
+  p[0] = ('NUMERIC', int(lhs) / int(rhs))
 
 
 def p_dataword(p):
@@ -319,13 +355,13 @@ def p_dataword(p):
 
   global preamble
   global automaton
-  if p[1] == "NOT":
+  if p[1][1] == "NOT":
     not_dataword = True
-    syscall_name = p[2]
+    syscall_name = p[2][1]
     params = p[4]
   else:
     not_dataword = False
-    syscall_name = p[1]
+    syscall_name = p[1][1]
     params = p[3]
 
   register_matches = []
@@ -413,9 +449,9 @@ def p_parameter(p):
                | IDENTIFIER
   '''
   if len(p) == 3:
-    p[0] = p[1] + p[2]
+    p[0] = p[1][1] + p[2][1]
   else:
-    p[0] =  p[1]
+    p[0] =  p[1][1]
 
 
 

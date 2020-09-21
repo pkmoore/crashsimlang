@@ -1,11 +1,10 @@
-capture open 0 as filename;
-capture open ret as filedesc;
+define open String 0 as filename, Int ret as filedesc;
 
-#file <- "test.txt"
+file <- "test.txt";
 #
 #
 ##
 ### Match an open call, store the file name and returned file descriptors
 ### to the 'filename' and 'filedesc' registers respectively
 ##
-#open(?file, !filedesc);
+open(?file, !filedesc);

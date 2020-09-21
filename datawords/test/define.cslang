@@ -1,1 +1,3 @@
-define fstat Int 0 as filename;
+define fstat Int 0 as filedesc;
+
+fstat(filedesc);

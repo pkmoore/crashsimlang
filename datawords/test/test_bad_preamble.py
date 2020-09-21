@@ -17,6 +17,6 @@ class TestOpen(unittest.TestCase):
 
   def test_late_preamble_statement(self):
     test_file = "test/bad_preamble.cslang"
-    cslang_main(test_file, parse_only=True)
-    self.assertRaises(CSlangError)
+    with self.assertRaises(CSlangError):
+      cslang_main(test_file, parse_only=True)
 

@@ -15,7 +15,6 @@ import sys
 
 
 reserved = {
-    'capture' : 'CAPTURE',
     'predicate' : 'PREDICATE',
     'NOT' : 'NOT',
     'as' : 'AS',
@@ -119,7 +118,6 @@ def p_statement(p):
 
 def p_preamblestatement(p):
   ''' preamblestatement : predicatestmt ';'
-                        | capturestmt ';'
                         | definestmt ';'
   '''
   global in_preamble
@@ -132,12 +130,15 @@ def p_bodystatement(p):
   '''
   global in_preamble
   global preamble
+  global containerbuilder
   # If this is true, we have encountered our first body statement.
   # This means we have seen all the type definitions we are going to see
   # and it is time for the preamble object to read through the generated
   # data structure and figure out what stuff it needs to capture
   if in_preamble:
     in_preamble = False
+    preamble.inject_containerbuilder(containerbuilder)
+
 
 def p_type(p):
   ''' type : INT NUMERIC AS IDENTIFIER
@@ -168,18 +169,6 @@ def p_definestmt(p):
   global containerbuilder
   containerbuilder.define_type(p[2][1], p[3])
 
-
-def p_capturestmt(p):
-  ''' capturestmt : CAPTURE IDENTIFIER NUMERIC AS IDENTIFIER
-                  | CAPTURE IDENTIFIER RET AS IDENTIFIER
-  '''
-
-
-  global preamble
-  if p[3] == "ret":
-    preamble.capture(p[2], p[5], "ret")
-  else:
-    preamble.capture(p[2], p[5], p[3])
 
 
 def p_predexpression(p):

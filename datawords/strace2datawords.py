@@ -83,9 +83,30 @@ class Preamble:
   def __init__(self):
     self.predicates = {}
     self.captures = {}
+    self.containerbuilder = None
     self._current_captured_args = None
     self._current_predicate_results = None
     self._current_syscall = None
+
+
+  def inject_containerbuilder(self, containerbuilder):
+    self.containerbuilder = containerbuilder
+
+    container = []
+    # Instantiate an instance of each top level type
+    # and add it to a list that the preamble will use
+    for k in containerbuilder.builders.keys():
+      if containerbuilder.top_level[k]:
+        container.append(containerbuilder.instantiate_type(k))
+
+    #  These are our top level types
+    for i in container:
+      cur_type = i["type"]
+      if cur_type not in self.captures:
+        self.captures[cur_type] = []
+      for j in i["members"]:
+        self.captures[cur_type].append({"arg_name": j["identifier"], "arg_pos": j["argpos"]})
+
 
 
   def handle_syscall(self, call):
@@ -114,12 +135,6 @@ class Preamble:
         self._current_captured_args[i["arg_name"]] = {
           "arg_pos": i["arg_pos"],
           "value": self._current_syscall.args[int(i["arg_pos"])] if i["arg_pos"] != "ret" else self._current_syscall.ret[0]}
-
-
-  def capture(self, syscall_name, arg_name, arg_pos):
-    if syscall_name not in self.captures:
-      self.captures[syscall_name] = []
-    self.captures[syscall_name].append({"arg_name": arg_name, "arg_pos": arg_pos})
 
 
   def predicate(self, syscall_name, f):

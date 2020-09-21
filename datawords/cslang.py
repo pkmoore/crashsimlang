@@ -34,7 +34,13 @@ tokens = ["IDENTIFIER",
           "NUMERIC",
 ] + list(reserved.values())
 
-literals = ['/', '*', '-', '+', ';',',','(', ')' ]
+literals = ['.', '/', '*', '-', '+', ';',',','(', ')' ]
+
+precedence = (
+    ('left', 'ASSIGNOP'),
+    ('left', '+', '-', '.'),
+    ('left', '*', '/'),
+ )
 
 def t_ASSIGNOP(t):
   r"<-"
@@ -58,6 +64,11 @@ def t_WRITEOP(t):
 
 def t_NUMERIC(t):
   r"[0-9][0-9]*"
+  return t
+
+def t_STRING(t):
+  "\"[^\"]+\""
+  t.value = t.value[1:-1]
   return t
 
 t_ignore = " \t\n"
@@ -182,25 +193,50 @@ def p_predicatestmt(p):
   '''
 
   global preamble
+  global preamble
   preamble.predicate(p[2], p[3])
 
 
 def p_registerassignment(p):
   ''' registerassignment : IDENTIFIER ASSIGNOP NUMERIC
+                         | IDENTIFIER ASSIGNOP STRING
                          | IDENTIFIER ASSIGNOP registerexp
   '''
 
   global automaton
-  automaton.registers[p[1]] = int(p[3])
+  try:
+    automaton.registers[p[1]] = int(p[3])
+  except ValueError:
+    automaton.registers[p[1]] = p[3]
 
 def p_registerexp(p):
   ''' registerexp : registeradd
                   | registersub
                   | registermul
                   | registerdiv
+                  | registerconcat
   '''
 
   p[0] = p[1]
+
+def p_registerconcat(p):
+  ''' registerconcat : IDENTIFIER '.' IDENTIFIER
+                     | IDENTIFIER '.' STRING
+                     | STRING '.' IDENTIFIER
+                     | STRING '.' STRING
+  '''
+
+  if p[1] in automaton.registers:
+    lhs = automaton.registers[p[1]]
+  else:
+    lhs = p[1]
+
+  if p[3] in automaton.registers:
+    rhs = automaton.registers[p[3]]
+  else:
+    rhs = p[3]
+  p[0] = str(lhs) + str(rhs)
+
 
 def p_registeradd(p):
   ''' registeradd : IDENTIFIER '+' IDENTIFIER

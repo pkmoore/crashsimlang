@@ -5,6 +5,16 @@ from cslang import main as cslang_main
 
 class TestRegisterExpressions():
 
+  def test_concat(self):
+    global automaton
+    test_file = "test/registerconcat.cslang"
+    cslang_main(test_file)
+    automaton = runner_main(test_file)
+    assert automaton.registers["numnum"] == "hello"
+    assert automaton.registers["regnum"] == "hello"
+    assert automaton.registers["numreg"] == "lohel"
+    assert automaton.registers["regreg"] == "helhel"
+
   def test_add(self):
     global automaton
     test_file = "test/registeradd.cslang"

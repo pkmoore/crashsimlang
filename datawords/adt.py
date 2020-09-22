@@ -11,8 +11,8 @@ class ContainerBuilder(object):
   def primative(self, in_data):
     incoming_type = in_data[0]
     incoming_arg = in_data[1]
-    incoming_identifier = in_data[2]
-    return {"type": incoming_type, "argpos": incoming_arg, "members": [], "identifier": incoming_identifier}
+    incoming_arg_name = in_data[2]
+    return {"type": incoming_type, "arg_pos": incoming_arg, "members": [], "arg_name": incoming_arg_name}
 
   def define_type(self, container_type, types):
     # It is an error for us to already have a builder for the type we're defining
@@ -39,11 +39,11 @@ class ContainerBuilder(object):
     def t_func(in_data):
       incoming_type = container_type
       incoming_arg = in_data[1]
-      incoming_identifier = in_data[2]
+      incoming_arg_name = in_data[2]
       t = {}
       t["type"] = incoming_type
-      t["argpos"] = incoming_arg
-      t["identifier"] = incoming_identifier
+      t["arg_pos"] = incoming_arg
+      t["arg_name"] = incoming_arg_name
       t["members"] = []
 
       # Step through each type and apply the appropriate builder
@@ -65,21 +65,21 @@ class ContainerBuilder(object):
 
   def instantiate_type(self, t):
     instance = self.builders[t](t)
-    del(instance["argpos"])
-    del(instance["identifier"])
+    del(instance["arg_pos"])
+    del(instance["arg_name"])
     return instance
 
 
 #define statbuf("String":0, "Int":5)
-#{"type": "statbuf", "values": [{"type": "String", "argpos": 0},
-#                               {"type": "Int", "argpos": 5}
+#{"type": "statbuf", "values": [{"type": "String", "arg_pos": 0},
+#                               {"type": "Int", "arg_pos": 5}
 #                              ]
 #}
 #
 #define stat(string:0, statbuf:1)
-#{"type": "stat", values:[{"type": "String", "argpos": 0},
-#                         {"type": "statbuf", "values": [{"type": "String", "argpos": 0},
-#                                                        {"type": "Int", "argpos": 5}
+#{"type": "stat", values:[{"type": "String", "arg_pos": 0},
+#                         {"type": "statbuf", "values": [{"type": "String", "arg_pos": 0},
+#                                                        {"type": "Int", "arg_pos": 5}
 #                                                       ]
 #                         }
 #                        ]

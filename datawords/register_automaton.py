@@ -48,13 +48,13 @@ class State:
     # incoming_dataword brought us into this state so its time to execute
     # our register stores using the captured_arguments it contains
     for i in self.register_stores:
-      cca = incoming_dataword.captured_arguments.items()[i[0]][1]
-      registers[i[1]] = str(cca["value"])
+      cca = incoming_dataword.captured_arguments[i[0]]
+      registers[i[1]] = str(cca["members"][0])
 
     for i in self.register_writes:
       cca = incoming_dataword
-      cca = incoming_dataword.captured_arguments.items()[i[0]][1]
-      cca["value"] = registers[i[1]]
+      cca = incoming_dataword.captured_arguments[i[0]]
+      cca["members"][0] = registers[i[1]]
 
 
   def __str__(self):
@@ -89,9 +89,8 @@ class Transition:
 
   def _pass_register_matches(self, current_dataword, registers):
     for i in self.register_matches:
-      cca = current_dataword.captured_arguments.items()[i[0]][1]
-      if str(cca["value"]) != registers[str(i[1])]:
-        print(str(cca["value"]) + "|" + registers[str(i[1])])
+      cca = current_dataword.captured_arguments[i[0]]
+      if str(cca["members"][0]) != registers[str(i[1])]:
         return False
     return True
 

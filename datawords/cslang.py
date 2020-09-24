@@ -67,7 +67,7 @@ def t_WRITEOP(t):
   return t
 
 def t_NUMERIC(t):
-  r"[0-9][0-9]*(\.[0-9]+)?"
+  r"-?[0-9][0-9]*(\.[0-9]+)?"
   t.value = ("NUMERIC", t.value)
   return t
 

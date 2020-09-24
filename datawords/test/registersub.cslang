@@ -1,5 +1,6 @@
 tmp <- 2;
 ftmp <- 2.5;
+ntmp <- -1.5;
 
 tmp <- 5;
 numnum <- 4 - 3;
@@ -11,3 +12,8 @@ fnumnum <- 3.5 - 3.5;
 fregnum <- ftmp - 2.5;
 fnumreg <- 2.5 - ftmp;
 fregreg <- ftmp - ftmp;
+
+nnumnum <- -1.5 - -1.5;
+nregnum <- ntmp - -1.5;
+nnumreg <- -1.5 - ntmp;
+nregreg <- ntmp - ntmp;

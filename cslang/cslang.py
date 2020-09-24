@@ -486,6 +486,7 @@ def main(name, parse_only=False):
     with open(automaton_path, "w") as f:
       pickle.dump(automaton, f)
 
+    return preamble, datawords, automaton, containerbuilder
 
 
 

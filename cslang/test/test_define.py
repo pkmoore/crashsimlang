@@ -8,8 +8,7 @@ class TestOpen():
 
   def test_define(self):
     # Hack: Global
-    global containerbuilder
     test_file = "test/define.cslang"
-    cslang_main(test_file, parse_only=True)
+    preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
     assert "fstat" in containerbuilder.builders
 

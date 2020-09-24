@@ -20,8 +20,6 @@ reserved = {
     'as' : 'AS',
     'ret' : 'RET',
     'define' : 'DEFINE',
-    'Numeric' : 'NUMERIC',
-    'String' : 'STRING'
 }
 
 tokens = ["IDENTIFIER",
@@ -31,6 +29,7 @@ tokens = ["IDENTIFIER",
           "EQUALSOP",
           "ASSIGNOP",
           "NUM_LITERAL",
+          "STRING_LITERAL"
 ] + list(reserved.values())
 
 literals = ['.', '/', '*', '-', '+', ';',',','(', ')' ]
@@ -71,7 +70,7 @@ def t_NUM_LITERAL(t):
   t.value = ("NUM_LITERAL", t.value)
   return t
 
-def t_STRING(t):
+def t_STRING_LITERAL(t):
   "\"[^\"]+\""
   t.value = ("STRING", t.value[1:-1])
   return t
@@ -141,10 +140,8 @@ def p_bodystatement(p):
 
 
 def p_type(p):
-  ''' type : NUMERIC NUM_LITERAL AS IDENTIFIER
-           | NUMERIC RET AS IDENTIFIER
-           | STRING NUM_LITERAL AS IDENTIFIER
-           | STRING RET AS IDENTIFIER
+  ''' type : IDENTIFIER NUM_LITERAL AS IDENTIFIER
+           | IDENTIFIER RET AS IDENTIFIER
   '''
 
   p[0] = (p[1][1], p[2][1], p[4][1])
@@ -196,7 +193,7 @@ def p_predicatestmt(p):
 
 def p_registerassignment(p):
   ''' registerassignment : IDENTIFIER ASSIGNOP NUM_LITERAL
-                         | IDENTIFIER ASSIGNOP STRING
+                         | IDENTIFIER ASSIGNOP STRING_LITERAL
                          | IDENTIFIER ASSIGNOP registerexp
   '''
 
@@ -223,9 +220,9 @@ def p_registerexp(p):
 
 def p_registerconcat(p):
   ''' registerconcat : IDENTIFIER '.' IDENTIFIER
-                     | IDENTIFIER '.' STRING
-                     | STRING '.' IDENTIFIER
-                     | STRING '.' STRING
+                     | IDENTIFIER '.' STRING_LITERAL
+                     | STRING_LITERAL '.' IDENTIFIER
+                     | STRING_LITERAL '.' STRING_LITERAL
   '''
 
   if p[1][0] == "IDENTIFIER":

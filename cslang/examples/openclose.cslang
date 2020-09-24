@@ -1,6 +1,6 @@
-define open String 0 as filename, Int ret as filedesc;
-define read Int 0 as filedesc;
-define close Int 0 as filedesc, Int ret as retval;
+define open String 0 as filename, Numeric ret as filedesc;
+define read Numeric 0 as filedesc;
+define close Numeric 0 as filedesc, Numeric ret as retval;
 
 #predicate open filename == "test.txt";
 

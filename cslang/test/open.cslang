@@ -1,4 +1,4 @@
-define open String 0 as filename, Int ret as filedesc;
+define open String 0 as filename, Numeric ret as filedesc;
 #predicate open filename == "test.txt";
 
 

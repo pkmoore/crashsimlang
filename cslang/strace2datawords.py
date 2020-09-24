@@ -145,7 +145,7 @@ class Preamble:
 
   def _get_arg_as_type(self, arg_pos, out_type):
     funcs = {"String": str,
-             "Int": int
+             "Numeric": int
      }
     if arg_pos == "ret":
       return funcs[out_type](self._current_syscall.ret[0])

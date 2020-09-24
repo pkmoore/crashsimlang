@@ -5,8 +5,8 @@ import pprint
 
 class ContainerBuilder(object):
   def __init__(self):
-    self.builders = {"Int": self.primative, "String": self.primative}
-    self.top_level = {"Int": False, "String": False}
+    self.builders = {"Numeric": self.primative, "String": self.primative}
+    self.top_level = {"Numeric": False, "String": False}
 
   def primative(self, in_data):
     incoming_type = in_data[0]

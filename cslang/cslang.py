@@ -20,7 +20,7 @@ reserved = {
     'as' : 'AS',
     'ret' : 'RET',
     'define' : 'DEFINE',
-    'Int' : 'INT',
+    'Numeric' : 'NUMERIC',
     'String' : 'STRING'
 }
 
@@ -30,7 +30,7 @@ tokens = ["IDENTIFIER",
           "WRITEOP",
           "EQUALSOP",
           "ASSIGNOP",
-          "NUMERIC",
+          "NUM_LITERAL",
 ] + list(reserved.values())
 
 literals = ['.', '/', '*', '-', '+', ';',',','(', ')' ]
@@ -66,9 +66,9 @@ def t_WRITEOP(t):
   t.value = ("OPERATOR", t.value)
   return t
 
-def t_NUMERIC(t):
+def t_NUM_LITERAL(t):
   r"-?[0-9][0-9]*(\.[0-9]+)?"
-  t.value = ("NUMERIC", t.value)
+  t.value = ("NUM_LITERAL", t.value)
   return t
 
 def t_STRING(t):
@@ -141,9 +141,9 @@ def p_bodystatement(p):
 
 
 def p_type(p):
-  ''' type : INT NUMERIC AS IDENTIFIER
-           | INT RET AS IDENTIFIER
-           | STRING NUMERIC AS IDENTIFIER
+  ''' type : NUMERIC NUM_LITERAL AS IDENTIFIER
+           | NUMERIC RET AS IDENTIFIER
+           | STRING NUM_LITERAL AS IDENTIFIER
            | STRING RET AS IDENTIFIER
   '''
 
@@ -172,7 +172,7 @@ def p_definestmt(p):
 
 
 def p_predexpression(p):
-  ''' predexpression : IDENTIFIER EQUALSOP NUMERIC
+  ''' predexpression : IDENTIFIER EQUALSOP NUM_LITERAL
   '''
 
   if p[2] == "==":
@@ -195,16 +195,16 @@ def p_predicatestmt(p):
 
 
 def p_registerassignment(p):
-  ''' registerassignment : IDENTIFIER ASSIGNOP NUMERIC
+  ''' registerassignment : IDENTIFIER ASSIGNOP NUM_LITERAL
                          | IDENTIFIER ASSIGNOP STRING
                          | IDENTIFIER ASSIGNOP registerexp
   '''
 
   global automaton
   if p[1][0] != 'IDENTIFIER':
-    raise CSLangError("Bad type for register name: {}".format(p[1]))
+    raise CSlangError("Bad type for register name: {}".format(p[1]))
   register_name = p[1][1]
-  if p[3][0] == 'NUMERIC':
+  if p[3][0] in ['NUM_LITERAL', 'NUMERIC']:
     automaton.registers[register_name] = float(p[3][1])
   elif p[3][0] == 'STRING':
     automaton.registers[register_name] = str(p[3][1])
@@ -247,21 +247,21 @@ def p_registerconcat(p):
 
 def p_registeradd(p):
   ''' registeradd : IDENTIFIER '+' IDENTIFIER
-                  | IDENTIFIER '+' NUMERIC
-                  | NUMERIC '+' IDENTIFIER
-                  | NUMERIC '+' NUMERIC
+                  | IDENTIFIER '+' NUM_LITERAL
+                  | NUM_LITERAL '+' IDENTIFIER
+                  | NUM_LITERAL '+' NUM_LITERAL
   '''
 
   if p[1][0] == 'IDENTIFIER':
     lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUMERIC':
+  elif p[1][0] == 'NUM_LITERAL':
     lhs = p[1][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
   if p[3][0] == 'IDENTIFIER':
     rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUMERIC':
+  elif p[3][0] == 'NUM_LITERAL':
     rhs = p[3][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))
@@ -270,21 +270,21 @@ def p_registeradd(p):
 
 def p_registersub(p):
   ''' registersub : IDENTIFIER '-' IDENTIFIER
-                  | IDENTIFIER '-' NUMERIC
-                  | NUMERIC '-' IDENTIFIER
-                  | NUMERIC '-' NUMERIC
+                  | IDENTIFIER '-' NUM_LITERAL
+                  | NUM_LITERAL '-' IDENTIFIER
+                  | NUM_LITERAL '-' NUM_LITERAL
   '''
 
   if p[1][0] == 'IDENTIFIER':
     lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUMERIC':
+  elif p[1][0] == 'NUM_LITERAL':
     lhs = p[1][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
   if p[3][0] == 'IDENTIFIER':
     rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUMERIC':
+  elif p[3][0] == 'NUM_LITERAL':
     rhs = p[3][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))
@@ -293,21 +293,21 @@ def p_registersub(p):
 
 def p_registermul(p):
   ''' registermul : IDENTIFIER '*' IDENTIFIER
-                  | IDENTIFIER '*' NUMERIC
-                  | NUMERIC '*' IDENTIFIER
-                  | NUMERIC '*' NUMERIC
+                  | IDENTIFIER '*' NUM_LITERAL
+                  | NUM_LITERAL '*' IDENTIFIER
+                  | NUM_LITERAL '*' NUM_LITERAL
   '''
 
   if p[1][0] == 'IDENTIFIER':
     lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUMERIC':
+  elif p[1][0] == 'NUM_LITERAL':
     lhs = p[1][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
   if p[3][0] == 'IDENTIFIER':
     rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUMERIC':
+  elif p[3][0] == 'NUM_LITERAL':
     rhs = p[3][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))
@@ -316,20 +316,20 @@ def p_registermul(p):
 
 def p_registerdiv(p):
   ''' registerdiv : IDENTIFIER '/' IDENTIFIER
-                  | IDENTIFIER '/' NUMERIC
-                  | NUMERIC '/' IDENTIFIER
-                  | NUMERIC '/' NUMERIC
+                  | IDENTIFIER '/' NUM_LITERAL
+                  | NUM_LITERAL '/' IDENTIFIER
+                  | NUM_LITERAL '/' NUM_LITERAL
   '''
   if p[1][0] == 'IDENTIFIER':
     lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUMERIC':
+  elif p[1][0] == 'NUM_LITERAL':
     lhs = p[1][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[1]))
 
   if p[3][0] == 'IDENTIFIER':
     rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUMERIC':
+  elif p[3][0] == 'NUM_LITERAL':
     rhs = p[3][1]
   else:
     raise CSlangError("Bad type in substraction: {}".format(p[3]))

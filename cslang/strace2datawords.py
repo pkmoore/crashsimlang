@@ -83,7 +83,7 @@ class UninterestingDataWord(DataWord):
 class Preamble:
   def __init__(self):
     self.predicates = {}
-    self.captures = {}
+    self.captures = []
     self.containerbuilder = None
     self._current_captured_args = None
     self._current_predicate_results = None
@@ -104,10 +104,7 @@ class Preamble:
     for i in container:
       cur_type = i["type"]
       if cur_type not in self.captures:
-        self.captures[cur_type] = []
-      for j in i["members"]:
-        self.captures[cur_type].append({"arg_name": j["arg_name"], "arg_pos": j["arg_pos"]})
-
+        self.captures.append(cur_type)
 
 
   def handle_syscall(self, call):
@@ -132,14 +129,8 @@ class Preamble:
   def _capture_args(self):
     if self._current_syscall.name in self.captures:
       container = self.containerbuilder.instantiate_type(self._current_syscall.name)
-      for i in range(len(self.captures[self._current_syscall.name])):
-        current_capture = self.captures[self._current_syscall.name][i]
-        # Note this works because self.captures was built based on the layout of container
-        # as determined when inject_containerbuilder was called
-        if current_capture["arg_pos"] == "ret":
-          container["members"][i]["members"].append(self._get_arg_as_type("ret", container["members"][i]["type"]))
-        else:
-          container["members"][i]["members"].append(self._get_arg_as_type(int(current_capture["arg_pos"]), container["members"][i]["type"]))
+      for i in container["members"]:
+        i["members"].append(self._get_arg_as_type(i["arg_pos"], i["type"]))
       return container
 
 
@@ -150,7 +141,7 @@ class Preamble:
     if arg_pos == "ret":
       return funcs[out_type](self._current_syscall.ret[0])
     else:
-      return funcs[out_type](self._current_syscall.args[arg_pos].value)
+      return funcs[out_type](self._current_syscall.args[int(arg_pos)].value)
 
 
 

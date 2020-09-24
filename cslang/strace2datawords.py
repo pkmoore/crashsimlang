@@ -112,12 +112,17 @@ class Preamble:
     self._current_captured_args = OrderedDict()
     self._current_predicate_results = []
     self._apply_predicates()
+    if self._current_syscall.name in self.captures:
+      argslist = list(call.args)
+      argslist.append(call.ret[0])
+      container = self.containerbuilder.instantiate_type(self._current_syscall.name)
+      container = self._capture_args(container, argslist)
     if len(self.captures) == 0:
       # Right now, we define a system call we aren't interested in as
       # any system call with no captured arguments
       return UninterestingDataWord(self._current_syscall)
     else:
-      return DataWord(self._current_syscall, self._capture_args(), self._current_predicate_results)
+      return DataWord(self._current_syscall, container, self._current_predicate_results)
 
 
   def _apply_predicates(self):
@@ -126,22 +131,26 @@ class Preamble:
         self._current_predicate_results.append(i(self._current_captured_args))
 
 
-  def _capture_args(self):
-    if self._current_syscall.name in self.captures:
-      container = self.containerbuilder.instantiate_type(self._current_syscall.name)
-      for i in container["members"]:
-        i["members"].append(self._get_arg_as_type(i["arg_pos"], i["type"]))
-      return container
+  def _capture_args(self, container, argslist):
+    for i in container["members"]:
+      if i["type"] in self.containerbuilder.primatives:
+        i["members"].append(self._get_arg_as_type(i["arg_pos"], i["type"], argslist))
+      else:
+        self._capture_args(i, argslist[int(i["arg_pos"])])
+    return container
 
 
-  def _get_arg_as_type(self, arg_pos, out_type):
+  def _get_arg_as_type(self, arg_pos, out_type, argslist):
     funcs = {"String": str,
              "Numeric": int
      }
     if arg_pos == "ret":
-      return funcs[out_type](self._current_syscall.ret[0])
+      return funcs[out_type](argslist[-1])
     else:
-      return funcs[out_type](self._current_syscall.args[int(arg_pos)].value)
+      if hasattr(argslist[int(arg_pos)], 'value'):
+        return funcs[out_type](argslist[int(arg_pos)].value)
+      else:
+        return funcs[out_type](argslist[int(arg_pos)])
 
 
 

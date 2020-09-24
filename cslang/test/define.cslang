@@ -1,3 +1,4 @@
-define fstat Numeric 0 as filedesc;
+define statbuf String 0 as dev, String 1 as stino;
+define fstat Numeric 0 as filedesc, statbuf 1 as statstruct;
 
 fstat(filedesc);

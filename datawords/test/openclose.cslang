@@ -1,0 +1,20 @@
+define open String 0 as filename, Int ret as filedesc;
+define read Int 0 as filedesc;
+define close Int 0 as filedesc, Int ret as retval;
+
+#predicate open filename == "test.txt";
+
+# Register initialization.  Registers do not have to be initialized before use
+retval <- "-1";
+
+# Match an open call, store the file name and returned file descriptors
+# to the 'filename' and 'filedesc' registers respectively
+#
+open(!filename, !filedesc);
+
+NOT read(?filedesc);
+## Match a close call its the value in 'filedesc' as the file descriptor being
+## closed
+
+
+close(?filedesc, ->retval);

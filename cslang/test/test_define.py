@@ -11,6 +11,7 @@ class TestOpen(unittest.TestCase):
     # Hack: Global
     test_file = "test/define.cslang"
     preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
+    runner_main(test_file)
     assert "fstat" in containerbuilder.builders
     assert "statbuf" in containerbuilder.builders
 

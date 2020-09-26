@@ -47,15 +47,17 @@ class DataWord(object):
     tmp += '  '
     tmp += self.type
     tmp += '('
-
-    coalesced_args = [str(v) for v in list(self.original_system_call.args)]
+    coalesced_args = list(self.original_system_call.args)
     modified_ret = None
     for i in self.captured_arguments:
       if i["arg_pos"] == "ret":
         modified_ret = i
         continue
-      coalesced_args[int(i["arg_pos"])] = str(i["members"][0])
-    tmp += ', '.join(coalesced_args)
+      arg_to_be_updated = coalesced_args[int(i["arg_pos"])]
+      print(arg_to_be_updated)
+      arg_to_be_updated.value = self._recursive_update_args(arg_to_be_updated, i)
+      print(arg_to_be_updated)
+    tmp += ', '.join([str(v) for v in coalesced_args])
     tmp += ')'
     tmp += '  =  '
 
@@ -67,6 +69,25 @@ class DataWord(object):
     return tmp
 
 
+  def _recursive_update_args(self, args, values):
+    # There are three cases we have to deal with here
+    # Case 1. When we get a posix_omni_parser object with a single
+    # value.  This is indicated by an object with a "value" attribute
+    # that is not a list.  In this case, we set the object's value attribute
+    if hasattr(args, 'value') and type(args.value) is not list:
+        return values["members"][0]
+    # Case 2 happens we are going through a list encountered in Case 3
+    # and hit a non-list item.  In this case, we set the value of that item.
+    elif type(args) is str or type(args.value) is not list:
+        return  values["members"][0]
+    # Case 3 happens when we encounter a list and must iterate through and
+    # handle each of its items recursively
+    # Note: This may break if there are nested parsing classes
+    else:
+      values = values["members"]
+      for i in range(len(values)):
+        args.value[int(values[i]["arg_pos"])] =  self._recursive_update_args(args.value[int(values[i]["arg_pos"])], values[i])
+      return args.value
 
 
 

@@ -1,6 +1,6 @@
 tmp <- "hel";
 
-numnum <- "hel" . "lo";
-regnum <- tmp . "lo";
-numreg <- "lo" . tmp;
-regreg <- tmp . tmp;
+numnum <- "hel" + "lo";
+regnum <- tmp + "lo";
+numreg <- "lo" + tmp;
+regreg <- tmp + tmp;

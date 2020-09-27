@@ -32,11 +32,11 @@ tokens = ["IDENTIFIER",
           "STRING_LITERAL"
 ] + list(reserved.values())
 
-literals = ['.', '/', '*', '-', '+', ';',',','(', ')' ]
+literals = ['/', '*', '-', '+', ';',',','(', ')' ]
 
 precedence = (
     ('left', 'ASSIGNOP'),
-    ('left', '+', '-', '.'),
+    ('left', '+', '-'),
     ('left', '*', '/'),
  )
 
@@ -215,15 +215,34 @@ def p_registerexp(p):
                   | registermul
                   | registerdiv
                   | registerconcat
+                  | registeraddorconcat
   '''
 
   p[0] = p[1]
 
+def p_registeraddorconcat(p):
+  ''' registeraddorconcat : IDENTIFIER '+' IDENTIFIER
+  '''
+
+  lhs = automaton.registers[p[1][1]]
+  rhs = automaton.registers[p[3][1]]
+
+  if type(lhs) != type(rhs):
+    raise CSlangError("Type mismatch between registers {} and {}"
+                      .format(p[1][1], p[3][1]))
+
+  if type(lhs) == str:
+    p[0] = ('STRING', str(lhs) + str(rhs))
+  elif type(rhs) == float:
+    p[0] = ('NUMERIC', float(lhs) + float(rhs))
+  else:
+    raise CSlangError("Bad type in string concatenation: {}".format(p[1]))
+
+
 def p_registerconcat(p):
-  ''' registerconcat : IDENTIFIER '.' IDENTIFIER
-                     | IDENTIFIER '.' STRING_LITERAL
-                     | STRING_LITERAL '.' IDENTIFIER
-                     | STRING_LITERAL '.' STRING_LITERAL
+  ''' registerconcat : IDENTIFIER '+' STRING_LITERAL
+                     | STRING_LITERAL '+' IDENTIFIER
+                     | STRING_LITERAL '+' STRING_LITERAL
   '''
 
   if p[1][0] == "IDENTIFIER":
@@ -244,8 +263,7 @@ def p_registerconcat(p):
 
 
 def p_registeradd(p):
-  ''' registeradd : IDENTIFIER '+' IDENTIFIER
-                  | IDENTIFIER '+' NUM_LITERAL
+  ''' registeradd : IDENTIFIER '+' NUM_LITERAL
                   | NUM_LITERAL '+' IDENTIFIER
                   | NUM_LITERAL '+' NUM_LITERAL
   '''

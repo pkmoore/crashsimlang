@@ -194,14 +194,15 @@ def p_predicatestmt(p):
 def p_registerassignment(p):
   ''' registerassignment : IDENTIFIER ASSIGNOP NUM_LITERAL
                          | IDENTIFIER ASSIGNOP STRING_LITERAL
+                         | IDENTIFIER ASSIGNOP IDENTIFIER
                          | IDENTIFIER ASSIGNOP registerexp
   '''
 
   global automaton
-  if p[1][0] != 'IDENTIFIER':
-    raise CSlangError("Bad type for register name: {}".format(p[1]))
   register_name = p[1][1]
-  if p[3][0] in ['NUM_LITERAL', 'NUMERIC']:
+  if p[3][0] == 'IDENTIFIER':
+    automaton.registers[register_name] = automaton.registers[p[3][1]]
+  elif p[3][0] in ['NUM_LITERAL', 'NUMERIC']:
     automaton.registers[register_name] = float(p[3][1])
   elif p[3][0] == 'STRING':
     automaton.registers[register_name] = str(p[3][1])

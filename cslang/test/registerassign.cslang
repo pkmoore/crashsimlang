@@ -1,0 +1,7 @@
+assignstr <- "hel";
+assignnum <- 5;
+tmpn <- 4;
+tmps <- "worked";
+assignidn <- tmpn;
+assignids <- tmps;
+

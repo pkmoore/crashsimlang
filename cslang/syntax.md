@@ -6,9 +6,9 @@ READOP: ?
 
 STOREOP: !
 
-_WRITEOP: ->
+WRITEOP: ->
 
-_NUM_LITERAL: -?[0-9][0-9]*(\.[0-9]+)?
+NUM_LITERAL: -?[0-9][0-9]*(\.[0-9]+)?
 
 STRING_LITERAL: "[^"]+"
 

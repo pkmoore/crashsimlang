@@ -1,4 +1,4 @@
-ASSIGNOP: <-
+```ASSIGNOP: <-
 
 EQUALSOP: ==
 
@@ -8,16 +8,16 @@ STOREOP: !
 
 _WRITEOP: ->
 
-_NUM_LITERAL: ```-?[0-9][0-9]*(\.[0-9]+)?```
+_NUM_LITERAL: -?[0-9][0-9]*(\.[0-9]+)?
 
 STRING_LITERAL: "[^"]+"
 
-IDENTIFIER: "[A-Za-z_][a-zA-Z0-9]*
+IDENTIFIER: [A-Za-z_][a-zA-Z0-9]*
 
 COMMENT: #
 
-statementlist : statement  statementlist
-              | statement
+statementlist : statement  statementlist  
+                 | statement  
 
 statement : preamblestatement
           | bodystatement
@@ -88,3 +88,4 @@ parameter : READOP IDENTIFIER
           | WRITEOP IDENTIFIER
           | IDENTIFIER
 
+```

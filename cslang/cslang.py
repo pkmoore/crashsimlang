@@ -17,9 +17,8 @@ import sys
 reserved = {
     'predicate' : 'PREDICATE',
     'NOT' : 'NOT',
-    'as' : 'AS',
     'ret' : 'RET',
-    'define' : 'DEFINE',
+    'type' : 'TYPE',
 }
 
 tokens = ["IDENTIFIER",
@@ -32,7 +31,7 @@ tokens = ["IDENTIFIER",
           "STRING_LITERAL"
 ] + list(reserved.values())
 
-literals = ['/', '*', '-', '+', ';',',','(', ')' ]
+literals = ['{', '}', ':', '@', '/', '*', '-', '+', ';',',','(', ')' ]
 
 precedence = (
     ('left', 'ASSIGNOP'),
@@ -117,7 +116,7 @@ def p_statement(p):
 
 def p_preamblestatement(p):
   ''' preamblestatement : predicatestmt ';'
-                        | definestmt ';'
+                        | typedefinition ';'
   '''
   global in_preamble
   if not in_preamble:
@@ -139,17 +138,17 @@ def p_bodystatement(p):
     preamble.inject_containerbuilder(containerbuilder)
 
 
-def p_type(p):
-  ''' type : IDENTIFIER NUM_LITERAL AS IDENTIFIER
-           | IDENTIFIER RET AS IDENTIFIER
+def p_typeexpression(p):
+  ''' typeexpression :  IDENTIFIER ':' IDENTIFIER '@' NUM_LITERAL
+                     |  IDENTIFIER ':' IDENTIFIER '@' RET
   '''
+        # Type     Position Name
+  p[0] = (p[3][1], p[5][1], p[1][1])
 
-  p[0] = (p[1][1], p[2][1], p[4][1])
 
-
-def p_typelist(p):
-  ''' typelist : type ',' typelist
-               | type
+def p_typeexpressionlist(p):
+  ''' typeexpressionlist : typeexpression ',' typeexpressionlist
+                             | typeexpression
   '''
 
   if len(p) == 4:
@@ -158,13 +157,13 @@ def p_typelist(p):
     p[0] = [p[1]]
 
 
-def p_definestmt(p):
-  ''' definestmt : DEFINE IDENTIFIER typelist
+def p_typedefinition(p):
+  ''' typedefinition : TYPE IDENTIFIER '{' typeexpressionlist '}'
 
   '''
 
   global containerbuilder
-  containerbuilder.define_type(p[2][1], p[3])
+  containerbuilder.define_type(p[2][1], p[4])
 
 
 

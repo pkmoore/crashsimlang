@@ -1,6 +1,6 @@
-define open String 0 as filename, Numeric ret as filedesc;
-define read Numeric 0 as filedesc;
-define close Numeric 0 as filedesc, Numeric ret as retval;
+type open {filename: String@0, filedesc: Numeric@ret};
+type read {filedesc: Numeric@0};
+type close {filedesc: Numeric@0, retval: Numeric@ret};
 
 #predicate open filename == "test.txt";
 

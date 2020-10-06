@@ -29,12 +29,11 @@ class RegisterAutomaton:
 
 
 class State:
-  def __init__(self, name, transitions=None, is_accepting=False, register_stores=None, register_writes=None, tags=None):
+  def __init__(self, name, operations=None, transitions=None, is_accepting=False, tags=None):
     self.name = name
     self.transitions = transitions if transitions is not None else []
     self.is_accepting = is_accepting
-    self.register_stores = register_stores if register_stores is not None else []
-    self.register_writes = register_writes if register_writes is not None else []
+    self.operations = operations if operations is not None else []
     self.tags = tags if tags is not None else []
 
   def match(self, incoming_dataword, registers):
@@ -45,27 +44,41 @@ class State:
     return -1
 
   def enter(self, incoming_dataword, registers):
-    # incoming_dataword brought us into this state so its time to execute
-    # our register stores using the captured_arguments it contains
-    for i in self.register_stores:
-      for j in range(len(incoming_dataword.captured_arguments)):
-        # We have to search through a list of dictionaries until we find
-        # one whose "arg_name" matches the arg_name from the register match
-        # tuple (position 0)
-        if incoming_dataword.captured_arguments[j]["arg_name"] == i[0]:
-          cca = incoming_dataword.captured_arguments[j]
-      registers[i[1]] = str(cca["members"][0])
+    for i in self.operations:
+    # REGISTER STORES
+      for i in self.operations:
+        match_paths = _extract_paths("", (i, ), "!")
+        if match_paths:
+          for i in match_paths:
+            self._store_path_to_register(incoming_dataword, i[0], registers, i[1])
 
-    for i in self.register_writes:
-      cca = incoming_dataword
-      # HACK: THIS WAS COPIED FROM AROUND LINE 52! REFACTOR OUT!
-      for j in range(len(incoming_dataword.captured_arguments)):
-        # We have to search through a list of dictionaries until we find
-        # one whose "arg_name" matches the arg_name from the register match
-        # tuple (position 0)
-        if incoming_dataword.captured_arguments[j]["arg_name"] == i[0]:
-          cca = incoming_dataword.captured_arguments[j]
-      cca["members"][0] = registers[i[1]]
+    for i in self.operations:
+    # REGISTER WRITES
+      for i in self.operations:
+        match_paths = _extract_paths("", (i, ), "->")
+        if match_paths:
+          for i in match_paths:
+            self._write_register_to_path(incoming_dataword, i[0], registers, i[1])
+
+  def _write_register_to_path(self, dataword, path, registers, register):
+    # HACK: Fix the recursion so we don't have to do the below
+    # HACK HACK: This was stolen from around line 159! REFACTOR OUT!
+    path = path[1:]
+    steps = path.split(".")
+    current_argument = _get_member_for_name(dataword.captured_arguments, steps[0])
+    for i in steps[1:]:
+      current_argument = _get_member_for_name(current_argument["members"], i)
+    current_argument["members"][0] = registers[register]
+
+  def _store_path_to_register(self, dataword, path, registers, register):
+    # HACK: Fix the recursion so we don't have to do the below
+    # HACK HACK: This was stolen from around line 159! REFACTOR OUT!
+    path = path[1:]
+    steps = path.split(".")
+    current_argument = _get_member_for_name(dataword.captured_arguments, steps[0])
+    for i in steps[1:]:
+      current_argument = _get_member_for_name(current_argument["members"], i)
+    registers[register] = current_argument["members"][0]
 
 
   def __str__(self):
@@ -81,38 +94,52 @@ class State:
 
 
 class Transition:
-  def __init__(self, dataword_name, register_matches, to_state):
+  def __init__(self, dataword_name, to_state, operations=None):
     self.dataword_name = dataword_name
-    self.register_matches = register_matches
     self.to_state = to_state
+    self.operations = operations if operations is not None else []
 
   def __str__(self):
     tmp = ""
     tmp += "        dataword_name: " + self.dataword_name + "\n"
-    tmp += "        register_matches: " + str(self.register_matches) + "\n"
+    tmp += "        operations: " + str() + "\n"
     tmp += "        to_state: " + str(self.to_state) + "\n"
     return tmp
 
   def match(self, current_dataword, registers):
-    if current_dataword.get_name() == self.dataword_name and self._pass_register_matches(current_dataword, registers):
+    if current_dataword.get_name() == self.dataword_name and self._pass_operations(current_dataword, registers):
       return self.to_state
     return -1
 
-  def _pass_register_matches(self, incoming_dataword, registers):
-    for i in self.register_matches:
-      # HACK: THIS WAS COPIED FROM AROUND LINE 52! REFACTOR OUT!
-      for j in range(len(incoming_dataword.captured_arguments)):
-        # We have to search through a list of dictionaries until we find
-        # one whose "arg_name" matches the arg_name from the register match
-        # tuple (position 0)
-        if incoming_dataword.captured_arguments[j]["arg_name"] == i[0]:
-          cca = incoming_dataword.captured_arguments[j]
-      if str(cca["members"][0]) != registers[str(i[1])]:
-        return False
+  def _pass_operations(self, incoming_dataword, registers):
+    for i in self.operations:
+      match_paths = _extract_paths("", (i, ), "?")
+      if match_paths:
+        # HACK:  Fix the recusion so we don't have to do the next line
+        for i in match_paths:
+          if not self._path_matches_register(incoming_dataword, i[0], registers, i[1]):
+            return False
     return True
 
+  def _path_matches_register(self, dataword, path, registers, register):
+    # HACK: Fix the recursion so we don't have to do the below
+    path = path[1:]
+    steps = path.split(".")
+    current_argument = _get_member_for_name(dataword.captured_arguments, steps[0])
+    for i in steps[1:]:
+      current_argument = _get_member_for_name(current_argument["members"], i)
+    return current_argument["members"][0] == registers[register]
 
-# Matching with no registers -> Does the current data word name match the data
-# word name specified by one of the transitions Right now we only go forward in
-# transitions, so transitioning is current_state++
-# Each state only has one transition
+def _get_member_for_name(current_argument, name):
+  for i in current_argument:
+    if i["arg_name"] == name:
+      return i
+
+def _extract_paths(in_path, objs_list, op):
+  paths = []
+  for i in objs_list:
+    if i[0] == "#":
+      paths.extend(_extract_paths(in_path + "." + i[1], i[2], op))
+    elif i[0] == op:
+      paths.append((in_path + "." + i[1], i[2]))
+  return paths

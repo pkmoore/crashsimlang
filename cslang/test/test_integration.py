@@ -16,7 +16,7 @@ class TestIntegration():
     automaton = runner_main(test_file)
     assert automaton.current_state == 3
     assert automaton.is_accepting
-    assert automaton.registers["fd"] == "3"
+    assert automaton.registers["fd"] == 3
     assert automaton.registers["fn"] == "test.txt"
     assert automaton.registers["retval"] == "-1"
 

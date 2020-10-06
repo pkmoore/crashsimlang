@@ -362,49 +362,12 @@ def p_dataword(p):
   if p[1][1] == "NOT":
     not_dataword = True
     syscall_name = p[2][1]
-    params = p[4]
+    operations = p[4][1]
   else:
     not_dataword = False
     syscall_name = p[1][1]
-    params = p[3]
+    operations = p[3][1]
 
-  register_matches = []
-  register_stores = []
-  register_writes = []
-  for i, v in enumerate(params):
-    operator = v[0]
-    argument_name = v[1]
-    register_name = v[2]
-    if operator == "?":
-      # When we see the "?" operator it means in order to get into this state,
-      # the register name following "?" needs to have the same value as the
-      # captured argument in the same position in the data word.  For example:
-      #
-      # open(?filedesc);
-      #
-      # means that in order to transition to the next state, the current
-      # dataword must represent an open system call with captured argument 0
-      # matching the value in the filedesc register.  Captured argument order
-      # is important and comes from the order the captures are specified in the
-      # preamble
-      register_matches.append((argument_name, register_name))
-
-    if operator == "!":
-      if not_dataword:
-        raise CSlangError("Register stores are illegal in NOT datawords")
-      # When we see "!" it means take the value from the captured argument
-      # corresponding to this parameter's position in the current dataword and
-      # store it into the following register value.  We do this by specifying
-      # register_store tuple that looks like (<captured_arg_position>,
-      # <register_value>).  These register stores are performed whenever we
-      # transition into a new state so we give them to the new State being
-      # created below
-      register_stores.append((argument_name, register_name))
-
-    if operator == "->":
-      if not_dataword:
-        raise CSlangError("Write operations are illegal in NOT datawords")
-      register_writes.append((argument_name, register_name))
 
   if not_dataword:
     #  This is a not dataword so we create our NOT state
@@ -412,14 +375,12 @@ def p_dataword(p):
 
     # And make a transition to it with appropriate register_matches
     automaton.states[-2].transitions.append(Transition(syscall_name,
-                                            register_matches,
-                                            len(automaton.states) - 1))
+                                            len(automaton.states) - 1,
+                                            operations=operations))
 
   else:
     # We encountered a new dataword so we make a new state
-    automaton.states.append(State(syscall_name,
-                            register_stores=register_stores,
-                            register_writes=register_writes))
+    automaton.states.append(State(syscall_name, operations))
 
     # We create a transition to this state on the previous state
 
@@ -433,17 +394,17 @@ def p_dataword(p):
       neg_index -= 1
 
     automaton.states[neg_index].transitions.append(Transition(syscall_name,
-                                                              register_matches,
-                                                              len(automaton.states) - 1))
+                                                              len(automaton.states) - 1,
+                                                              operations=operations))
 
 def p_parameterexpression(p):
   ''' parameterexpression : '{' parameterlist '}'
                           | '{' '}'
   '''
   if len(p) == 3:
-    p[0] = ()
+    p[0] = ("PARAMETEREXPRESSION", )
   else:
-    p[0] = p[2]
+    p[0] = ("PARAMETEREXPRESSION", p[2])
 
 
 
@@ -453,9 +414,9 @@ def p_parameterlist(p):
   '''
 
   if len(p) == 4:
-    p[0] = [p[1]] + p[3]
+    p[0] = (p[1], ) + p[3]
   else:
-    p[0] = [p[1]]
+    p[0] = (p[1], )
 
 
 
@@ -463,8 +424,15 @@ def p_parameter(p):
   '''parameter : READOP IDENTIFIER ':' IDENTIFIER
                | STOREOP IDENTIFIER ':' IDENTIFIER
                | WRITEOP IDENTIFIER ':' IDENTIFIER
+               | IDENTIFIER ':' parameterexpression
   '''
-  p[0] = (p[1][1], p[2][1], p[4][1])
+
+  if p[3][0] == "PARAMETEREXPRESSION":
+    # HACK: We use # to denote that this parameter has a non-primative type
+    p[0] = ("#", p[1][1], p[3][1])
+  else:
+    p[0] = (p[1][1], p[2][1], p[4][1])
+
 
 
 

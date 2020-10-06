@@ -387,7 +387,7 @@ def p_dataword(p):
       # matching the value in the filedesc register.  Captured argument order
       # is important and comes from the order the captures are specified in the
       # preamble
-      register_matches.append((i, register_name))
+      register_matches.append((argument_name, register_name))
 
     if operator == "!":
       if not_dataword:
@@ -399,12 +399,12 @@ def p_dataword(p):
       # <register_value>).  These register stores are performed whenever we
       # transition into a new state so we give them to the new State being
       # created below
-      register_stores.append((i, register_name))
+      register_stores.append((argument_name, register_name))
 
     if operator == "->":
       if not_dataword:
         raise CSlangError("Write operations are illegal in NOT datawords")
-      register_writes.append((i, register_name))
+      register_writes.append((argument_name, register_name))
 
   if not_dataword:
     #  This is a not dataword so we create our NOT state

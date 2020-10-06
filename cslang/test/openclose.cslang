@@ -17,4 +17,4 @@ NOT read({?filedesc: fd});
 ## closed
 
 
-close({?filedesc: fd, ->retval: retval});
+close({->retval: retval, ?filedesc: fd});

@@ -48,12 +48,23 @@ class State:
     # incoming_dataword brought us into this state so its time to execute
     # our register stores using the captured_arguments it contains
     for i in self.register_stores:
-      cca = incoming_dataword.captured_arguments[i[0]]
+      for j in range(len(incoming_dataword.captured_arguments)):
+        # We have to search through a list of dictionaries until we find
+        # one whose "arg_name" matches the arg_name from the register match
+        # tuple (position 0)
+        if incoming_dataword.captured_arguments[j]["arg_name"] == i[0]:
+          cca = incoming_dataword.captured_arguments[j]
       registers[i[1]] = str(cca["members"][0])
 
     for i in self.register_writes:
       cca = incoming_dataword
-      cca = incoming_dataword.captured_arguments[i[0]]
+      # HACK: THIS WAS COPIED FROM AROUND LINE 52! REFACTOR OUT!
+      for j in range(len(incoming_dataword.captured_arguments)):
+        # We have to search through a list of dictionaries until we find
+        # one whose "arg_name" matches the arg_name from the register match
+        # tuple (position 0)
+        if incoming_dataword.captured_arguments[j]["arg_name"] == i[0]:
+          cca = incoming_dataword.captured_arguments[j]
       cca["members"][0] = registers[i[1]]
 
 
@@ -87,9 +98,15 @@ class Transition:
       return self.to_state
     return -1
 
-  def _pass_register_matches(self, current_dataword, registers):
+  def _pass_register_matches(self, incoming_dataword, registers):
     for i in self.register_matches:
-      cca = current_dataword.captured_arguments[i[0]]
+      # HACK: THIS WAS COPIED FROM AROUND LINE 52! REFACTOR OUT!
+      for j in range(len(incoming_dataword.captured_arguments)):
+        # We have to search through a list of dictionaries until we find
+        # one whose "arg_name" matches the arg_name from the register match
+        # tuple (position 0)
+        if incoming_dataword.captured_arguments[j]["arg_name"] == i[0]:
+          cca = incoming_dataword.captured_arguments[j]
       if str(cca["members"][0]) != registers[str(i[1])]:
         return False
     return True

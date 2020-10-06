@@ -6,4 +6,4 @@ type open {filename: String@0, filedesc: Numeric@ret};
 ## Match an open call, store the file name and returned file descriptors
 ## to the 'filename' and 'filedesc' registers respectively
 #
-open(!filename, !filedesc);
+open({!filename: fn, !filedesc: fd});

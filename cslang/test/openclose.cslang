@@ -10,11 +10,11 @@ retval <- "-1";
 # Match an open call, store the file name and returned file descriptors
 # to the 'filename' and 'filedesc' registers respectively
 #
-open(!filename, !filedesc);
+open({!filename: fn, !filedesc: fd});
 
-NOT read(?filedesc);
+NOT read({?filedesc: fd});
 ## Match a close call its the value in 'filedesc' as the file descriptor being
 ## closed
 
 
-close(?filedesc, ->retval);
+close({?filedesc: fd, ->retval: retval});

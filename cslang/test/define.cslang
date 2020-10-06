@@ -1,4 +1,4 @@
 type statbuf {dev: String@0, stino: String@1, mode: String@2};
 type fstat {filedesc: Numeric@0, statstruct: statbuf@1};
 
-fstat(filedesc);
+fstat({});

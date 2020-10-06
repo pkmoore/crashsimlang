@@ -353,8 +353,8 @@ def p_registerdiv(p):
 
 
 def p_dataword(p):
-  ''' dataword : NOT IDENTIFIER '(' parameterlist ')'
-               | IDENTIFIER '(' parameterlist ')'
+  ''' dataword : NOT IDENTIFIER '(' parameterexpression ')'
+               | IDENTIFIER '(' parameterexpression ')'
   '''
 
   global preamble
@@ -372,7 +372,10 @@ def p_dataword(p):
   register_stores = []
   register_writes = []
   for i, v in enumerate(params):
-    if v.startswith("?"):
+    operator = v[0]
+    argument_name = v[1]
+    register_name = v[2]
+    if operator == "?":
       # When we see the "?" operator it means in order to get into this state,
       # the register name following "?" needs to have the same value as the
       # captured argument in the same position in the data word.  For example:
@@ -384,9 +387,9 @@ def p_dataword(p):
       # matching the value in the filedesc register.  Captured argument order
       # is important and comes from the order the captures are specified in the
       # preamble
-      register_matches.append((i, v[1:]))
+      register_matches.append((i, register_name))
 
-    if v.startswith("!"):
+    if operator == "!":
       if not_dataword:
         raise CSlangError("Register stores are illegal in NOT datawords")
       # When we see "!" it means take the value from the captured argument
@@ -396,12 +399,12 @@ def p_dataword(p):
       # <register_value>).  These register stores are performed whenever we
       # transition into a new state so we give them to the new State being
       # created below
-      register_stores.append((i, v[1:]))
+      register_stores.append((i, register_name))
 
-    if v.startswith("->"):
+    if operator == "->":
       if not_dataword:
         raise CSlangError("Write operations are illegal in NOT datawords")
-      register_writes.append((i, v[2:]))
+      register_writes.append((i, register_name))
 
   if not_dataword:
     #  This is a not dataword so we create our NOT state
@@ -433,6 +436,16 @@ def p_dataword(p):
                                                               register_matches,
                                                               len(automaton.states) - 1))
 
+def p_parameterexpression(p):
+  ''' parameterexpression : '{' parameterlist '}'
+                          | '{' '}'
+  '''
+  if len(p) == 3:
+    p[0] = ()
+  else:
+    p[0] = p[2]
+
+
 
 def p_parameterlist(p):
   '''parameterlist : parameter ',' parameterlist
@@ -447,15 +460,11 @@ def p_parameterlist(p):
 
 
 def p_parameter(p):
-  '''parameter : READOP IDENTIFIER
-               | STOREOP IDENTIFIER
-               | WRITEOP IDENTIFIER
-               | IDENTIFIER
+  '''parameter : READOP IDENTIFIER ':' IDENTIFIER
+               | STOREOP IDENTIFIER ':' IDENTIFIER
+               | WRITEOP IDENTIFIER ':' IDENTIFIER
   '''
-  if len(p) == 3:
-    p[0] = p[1][1] + p[2][1]
-  else:
-    p[0] =  p[1][1]
+  p[0] = (p[1][1], p[2][1], p[4][1])
 
 
 

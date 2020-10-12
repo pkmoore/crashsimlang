@@ -148,7 +148,7 @@ def p_typeexpression(p):
 
 def p_typeexpressionlist(p):
   ''' typeexpressionlist : typeexpression ',' typeexpressionlist
-                             | typeexpression
+                         | typeexpression
   '''
 
   if len(p) == 4:
@@ -185,7 +185,6 @@ def p_predicatestmt(p):
   ''' predicatestmt : PREDICATE IDENTIFIER predexpression
   '''
 
-  global preamble
   global preamble
   preamble.predicate(p[2], p[3])
 

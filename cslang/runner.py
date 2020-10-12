@@ -1,5 +1,5 @@
 from __future__ import print_function
-import pickle
+import dill as pickle
 import sys
 import os
 from strace2datawords import DataWord

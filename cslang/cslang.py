@@ -9,7 +9,7 @@ from strace2datawords import UninterestingDataWord
 from posix_omni_parser import Trace
 from adt import ContainerBuilder
 from cslang_error import CSlangError
-import pickle
+import dill as pickle
 import os
 import sys
 
@@ -31,7 +31,7 @@ tokens = ["IDENTIFIER",
           "STRING_LITERAL"
 ] + list(reserved.values())
 
-literals = ['{', '}', ':', '@', '/', '*', '-', '+', ';',',','(', ')' ]
+literals = ['.', '{', '}', ':', '@', '/', '*', '-', '+', ';',',','(', ')' ]
 
 precedence = (
     ('left', 'ASSIGNOP'),
@@ -166,19 +166,24 @@ def p_typedefinition(p):
   containerbuilder.define_type(p[2][1], p[4])
 
 
-
-def p_predexpression(p):
-  ''' predexpression : IDENTIFIER EQUALSOP NUM_LITERAL
+def p_predpath(p):
+  ''' predpath : IDENTIFIER "." predpath
+               | IDENTIFIER
   '''
 
-  if p[2] == "==":
-    # Form a closure over p[1] and p[3] using new names i and v so copies of these
-    # values are available when the predicate is called elsewhere during evaluation
-    i = p[1]
-    v = p[3]
-    def equalsexpression(args):
-      return args[i]["value"].value == v
-    p[0] = equalsexpression
+  if len(p) == 4:
+    p[0] = (p[1], ) + p[3]
+  else:
+    p[0] = p[1]
+
+
+
+def p_predexpression(p):
+  ''' predexpression : predpath EQUALSOP NUM_LITERAL
+                     | predpath EQUALSOP STRING_LITERAL
+  '''
+
+  p[0] = ("PREDICATEEXPRESSION", p[1][1], p[2][1], p[3][1])
 
 
 def p_predicatestmt(p):
@@ -186,7 +191,7 @@ def p_predicatestmt(p):
   '''
 
   global preamble
-  preamble.predicate(p[2], p[3])
+  preamble.predicate(p[2][1], p[3][1:])
 
 
 def p_registerassignment(p):

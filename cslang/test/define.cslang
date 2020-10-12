@@ -7,6 +7,6 @@ findino <- "st_ino=4026532069";
 obvious1 <- "foo";
 obvious2 <- "bar";
 
-fstat({statstruct: {?dev: finddev, ?stino: findino}});
-fstat({statstruct: {!dev: finddev2, !stino: findino2}});
-fstat({statstruct: {->dev: obvious2, ->stino: obvious2}});
+fstat({statstruct: {dev: ?finddev, stino: ?findino}});
+fstat({statstruct: {dev: !finddev2, stino: !findino2}});
+fstat({statstruct: {dev: ->obvious2, stino: ->obvious2}});

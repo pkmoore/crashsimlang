@@ -421,17 +421,17 @@ def p_parameterlist(p):
 
 
 def p_parameter(p):
-  '''parameter : READOP IDENTIFIER ':' IDENTIFIER
-               | STOREOP IDENTIFIER ':' IDENTIFIER
-               | WRITEOP IDENTIFIER ':' IDENTIFIER
+  '''parameter : IDENTIFIER ':' READOP IDENTIFIER
+               | IDENTIFIER ':' STOREOP  IDENTIFIER
+               | IDENTIFIER ':' WRITEOP IDENTIFIER
                | IDENTIFIER ':' parameterexpression
   '''
 
   if p[3][0] == "PARAMETEREXPRESSION":
     # HACK: We use # to denote that this parameter has a non-primative type
-    p[0] = ("#", p[1][1], p[3][1])
+    p[0] = (p[1][1], "#", p[3][1])
   else:
-    p[0] = (p[1][1], p[2][1], p[4][1])
+    p[0] = (p[3][1], p[1][1], p[4][1])
 
 
 

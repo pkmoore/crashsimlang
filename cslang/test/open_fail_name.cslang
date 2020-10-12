@@ -7,4 +7,4 @@ file <- "test.txt";
 ### Match an open call, store the file name and returned file descriptors
 ### to the 'filename' and 'filedesc' registers respectively
 ##
-open({?filename: file, !filedesc: fd});
+open({filename: ?file, filedesc: !fd});

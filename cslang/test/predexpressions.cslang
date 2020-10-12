@@ -1,0 +1,5 @@
+type fstat {filedesc: Numeric@0};
+
+predicate fstat filedesc == 3;
+
+fstat({});

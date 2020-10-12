@@ -401,7 +401,7 @@ def p_parameterexpression(p):
                           | '{' '}'
   '''
   if len(p) == 3:
-    p[0] = ("PARAMETEREXPRESSION", )
+    p[0] = ("PARAMETEREXPRESSION", None)
   else:
     p[0] = ("PARAMETEREXPRESSION", p[2])
 

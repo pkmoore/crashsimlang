@@ -20,4 +20,14 @@ class TestIntegration():
     assert automaton.registers["fn"] == "test.txt"
     assert automaton.registers["retval"] == "-1"
 
+  def test_uninteresting_dataword(self):
+    test_file = "test/uninterestingdataword.cslang"
+    cslang_main(test_file)
+    automaton = runner_main(test_file)
+    assert automaton
 
+  def test_empty_dataword(self):
+    test_file = "test/emptydataword.cslang"
+    cslang_main(test_file)
+    automaton = runner_main(test_file)
+    assert len(automaton.states) == 2

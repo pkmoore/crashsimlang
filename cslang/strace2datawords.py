@@ -14,8 +14,12 @@ class DataWord(object):
   def __init__(self, system_call, container, predicate_results):
     self.original_system_call = system_call
     self.container = container
-    self.type = container["type"]
-    self.captured_arguments = container["members"]
+    if container:
+      self.type = container["type"]
+      self.captured_arguments = container["members"]
+    else:
+      self.type = system_call.name
+      self.captured_arguments = None
     self.predicate_results = predicate_results
 
 
@@ -36,7 +40,9 @@ class DataWord(object):
         tmp += '[F]'
     tmp += self.original_system_call.name
     tmp += '('
-    tmp += ', '.join([str(x["members"][0]) for x in self.captured_arguments])
+    # Only print dataword parameters if we have them
+    if self.container:
+      tmp += ', '.join([str(x["members"][0]) for x in self.captured_arguments])
     tmp += ')'
     return tmp
 
@@ -49,14 +55,13 @@ class DataWord(object):
     tmp += '('
     coalesced_args = list(self.original_system_call.args)
     modified_ret = None
-    for i in self.captured_arguments:
-      if i["arg_pos"] == "ret":
-        modified_ret = i
-        continue
-      arg_to_be_updated = coalesced_args[int(i["arg_pos"])]
-      print(arg_to_be_updated)
-      arg_to_be_updated.value = self._recursive_update_args(arg_to_be_updated, i)
-      print(arg_to_be_updated)
+    if self.captured_arguments:
+      for i in self.captured_arguments:
+        if i["arg_pos"] == "ret":
+          modified_ret = i
+          continue
+        arg_to_be_updated = coalesced_args[int(i["arg_pos"])]
+        arg_to_be_updated.value = self._recursive_update_args(arg_to_be_updated, i)
     tmp += ', '.join([str(v) for v in coalesced_args])
     tmp += ')'
     tmp += '  =  '

@@ -50,7 +50,7 @@ def main(name):
   for i in dataword_objs:
     print(i.get_mutated_strace())
 
-  return automaton
+  return automaton, dataword_objs
 
 
 

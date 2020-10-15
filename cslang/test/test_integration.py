@@ -13,7 +13,7 @@ class TestIntegration():
   def test_openclose(self):
     test_file = "test/openclose.cslang"
     cslang_main(test_file)
-    automaton = runner_main(test_file)
+    automaton, datawords_after = runner_main(test_file)
     assert automaton.current_state == 3
     assert automaton.is_accepting
     assert automaton.registers["fd"] == 3
@@ -23,11 +23,11 @@ class TestIntegration():
   def test_uninteresting_dataword(self):
     test_file = "test/uninterestingdataword.cslang"
     cslang_main(test_file)
-    automaton = runner_main(test_file)
+    automaton, datawords_after = runner_main(test_file)
     assert automaton
 
   def test_empty_dataword(self):
     test_file = "test/emptydataword.cslang"
     cslang_main(test_file)
-    automaton = runner_main(test_file)
+    automaton, datawords_after = runner_main(test_file)
     assert len(automaton.states) == 2

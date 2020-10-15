@@ -13,11 +13,11 @@ class TestOpen():
   def test_open(self):
     test_file = "test/open.cslang"
     cslang_main(test_file)
-    automaton = runner_main(test_file)
+    automaton, datawords_after = runner_main(test_file)
     assert automaton.is_accepting
 
   def test_open_fail_pred(self):
     test_file = "test/open_fail_name.cslang"
     cslang_main(test_file)
-    automaton = runner_main(test_file)
+    automaton, datawords_after = runner_main(test_file)
     assert automaton.is_accepting

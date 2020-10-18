@@ -172,9 +172,9 @@ def p_predpath(p):
   '''
 
   if len(p) == 4:
-    p[0] = (p[1], ) + p[3]
+    p[0] = ("PREDPATH", p[1][1] + p[2] + p[3][1])
   else:
-    p[0] = p[1]
+    p[0] = ("PREDPATH", p[1][1])
 
 
 
@@ -460,7 +460,7 @@ def main(name, parse_only=False):
   preamble = Preamble()
   containerbuilder = ContainerBuilder()
   with open(name, "r") as f:
-    parser.parse(f.read())
+    parser.parse(f.read(), debug=False)
 
   if not parse_only:
     basename = os.path.splitext(os.path.basename(name))[0]

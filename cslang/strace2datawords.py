@@ -30,8 +30,13 @@ class DataWord(object):
   def execute_predicate(self, p):
     member = adt.get_nested_member_for_path(self.captured_arguments, p[0])
     #  Setting up to do this via eval!  Could be dangerous!
-    danger = "member"
-    return ("".join(p), eval(danger + p[1] + p[2]))
+    if p[1] == "==":
+      if member[0] == "Numeric":
+        return ((p[0] + p[1] + str(p[2])), member[1] == int(p[2]))
+      if member[0] == "String":
+        return ((p[0] + p[1] + str(p[2])), member[1] == str(p[2]))
+    else:
+      raise CSlangError("Bad operator in predicate: {}".format(p[1]))
 
 
   def is_interesting(self):

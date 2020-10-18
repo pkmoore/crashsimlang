@@ -64,12 +64,12 @@ class State:
 
   def _write_register_to_path(self, dataword, path, registers, register):
     # HACK: Fix the recursion so we don't have to do the below
-    member = adt.get_nested_member_for_path(dataword.captured_arguments, path)
+    member = adt.get_nested_member_for_path(dataword.captured_arguments, path)[1]
     member = registers[register]
 
   def _store_path_to_register(self, dataword, path, registers, register):
     # HACK: Fix the recursion so we don't have to do the below
-    member = adt.get_nested_member_for_path(dataword.captured_arguments, path)
+    member = adt.get_nested_member_for_path(dataword.captured_arguments, path)[1]
     registers[register] = member
 
 
@@ -113,7 +113,7 @@ class Transition:
     return True
 
   def _path_matches_register(self, dataword, path, registers, register):
-    member = adt.get_nested_member_for_path(dataword.captured_arguments, path)
+    member = adt.get_nested_member_for_path(dataword.captured_arguments, path)[1]
     return member == registers[register]
 
 

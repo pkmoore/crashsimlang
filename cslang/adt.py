@@ -10,7 +10,8 @@ def get_nested_member_for_path(container, path):
     current_argument = _get_member_for_name(container, steps[0])
     for i in steps[1:]:
       current_argument = _get_member_for_name(current_argument["members"], i)
-    return current_argument["members"][0]
+    # HACK: Returning a tuple with the type in the first element might be bad?
+    return (current_argument["type"], current_argument["members"][0])
 
 def _get_member_for_name(current_argument, name):
   for i in current_argument:

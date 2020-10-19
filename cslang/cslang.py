@@ -449,7 +449,7 @@ def p_parameter(p):
 
   if p[3][0] == "PARAMETEREXPRESSION":
     # HACK: We use # to denote that this parameter has a non-primative type
-    p[0] = (p[1][1], "#", p[3][1])
+    p[0] = ("#", p[1][1], p[3][1])
   else:
     p[0] = (p[3][1], p[1][1], p[4][1])
 

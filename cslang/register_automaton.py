@@ -63,12 +63,9 @@ class State:
             self._write_register_to_path(incoming_dataword, i[0], registers, i[1])
 
   def _write_register_to_path(self, dataword, path, registers, register):
-    # HACK: Fix the recursion so we don't have to do the below
-    member = adt.get_nested_member_for_path(dataword.captured_arguments, path)[1]
-    member = registers[register]
+    adt.write_nested_member_for_path(dataword.captured_arguments, path, registers[register])
 
   def _store_path_to_register(self, dataword, path, registers, register):
-    # HACK: Fix the recursion so we don't have to do the below
     member = adt.get_nested_member_for_path(dataword.captured_arguments, path)[1]
     registers[register] = member
 

@@ -13,6 +13,23 @@ def get_nested_member_for_path(container, path):
     # HACK: Returning a tuple with the type in the first element might be bad?
     return (current_argument["type"], current_argument["members"][0])
 
+def write_nested_member_for_path(container, path, value):
+    # HACK: Fix the recursion so we don't have to do the below
+    if path.startswith("."):
+      path = path[1:]
+    steps = path.split(".")
+    current_argument = _get_member_for_name(container, steps[0])
+    for i in steps[1:]:
+      current_argument = _get_member_for_name(current_argument["members"], i)
+    if current_argument["type"] == "Numeric":
+      current_argument["members"][0] = float(value)
+    elif current_argument["type"] == "String":
+      current_argument["members"][0] = str(value)
+    else:
+      raise CSlangError("Bad type found ({}) when writing value {}"
+                        .format(current_argument["type"], value))
+
+
 def _get_member_for_name(current_argument, name):
   for i in current_argument:
     if i["arg_name"] == name:

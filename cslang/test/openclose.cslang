@@ -2,8 +2,6 @@ type open {filename: String@0, filedesc: Numeric@ret};
 type read {filedesc: Numeric@0};
 type close {filedesc: Numeric@0, retval: Numeric@ret};
 
-#predicate open filename == "test.txt";
-
 # Register initialization.  Registers do not have to be initialized before use
 retval <- "-1";
 

@@ -14,8 +14,5 @@ class TestPredicates():
     test_file = "test/predicates.cslang"
     cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
-    assert automaton.current_state == 1
-    assert datawords_after[0].predicate_results[0][1] == True
-    assert datawords_after[0].predicate_results[1][1] == False
-    assert datawords_after[0].predicate_results[2][1] == True
-    assert datawords_after[0].predicate_results[3][1] == False
+    assert automaton.current_state == 3
+    assert "foo, bar" in datawords_after[2].get_mutated_strace()

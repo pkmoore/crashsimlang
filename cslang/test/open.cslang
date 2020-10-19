@@ -1,5 +1,4 @@
 type open {filename: String@0, filedesc: Numeric@ret};
-#predicate open filename == "test.txt";
 
 
 #

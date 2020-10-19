@@ -15,10 +15,11 @@ import sys
 
 
 reserved = {
-    'predicate' : 'PREDICATE',
     'NOT' : 'NOT',
     'ret' : 'RET',
     'type' : 'TYPE',
+    'with' : 'WITH',
+    'and' : 'AND'
 }
 
 tokens = ["IDENTIFIER",
@@ -115,8 +116,7 @@ def p_statement(p):
   '''
 
 def p_preamblestatement(p):
-  ''' preamblestatement : predicatestmt ';'
-                        | typedefinition ';'
+  ''' preamblestatement : typedefinition ';'
   '''
   global in_preamble
   if not in_preamble:
@@ -177,6 +177,17 @@ def p_predpath(p):
     p[0] = ("PREDPATH", p[1][1])
 
 
+def p_predexpressionlist(p):
+  ''' predexpressionlist : predexpression AND predexpressionlist
+                         | predexpression
+  '''
+
+  if len(p) == 4:
+    p[0] = ("PREDEXPRESSIONLIST", p[1][1:]) + p[3][1:]
+  else:
+    p[0] = ("PREDEXPRESSIONLIST", p[1][1:])
+
+
 
 def p_predexpression(p):
   ''' predexpression : predpath EQUALSOP NUM_LITERAL
@@ -186,12 +197,6 @@ def p_predexpression(p):
   p[0] = ("PREDICATEEXPRESSION", p[1][1], p[2][1], p[3][1])
 
 
-def p_predicatestmt(p):
-  ''' predicatestmt : PREDICATE IDENTIFIER predexpression
-  '''
-
-  global preamble
-  preamble.predicate(p[2][1], p[3][1:])
 
 
 def p_registerassignment(p):
@@ -359,6 +364,8 @@ def p_registerdiv(p):
 def p_dataword(p):
   ''' dataword : NOT IDENTIFIER '(' parameterexpression ')'
                | IDENTIFIER '(' parameterexpression ')'
+               | NOT IDENTIFIER '(' parameterexpression ')' WITH predexpressionlist
+               | IDENTIFIER '(' parameterexpression ')' WITH predexpressionlist
   '''
 
   global preamble
@@ -367,10 +374,18 @@ def p_dataword(p):
     not_dataword = True
     syscall_name = p[2][1]
     operations = p[4][1]
+    if len(p) == 8:
+      predicates = p[7][1:]
+    else:
+      predicates = None
   else:
     not_dataword = False
     syscall_name = p[1][1]
     operations = p[3][1]
+    if len(p) == 7:
+      predicates = p[6][1:]
+    else:
+      predicates = None
 
 
   if not_dataword:
@@ -399,7 +414,8 @@ def p_dataword(p):
 
     automaton.states[neg_index].transitions.append(Transition(syscall_name,
                                                               len(automaton.states) - 1,
-                                                              operations=operations))
+                                                              operations=operations,
+                                                              predicates=predicates))
 
 def p_parameterexpression(p):
   ''' parameterexpression : '{' parameterlist '}'

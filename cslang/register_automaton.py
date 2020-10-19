@@ -86,10 +86,11 @@ class State:
 
 
 class Transition:
-  def __init__(self, dataword_name, to_state, operations=None):
+  def __init__(self, dataword_name, to_state, operations=None, predicates=None):
     self.dataword_name = dataword_name
     self.to_state = to_state
     self.operations = operations if operations is not None else []
+    self.predicates = predicates if predicates is not None else []
 
   def __str__(self):
     tmp = ""
@@ -99,9 +100,28 @@ class Transition:
     return tmp
 
   def match(self, current_dataword, registers):
-    if current_dataword.get_name() == self.dataword_name and self._pass_operations(current_dataword, registers):
+    if current_dataword.get_name() == self.dataword_name \
+       and self._pass_predicates(current_dataword) \
+       and self._pass_operations(current_dataword, registers):
       return self.to_state
     return -1
+
+
+  def _pass_predicates(self, incoming_dataword):
+    predicate_results = []
+    for i in self.predicates:
+      member = adt.get_nested_member_for_path(incoming_dataword.captured_arguments, i[0])
+      if i[1] == "==":
+        if member[0] == "Numeric":
+          predicate_results.append(((i[0] + i[1] + str(i[2])), member[1] == int(i[2])))
+        if member[0] == "String":
+          predicate_results.append(((i[0] + i[1] + str(i[2])), member[1] == str(i[2])))
+      else:
+        raise CSlangError("Bad operator in predicate: {}".format(i[1]))
+    # All predicate results must be True for us to return True here
+    # the all() function handles this nicely
+    return all([x[1] for x in predicate_results])
+
 
   def _pass_operations(self, incoming_dataword, registers):
     for i in self.operations:

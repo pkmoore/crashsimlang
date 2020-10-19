@@ -12,10 +12,9 @@ from posix_omni_parser import Trace
 
 
 class DataWord(object):
-  def __init__(self, system_call, container, predicates):
+  def __init__(self, system_call, container):
     self.original_system_call = system_call
     self.container = container
-    self.predicates = predicates
     self.predicate_results = []
     if container:
       self.type = container["type"]
@@ -23,20 +22,6 @@ class DataWord(object):
     else:
       self.type = system_call.name
       self.captured_arguments = None
-    if self.predicates:
-      for i in self.predicates:
-        self.predicate_results.append(self.execute_predicate(i))
-
-  def execute_predicate(self, p):
-    member = adt.get_nested_member_for_path(self.captured_arguments, p[0])
-    #  Setting up to do this via eval!  Could be dangerous!
-    if p[1] == "==":
-      if member[0] == "Numeric":
-        return ((p[0] + p[1] + str(p[2])), member[1] == int(p[2]))
-      if member[0] == "String":
-        return ((p[0] + p[1] + str(p[2])), member[1] == str(p[2]))
-    else:
-      raise CSlangError("Bad operator in predicate: {}".format(p[1]))
 
 
   def is_interesting(self):
@@ -115,7 +100,7 @@ class DataWord(object):
 
 class UninterestingDataWord(DataWord):
   def __init__(self, system_call):
-    super(UninterestingDataWord, self).__init__(system_call, {}, [])
+    super(UninterestingDataWord, self).__init__(system_call, {})
 
   def is_interesting(self):
     return False
@@ -125,11 +110,9 @@ class UninterestingDataWord(DataWord):
 
 class Preamble:
   def __init__(self):
-    self.predicates = {}
     self.captures = []
     self.containerbuilder = None
     self._current_captured_args = None
-    self._current_predicate_results = None
     self._current_syscall = None
 
 
@@ -152,7 +135,6 @@ class Preamble:
 
   def handle_syscall(self, call):
     self._current_syscall = call
-    self._current_predicate_results = []
     if self._current_syscall.name in self.captures:
       argslist = list(call.args)
       argslist.append(call.ret[0])
@@ -163,13 +145,7 @@ class Preamble:
       # any system call with no captured arguments
       return UninterestingDataWord(self._current_syscall)
     else:
-      return DataWord(self._current_syscall, container, self.predicates.get(self._current_syscall.name))
-
-
-  def _apply_predicates(self):
-    if self._current_syscall.name in self.predicates:
-      for i in self.predicates[self._current_syscall.name]:
-        self._current_predicate_results.append(i(self._current_captured_args))
+      return DataWord(self._current_syscall, container)
 
 
   def _capture_args(self, container, argslist):
@@ -192,9 +168,3 @@ class Preamble:
         return funcs[out_type](argslist[int(arg_pos)].value)
       else:
         return funcs[out_type](argslist[int(arg_pos)])
-
-
-  def predicate(self, syscall_name, f):
-    if syscall_name not in self.predicates:
-      self.predicates[syscall_name] = []
-    self.predicates[syscall_name].append(f)

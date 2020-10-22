@@ -1,6 +1,11 @@
 import os
-from runner import main as runner_main
-from cslang import main as cslang_main
+from cslang.runner import main as runner_main
+from cslang.cslang import main as cslang_main
+
+
+def get_test_data_path(filename):
+  dir_path = os.path.dirname(os.path.realpath(__file__))
+  return os.path.join(dir_path, filename)
 
 
 class TestIntegration():
@@ -11,7 +16,7 @@ class TestIntegration():
     os.system("rm test/*.auto")
 
   def test_openclose(self):
-    test_file = "test/openclose.cslang"
+    test_file = get_test_data_path("openclose.cslang")
     cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton.current_state == 3
@@ -21,13 +26,13 @@ class TestIntegration():
     assert automaton.registers["retval"] == "-1"
 
   def test_uninteresting_dataword(self):
-    test_file = "test/uninterestingdataword.cslang"
+    test_file = get_test_data_path("uninterestingdataword.cslang")
     cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton
 
   def test_empty_dataword(self):
-    test_file = "test/emptydataword.cslang"
+    test_file = get_test_data_path("emptydataword.cslang")
     cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert len(automaton.states) == 2

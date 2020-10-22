@@ -1,15 +1,19 @@
 import os
 import unittest
-from runner import main as runner_main
-from cslang import main as cslang_main
-from cslang import containerbuilder
+from cslang.runner import main as runner_main
+from cslang.cslang import main as cslang_main
+from cslang.cslang import containerbuilder
+
+
+def get_test_data_path(filename):
+  dir_path = os.path.dirname(os.path.realpath(__file__))
+  return os.path.join(dir_path, filename)
 
 
 class TestOpen(unittest.TestCase):
 
   def test_define(self):
-    # Hack: Global
-    test_file = "test/define.cslang"
+    test_file = get_test_data_path("define.cslang")
     preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
     runner_main(test_file)
     assert "fstat" in containerbuilder.builders

@@ -486,7 +486,10 @@ def main(name, parse_only=False):
     pickle_path = os.path.join(dirname, basename + ".pickle")
     automaton_path = os.path.join(dirname, basename + ".auto")
 
-    t = Trace.Trace(strace_path, "./syscall_definitions.pickle")
+    syscall_definitions = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "syscall_definitions.pickle")
+    t = Trace.Trace(strace_path, syscall_definitions)
 
     datawords = []
     with open(datawords_path, "w") as f:

@@ -1,12 +1,17 @@
 import os
-from runner import main as runner_main
-from cslang import main as cslang_main
+from cslang.runner import main as runner_main
+from cslang.cslang import main as cslang_main
+
+
+def get_test_data_path(filename):
+  dir_path = os.path.dirname(os.path.realpath(__file__))
+  return os.path.join(dir_path, filename)
 
 
 class TestRegisterExpressions():
 
   def test_assign(self):
-    test_file = "test/registerassign.cslang"
+    test_file = get_test_data_path("registerassign.cslang")
     preamble, datawords, _, containerbuilder = cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton.registers["assignstr"] == "hel"
@@ -15,7 +20,7 @@ class TestRegisterExpressions():
     assert automaton.registers["assignids"] == "worked"
 
   def test_concat(self):
-    test_file = "test/registerconcat.cslang"
+    test_file = get_test_data_path("registerconcat.cslang")
     preamble, datawords, _, containerbuilder = cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton.registers["numnum"] == "hello"
@@ -24,7 +29,7 @@ class TestRegisterExpressions():
     assert automaton.registers["regreg"] == "helhel"
 
   def test_add(self):
-    test_file = "test/registeradd.cslang"
+    test_file = get_test_data_path("registeradd.cslang")
     preamble, datawords, _, containerbuilder = cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton.registers["numnum"] == 7
@@ -44,7 +49,7 @@ class TestRegisterExpressions():
 
 
   def test_subtract(self):
-    test_file = "test/registersub.cslang"
+    test_file = get_test_data_path("registersub.cslang")
     preamble, datawords, _, containerbuilder = cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton.registers["numnum"] == 1
@@ -64,7 +69,7 @@ class TestRegisterExpressions():
 
 
   def test_multiply(self):
-    test_file = "test/registermul.cslang"
+    test_file = get_test_data_path("registermul.cslang")
     preamble, datawords, _, containerbuilder = cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton.registers["numnum"] == 12
@@ -83,7 +88,7 @@ class TestRegisterExpressions():
     assert automaton.registers["nregreg"] == 1
 
   def test_divide(self):
-    test_file = "test/registerdiv.cslang"
+    test_file = get_test_data_path("registerdiv.cslang")
     preamble, datawords, _, containerbuilder = cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
     assert automaton.registers["numnum"] == 3

@@ -19,5 +19,6 @@ class TestPredicates():
     test_file = get_test_data_path("predicates.cslang")
     cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
-    assert automaton.current_state == 3
+    assert automaton.current_state == 4
+    assert not automaton.is_accepting()
     assert "foo, bar" in datawords_after[2].get_mutated_strace()

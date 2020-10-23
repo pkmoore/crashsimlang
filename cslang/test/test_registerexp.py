@@ -1,6 +1,8 @@
 import os
+import unittest
 from cslang.runner import main as runner_main
 from cslang.cslang import main as cslang_main
+from cslang.cslang_error import CSlangError
 
 
 def get_test_data_path(filename):
@@ -8,7 +10,7 @@ def get_test_data_path(filename):
   return os.path.join(dir_path, filename)
 
 
-class TestRegisterExpressions():
+class TestRegisterExpressions(unittest.TestCase):
 
   def test_assign(self):
     test_file = get_test_data_path("registerassign.cslang")
@@ -27,6 +29,13 @@ class TestRegisterExpressions():
     assert automaton.registers["regnum"] == "hello"
     assert automaton.registers["numreg"] == "lohel"
     assert automaton.registers["regreg"] == "helhel"
+
+  def test_badadd(self):
+    test_file = get_test_data_path("register_badadd.cslang")
+    with self.assertRaises(CSlangError) as cm:
+      preamble, datawords, _, containerbuilder = cslang_main(test_file)
+
+    assert "Type mismatch between registers" in str(cm.exception)
 
   def test_add(self):
     test_file = get_test_data_path("registeradd.cslang")

@@ -281,14 +281,14 @@ def p_registeradd(p):
   elif p[1][0] == 'NUM_LITERAL':
     lhs = p[1][1]
   else:
-    raise CSlangError("Bad type in substraction: {}".format(p[1]))
+    raise CSlangError("Bad type in addition: {}".format(p[1]))
 
   if p[3][0] == 'IDENTIFIER':
     rhs = automaton.registers[p[3][1]]
   elif p[3][0] == 'NUM_LITERAL':
     rhs = p[3][1]
   else:
-    raise CSlangError("Bad type in substraction: {}".format(p[3]))
+    raise CSlangError("Bad type in addition: {}".format(p[3]))
 
   p[0] = ('NUMERIC', float(lhs) + float(rhs))
 

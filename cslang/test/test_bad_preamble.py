@@ -20,7 +20,8 @@ class TestOpen(unittest.TestCase):
     os.system("rm test/*.auto")
 
   def test_late_preamble_statement(self):
-    test_file = get_test_data_path("./bad_preamble.cslang")
-    with self.assertRaises(CSlangError):
+    test_file = get_test_data_path("bad_preamble.cslang")
+    with self.assertRaises(CSlangError) as cm:
       cslang_main(test_file, parse_only=True)
 
+    assert "Found preamble statement after" in str(cm.exception)

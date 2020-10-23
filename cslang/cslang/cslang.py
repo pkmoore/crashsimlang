@@ -120,7 +120,7 @@ def p_preamblestatement(p):
   '''
   global in_preamble
   if not in_preamble:
-    raise CSlangError("Found preamble statment after preamble processing has ended")
+    raise CSlangError("Found preamble statement after preamble processing has ended")
 
 def p_bodystatement(p):
   ''' bodystatement : dataword ';'

@@ -34,12 +34,6 @@ class DataWord(object):
 
   def get_dataword(self):
     tmp = ''
-    if self.predicate_results:
-      for i in self.predicate_results:
-        if i[1]:
-          tmp += '[T]'
-        else:
-          tmp += '[F]'
     tmp += self.original_system_call.name
     tmp += '('
     # Only print dataword parameters if we have them

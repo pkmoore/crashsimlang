@@ -19,6 +19,8 @@ class TestIntegration():
     test_file = get_test_data_path("openclose.cslang")
     cslang_main(test_file)
     automaton, datawords_after = runner_main(test_file)
+    assert datawords_after[0].is_interesting()
+    assert not datawords_after[1].is_interesting()
     assert automaton.current_state == 3
     assert automaton.is_accepting
     assert automaton.registers["fd"] == 3

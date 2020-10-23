@@ -129,16 +129,15 @@ class Preamble:
 
   def handle_syscall(self, call):
     self._current_syscall = call
-    if self._current_syscall.name in self.captures:
-      argslist = list(call.args)
-      argslist.append(call.ret[0])
-      container = self.containerbuilder.instantiate_type(self._current_syscall.name)
-      container = self._capture_args(container, argslist)
-    if len(self.captures) == 0:
+    if len(self.captures) == 0 or self._current_syscall.name not in self.captures:
       # Right now, we define a system call we aren't interested in as
       # any system call with no captured arguments
       return UninterestingDataWord(self._current_syscall)
     else:
+      argslist = list(call.args)
+      argslist.append(call.ret[0])
+      container = self.containerbuilder.instantiate_type(self._current_syscall.name)
+      container = self._capture_args(container, argslist)
       return DataWord(self._current_syscall, container)
 
 

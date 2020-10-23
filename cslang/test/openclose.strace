@@ -1,2 +1,3 @@
 35388 open("test.txt", O_RDONLY, 0) = 3
+35388 getpid() = 34355
 35388 close(3) = 0

@@ -121,17 +121,17 @@ class ContainerBuilder(object):
 
 
 
-if __name__ == "__main__":
-  pp = pprint.PrettyPrinter(indent=2)
-  c = ContainerBuilder()
-  c.define_type("fakestat", [("Int", 0, "Somefield")])
-  c.define_type("statbuf", [("fakestat", 3, "Fakefield"), ("String", 0, "A_str"), ("String", 1, "Another_str"), ("Int", 5, "some_val")])
-  tmp = c.instantiate_type("statbuf")
-  pp.pprint(tmp)
-  print()
-  print()
-  c.define_type("stat", (("String", 0, "filename"), ("statbuf", 1, "stat_struct")))
-  tmp = c.instantiate_type("stat")
-  c.define_type("open", (("Int", "ret", "filedesc"),))
-  tmp = c.instantiate_type("open")
-  pp.pprint(tmp)
+#  Example Usage:
+#  pp = pprint.PrettyPrinter(indent=2)
+#  c = ContainerBuilder()
+#  c.define_type("fakestat", [("Int", 0, "Somefield")])
+#  c.define_type("statbuf", [("fakestat", 3, "Fakefield"), ("String", 0, "A_str"), ("String", 1, "Another_str"), ("Int", 5, "some_val")])
+#  tmp = c.instantiate_type("statbuf")
+#  pp.pprint(tmp)
+#  print()
+#  print()
+#  c.define_type("stat", (("String", 0, "filename"), ("statbuf", 1, "stat_struct")))
+#  tmp = c.instantiate_type("stat")
+#  c.define_type("open", (("Int", "ret", "filedesc"),))
+#  tmp = c.instantiate_type("open")
+#  pp.pprint(tmp)

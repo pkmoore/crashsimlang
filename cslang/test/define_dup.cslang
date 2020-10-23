@@ -1,0 +1,13 @@
+type statbuf {dev: String@0, stino: String@1, mode: String@2};
+type fstat {filedesc: Numeric@0, statstruct: statbuf@1};
+type fstat {filedescbad: Numeric@0, statstructbad: statbuf@1};
+
+finddev <- "st_dev=makedev(0, 4)";
+findino <- "st_ino=4026532069";
+
+obvious1 <- "foo";
+obvious2 <- "bar";
+
+fstat({statstruct: {dev: ?finddev, stino: ?findino}});
+fstat({statstruct: {dev: !finddev2, stino: !findino2}});
+fstat({statstruct: {dev: ->obvious2, stino: ->obvious2}});

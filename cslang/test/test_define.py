@@ -3,6 +3,7 @@ import unittest
 from cslang.runner import main as runner_main
 from cslang.cslang import main as cslang_main
 from cslang.cslang import containerbuilder
+from cslang.cslang_error import CSlangError
 
 
 def get_test_data_path(filename):
@@ -29,3 +30,19 @@ class TestOpen(unittest.TestCase):
     assert "makedev(0, 4)" in container["members"][1]["members"][0]["members"][0]
     assert container["members"][1]["members"][1]["type"] == "String"
     assert "402" in container["members"][1]["members"][1]["members"][0]
+
+
+  def test_definedup(self):
+    test_file = get_test_data_path("define_dup.cslang")
+    with self.assertRaises(CSlangError) as cm:
+      preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
+
+    assert "Illegal type redefinition" in str(cm.exception)
+
+
+  def test_definenonexistant(self):
+    test_file = get_test_data_path("define_nonexistant.cslang")
+    with self.assertRaises(CSlangError) as cm:
+      preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
+
+    assert "definition contains undefined type" in str(cm.exception)

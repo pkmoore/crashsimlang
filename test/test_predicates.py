@@ -11,16 +11,19 @@ def get_test_data_path(filename):
 class TestPredicates():
 
   def test_checkfdtrue(self):
+    syscall_definitions = get_test_data_path("../cslang/syscall_definitions.pickle")
+    automaton_path = get_test_data_path("predicates.auto")
+    containerbuilder_path = get_test_data_path("predicates.cb")
     cslang_main(Namespace(mode="strace",
                           operation="build",
                           cslang_path=get_test_data_path("predicates.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, s2d = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("predicates.strace"),
-                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("predicates.auto"),
-                          preamble_path=get_test_data_path("predicates.pre")))
+                          syscall_definitions=syscall_definitions,
+                          automaton_path=automaton_path,
+                          containerbuilder_path=containerbuilder_path))
     assert automaton.current_state == 4
     assert not automaton.is_accepting()
-    assert "foo, bar" in datawords_after[2].get_mutated_strace()
+    assert "foo, bar" in s2d.get_mutated_strace(datawords_after[2])

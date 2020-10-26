@@ -1,0 +1,6 @@
+type update {foo: Numeric@0, bar: Numeric@1};
+
+## Match an open call, store the file name and returned file descriptors
+## to the 'filename' and 'filedesc' registers respectively
+#
+update({foo: !pone, bar: !ptwo});

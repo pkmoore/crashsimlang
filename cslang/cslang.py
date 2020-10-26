@@ -3,9 +3,10 @@ from ply import yacc
 from register_automaton import RegisterAutomaton
 from register_automaton import State
 from register_automaton import Transition
-from strace2datawords import Preamble
-from strace2datawords import DataWord
-from strace2datawords import UninterestingDataWord
+from strace2datawords import StraceToDatawords
+from jsontodatawords import JSONToDatawords
+from dataword import DataWord
+from dataword import UninterestingDataWord
 from posix_omni_parser import Trace
 from adt import ContainerBuilder
 from cslang_error import CSlangError
@@ -136,7 +137,6 @@ def p_bodystatement(p):
   # data structure and figure out what stuff it needs to capture
   if in_preamble:
     in_preamble = False
-    preamble.inject_containerbuilder(containerbuilder)
 
 
 def p_typeexpression(p):
@@ -488,10 +488,10 @@ def main(args=None):
                                     type=str,
                                     help="Location of CSlang automaton to be used in processing the specified strace file."
   )
-  strace_run_argparser.add_argument("-p", "--preamble-path",
+  strace_run_argparser.add_argument("-b", "--containerbuilder-path",
                                     required=True,
                                     type=str,
-                                    help="Location of preamble to be used in processing the specified strace file."
+                                    help="Location of containerbuilder to be used in processing the specified strace file."
   )
   strace_run_argparser.add_argument("-s", "--strace-path",
                                     required=True,
@@ -504,6 +504,34 @@ def main(args=None):
                                         help="Location of posix-omni-parser syscall definitions file"
   )
 
+  jsonrpc_subparser = subparsers.add_parser("jsonrpc")
+  jsonrpc_build_or_run_subparsers = jsonrpc_subparser.add_subparsers(dest="operation", help="build or run")
+
+  jsonrpc_build_argparser = jsonrpc_build_or_run_subparsers.add_parser("build")
+  jsonrpc_build_argparser.add_argument("-c", "--cslang-path",
+                                        required=True,
+                                        type=str,
+                                        help="CSlang file to be compiled"
+  )
+  jsonrpc_run_argparser = jsonrpc_build_or_run_subparsers.add_parser("run")
+
+  jsonrpc_run_argparser.add_argument("-a", "--automaton-path",
+                                     required=True,
+                                     type=str,
+                                     help="Location of CSlang automaton to be used in processing the specified strace file."
+  )
+  jsonrpc_run_argparser.add_argument("-b", "--containerbuilder-path",
+                                     required=True,
+                                     type=str,
+                                     help="Location of preamble to be used in processing the specified strace file."
+  )
+  jsonrpc_run_argparser.add_argument("-j", "--json-path",
+                                     required=True,
+                                     type=str,
+                                     help="Location of strace recording to execute against"
+  )
+
+
   if not args:
     args = parser.parse_args()
 
@@ -512,7 +540,6 @@ def main(args=None):
   lexer = lex.lex()
   parser = yacc.yacc()
   automaton = RegisterAutomaton()
-  preamble = Preamble()
   containerbuilder = ContainerBuilder()
 
   if args.mode == "strace":
@@ -521,7 +548,7 @@ def main(args=None):
       basename = os.path.splitext(os.path.basename(args.cslang_path))[0]
       dirname = os.path.dirname(args.cslang_path)
       automaton_path = os.path.join(dirname, basename + ".auto")
-      preamble_path = os.path.join(dirname, basename + ".pre")
+      cb_path = os.path.join(dirname, basename + ".cb")
 
       with open(args.cslang_path, "r") as f:
         parser.parse(f.read(), debug=False)
@@ -529,10 +556,10 @@ def main(args=None):
       with open(automaton_path, "w") as f:
         pickle.dump(automaton, f)
 
-      with open(preamble_path, "w") as f:
-        pickle.dump(preamble, f)
+      with open(cb_path, "w") as f:
+        pickle.dump(containerbuilder, f)
 
-      return preamble, automaton, containerbuilder
+      return automaton, containerbuilder
 
 
 
@@ -543,23 +570,20 @@ def main(args=None):
 
       strace_path = args.strace_path
       automaton_path = args.automaton_path
-      preamble_path = args.preamble_path
+      containerbuilder_path = args.containerbuilder_path
       syscall_definitions = args.syscall_definitions
 
-      t = Trace.Trace(strace_path, syscall_definitions)
 
       # Load in the automaton
       with open(automaton_path, "r") as f:
         automaton = pickle.load(f)
 
-      # Load in the preamble
-      with open(preamble_path, "r") as f:
-        preamble = pickle.load(f)
+      with open(containerbuilder_path, "r") as f:
+        cb = pickle.load(f)
 
-      datawords = []
-      for i in t.syscalls:
-        d = preamble.handle_syscall(i)
-        datawords.append(d)
+
+      s2d = StraceToDatawords(cb, syscall_definitions, strace_path)
+      datawords = s2d.get_datawords()
 
       # Pass each dataword in the list in series into the automaton
       for i in datawords:
@@ -574,10 +598,59 @@ def main(args=None):
       print("With registers: " + str(automaton.registers))
 
       for i in datawords:
-        print(i.get_mutated_strace())
+        print(s2d.get_mutated_strace(i))
 
-      return automaton, datawords
+      return automaton, datawords, s2d
 
+  elif args.mode == "jsonrpc":
+    if args.operation == "build":
+
+      basename = os.path.splitext(os.path.basename(args.cslang_path))[0]
+      dirname = os.path.dirname(args.cslang_path)
+      automaton_path = os.path.join(dirname, basename + ".auto")
+      cb_path = os.path.join(dirname, basename + ".cb")
+
+      with open(args.cslang_path, "r") as f:
+        parser.parse(f.read(), debug=False)
+
+      with open(automaton_path, "w") as f:
+        pickle.dump(automaton, f)
+
+      with open(cb_path, "w") as f:
+        pickle.dump(containerbuilder, f)
+
+      return automaton, containerbuilder
+
+
+    elif args.operation == "run":
+
+      json_path = args.json_path
+      automaton_path = args.automaton_path
+      containerbuilder_path = args.containerbuilder_path
+
+
+      # Load in the automaton
+      with open(automaton_path, "r") as f:
+        automaton = pickle.load(f)
+
+      with open(containerbuilder_path, "r") as f:
+        cb = pickle.load(f)
+
+
+      j2d = JSONToDatawords(cb, json_path)
+      datawords = j2d.get_datawords()
+
+      # Pass each dataword in the list in series into the automaton
+      for i in datawords:
+        automaton.match(i)
+
+
+      # At the end of everything we have a transformed set of datawords.
+      # We either use them if we ended in an accepting state or drop ignore
+      # them if we haven't ended in an accepting state
+      # Some print goes here
+      print("Automaton ended in state: " + str(automaton.current_state))
+      print("With registers: " + str(automaton.registers))
 
 
   # This is to parse the program that is going to read the datawords that will be incoming from the preprocessor
@@ -594,7 +667,6 @@ in_preamble = None
 lexer = None
 parser = None
 automaton = None
-preamble = None
 containerbuilder = None
 
 if __name__ == "__main__":

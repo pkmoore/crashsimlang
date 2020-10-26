@@ -15,12 +15,12 @@ class TestIntegration():
                           operation="build",
                           cslang_path=get_test_data_path("openclose.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("openclose.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("openclose.auto"),
-                          preamble_path=get_test_data_path("openclose.pre")))
+                          containerbuilder_path=get_test_data_path("openclose.cb")))
     assert datawords_after[0].is_interesting()
     assert not datawords_after[1].is_interesting()
     assert automaton.current_state == 3
@@ -34,12 +34,12 @@ class TestIntegration():
                           operation="build",
                           cslang_path=get_test_data_path("uninterestingdataword.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("uninterestingdataword.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("uninterestingdataword.auto"),
-                          preamble_path=get_test_data_path("uninterestingdataword.pre")))
+                          containerbuilder_path=get_test_data_path("uninterestingdataword.cb")))
     assert automaton
 
   def test_empty_dataword(self):
@@ -47,10 +47,10 @@ class TestIntegration():
                           operation="build",
                           cslang_path=get_test_data_path("emptydataword.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("emptydataword.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("emptydataword.auto"),
-                          preamble_path=get_test_data_path("emptydataword.pre")))
+                          containerbuilder_path=get_test_data_path("emptydataword.cb")))
     assert len(automaton.states) == 2

@@ -15,12 +15,12 @@ class TestOpen():
                           operation="build",
                           cslang_path=get_test_data_path("open.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("open.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("open.auto"),
-                          preamble_path=get_test_data_path("open.pre")))
+                          containerbuilder_path=get_test_data_path("open.cb")))
 
     assert automaton.is_accepting
 
@@ -29,11 +29,11 @@ class TestOpen():
                           operation="build",
                           cslang_path=get_test_data_path("open_fail_name.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("open_fail_name.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("open_fail_name.auto"),
-                          preamble_path=get_test_data_path("open_fail_name.pre")))
+                          containerbuilder_path=get_test_data_path("open_fail_name.cb")))
 
     assert automaton.is_accepting

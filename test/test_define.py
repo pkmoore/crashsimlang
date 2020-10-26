@@ -15,16 +15,16 @@ class TestDefine(unittest.TestCase):
 
   def test_define(self):
     test_file = get_test_data_path("define.cslang")
-    preamble, automaton, containerbuilder = cslang_main(Namespace(mode="strace",
+    automaton, containerbuilder = cslang_main(Namespace(mode="strace",
                                                         operation="build",
                                                         cslang_path=get_test_data_path("define.cslang")))
 
-    automaton, datawords = cslang_main(Namespace(mode="strace",
+    automaton, datawords, _ = cslang_main(Namespace(mode="strace",
                                        operation="run",
                                        strace_path=get_test_data_path("define.strace"),
                                        syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                                        automaton_path=get_test_data_path("define.auto"),
-                                       preamble_path=get_test_data_path("define.pre")))
+                                       containerbuilder_path=get_test_data_path("define.cb")))
     assert "fstat" in containerbuilder.builders
     assert "statbuf" in containerbuilder.builders
 

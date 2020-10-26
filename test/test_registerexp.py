@@ -17,12 +17,12 @@ class TestRegisterExpressions(unittest.TestCase):
                           operation="build",
                           cslang_path=get_test_data_path("registerassign.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("registerassign.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registerassign.auto"),
-                          preamble_path=get_test_data_path("registerassign.pre")))
+                          containerbuilder_path=get_test_data_path("registerassign.cb")))
     assert automaton.registers["assignstr"] == "hel"
     assert automaton.registers["assignnum"] == 5
     assert automaton.registers["assignidn"] == 4
@@ -34,12 +34,12 @@ class TestRegisterExpressions(unittest.TestCase):
                           operation="build",
                           cslang_path=get_test_data_path("registerconcat.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("registerconcat.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registerconcat.auto"),
-                          preamble_path=get_test_data_path("registerconcat.pre")))
+                          containerbuilder_path=get_test_data_path("registerconcat.cb")))
     assert automaton.registers["numnum"] == "hello"
     assert automaton.registers["regnum"] == "hello"
     assert automaton.registers["numreg"] == "lohel"
@@ -58,12 +58,12 @@ class TestRegisterExpressions(unittest.TestCase):
                           operation="build",
                           cslang_path=get_test_data_path("registeradd.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("registeradd.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registeradd.auto"),
-                          preamble_path=get_test_data_path("registeradd.pre")))
+                          containerbuilder_path=get_test_data_path("registeradd.cb")))
     assert automaton.registers["numnum"] == 7
     assert automaton.registers["regnum"] == 6
     assert automaton.registers["numreg"] == 6
@@ -85,12 +85,12 @@ class TestRegisterExpressions(unittest.TestCase):
                           operation="build",
                           cslang_path=get_test_data_path("registersub.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("registersub.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registersub.auto"),
-                          preamble_path=get_test_data_path("registersub.pre")))
+                          containerbuilder_path=get_test_data_path("registersub.cb")))
     assert automaton.registers["numnum"] == 1
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1
@@ -112,12 +112,12 @@ class TestRegisterExpressions(unittest.TestCase):
                           operation="build",
                           cslang_path=get_test_data_path("registermul.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("registermul.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registermul.auto"),
-                          preamble_path=get_test_data_path("registermul.pre")))
+                          containerbuilder_path=get_test_data_path("registermul.cb")))
     assert automaton.registers["numnum"] == 12
     assert automaton.registers["regnum"] == 8
     assert automaton.registers["numreg"] == 8
@@ -139,12 +139,12 @@ class TestRegisterExpressions(unittest.TestCase):
                           operation="build",
                           cslang_path=get_test_data_path("registerdiv.cslang")))
 
-    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
                           operation="run",
                           strace_path=get_test_data_path("registerdiv.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registerdiv.auto"),
-                          preamble_path=get_test_data_path("registerdiv.pre")))
+                          containerbuilder_path=get_test_data_path("registerdiv.cb")))
     assert automaton.registers["numnum"] == 3
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1

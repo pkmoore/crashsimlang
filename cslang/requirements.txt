@@ -1,4 +1,0 @@
-git+https://github.com/pkmoore/posix-omni-parser
-dill
-setuptools
-

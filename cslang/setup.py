@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
@@ -9,6 +9,9 @@ setup(
     author_email = "pkm266@nyu.edu",
     description = ("Compile and run cslang automata"),
     url = "https://github.com/pkmoore/crashsimlang",
-    packages=['cslang', 'test'],
-    long_description='Long Description Goes Here',
+    install_requires = ["setuptools",
+                        "ply",
+                        "dill",
+                        "posix-omni-parser @ git+https://github.com/pkmoore/posix-omni-parser"],
+    packages=['cslang']
 )

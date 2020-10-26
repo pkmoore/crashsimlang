@@ -1,5 +1,5 @@
 import os
-from cslang.runner import main as runner_main
+from argparse import Namespace
 from cslang.cslang import main as cslang_main
 
 
@@ -10,15 +10,17 @@ def get_test_data_path(filename):
 
 class TestIntegration():
 
-  def teardown(self):
-    os.system("rm test/*.dw")
-    os.system("rm test/*.pickle")
-    os.system("rm test/*.auto")
-
   def test_openclose(self):
-    test_file = get_test_data_path("openclose.cslang")
-    cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("openclose.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("openclose.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("openclose.auto"),
+                          preamble_path=get_test_data_path("openclose.pre")))
     assert datawords_after[0].is_interesting()
     assert not datawords_after[1].is_interesting()
     assert automaton.current_state == 3
@@ -28,13 +30,27 @@ class TestIntegration():
     assert automaton.registers["retval"] == "-1"
 
   def test_uninteresting_dataword(self):
-    test_file = get_test_data_path("uninterestingdataword.cslang")
-    cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("uninterestingdataword.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("uninterestingdataword.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("uninterestingdataword.auto"),
+                          preamble_path=get_test_data_path("uninterestingdataword.pre")))
     assert automaton
 
   def test_empty_dataword(self):
-    test_file = get_test_data_path("emptydataword.cslang")
-    cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("emptydataword.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("emptydataword.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("emptydataword.auto"),
+                          preamble_path=get_test_data_path("emptydataword.pre")))
     assert len(automaton.states) == 2

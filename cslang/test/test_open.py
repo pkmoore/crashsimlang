@@ -1,5 +1,5 @@
 import os
-from cslang.runner import main as runner_main
+from argparse import Namespace
 from cslang.cslang import main as cslang_main
 
 
@@ -10,19 +10,30 @@ def get_test_data_path(filename):
 
 class TestOpen():
 
-  def teardown(self):
-    os.system("rm test/*.dw")
-    os.system("rm test/*.pickle")
-    os.system("rm test/*.auto")
-
   def test_open(self):
-    test_file = get_test_data_path("open.cslang")
-    cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("open.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("open.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("open.auto"),
+                          preamble_path=get_test_data_path("open.pre")))
+
     assert automaton.is_accepting
 
   def test_open_fail_pred(self):
-    test_file = get_test_data_path("open_fail_name.cslang")
-    cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("open_fail_name.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("open_fail_name.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("open_fail_name.auto"),
+                          preamble_path=get_test_data_path("open_fail_name.pre")))
+
     assert automaton.is_accepting

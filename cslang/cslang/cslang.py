@@ -12,6 +12,7 @@ from cslang_error import CSlangError
 import dill as pickle
 import os
 import sys
+import argparse
 
 
 reserved = {
@@ -457,7 +458,7 @@ def p_parameter(p):
 
 
 
-def main(name, parse_only=False):
+def main(args):
   global t_ignore
   global reserved
   global tokens
@@ -475,37 +476,69 @@ def main(name, parse_only=False):
   automaton = RegisterAutomaton()
   preamble = Preamble()
   containerbuilder = ContainerBuilder()
-  with open(name, "r") as f:
-    parser.parse(f.read(), debug=False)
 
-  if not parse_only:
-    basename = os.path.splitext(os.path.basename(name))[0]
-    dirname = os.path.dirname(name)
-    strace_path = os.path.join(dirname, basename + ".strace")
-    datawords_path = os.path.join(dirname, basename + ".dw")
-    pickle_path = os.path.join(dirname, basename + ".pickle")
-    automaton_path = os.path.join(dirname, basename + ".auto")
+  if args.mode == "strace":
+    if args.operation == "build":
 
-    syscall_definitions = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        "syscall_definitions.pickle")
-    t = Trace.Trace(strace_path, syscall_definitions)
+      basename = os.path.splitext(os.path.basename(args.cslang_path))[0]
+      dirname = os.path.dirname(args.cslang_path)
+      automaton_path = os.path.join(dirname, basename + ".auto")
+      preamble_path = os.path.join(dirname, basename + ".pre")
 
-    datawords = []
-    with open(datawords_path, "w") as f:
+      with open(args.cslang_path, "r") as f:
+        parser.parse(f.read(), debug=False)
+
+      with open(automaton_path, "w") as f:
+        pickle.dump(automaton, f)
+
+      with open(preamble_path, "w") as f:
+        pickle.dump(preamble, f)
+
+      return preamble, automaton, containerbuilder
+
+
+
+
+
+
+    elif args.operation == "run":
+
+      strace_path = args.strace_path
+      automaton_path = args.automaton_path
+      preamble_path = args.preamble_path
+      syscall_definitions = args.syscall_definitions
+
+      t = Trace.Trace(strace_path, syscall_definitions)
+
+      # Load in the automaton
+      with open(automaton_path, "r") as f:
+        automaton = pickle.load(f)
+
+      # Load in the preamble
+      with open(preamble_path, "r") as f:
+        preamble = pickle.load(f)
+
+      datawords = []
       for i in t.syscalls:
         d = preamble.handle_syscall(i)
-        f.write(d.get_dataword() + "\n")
         datawords.append(d)
 
-    with open(pickle_path, "w") as f:
-      pickle.dump(datawords, f)
+      # Pass each dataword in the list in series into the automaton
+      for i in datawords:
+        automaton.match(i)
 
-    with open(automaton_path, "w") as f:
-      pickle.dump(automaton, f)
 
-    return preamble, datawords, automaton, containerbuilder
+      # At the end of everything we have a transformed set of datawords.
+      # We either use them if we ended in an accepting state or drop ignore
+      # them if we haven't ended in an accepting state
+      # Some print goes here
+      print("Automaton ended in state: " + str(automaton.current_state))
+      print("With registers: " + str(automaton.registers))
 
+      for i in datawords:
+        print(i.get_mutated_strace())
+
+      return automaton, datawords
 
 
 
@@ -527,5 +560,41 @@ preamble = None
 containerbuilder = None
 
 if __name__ == "__main__":
-  main(sys.argv[1])
+  parser = argparse.ArgumentParser()
+  subparsers = parser.add_subparsers(dest="mode", help="input mode")
+
+  strace_subparser = subparsers.add_parser("strace")
+  strace_build_or_run_subparsers = strace_subparser.add_subparsers(dest="operation", help="build or run")
+
+  strace_build_argparser = strace_build_or_run_subparsers.add_parser("build")
+  strace_build_argparser.add_argument("-c", "--cslang-path",
+                                        required=True,
+                                        type=str,
+                                        help="CSlang file to be compiled"
+  )
+
+  strace_run_argparser = strace_build_or_run_subparsers.add_parser("run")
+  strace_run_argparser.add_argument("-a", "--automaton-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location of CSlang automaton to be used in processing the specified strace file."
+  )
+  strace_run_argparser.add_argument("-p", "--preamble-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location of preamble to be used in processing the specified strace file."
+  )
+  strace_run_argparser.add_argument("-s", "--strace-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location of strace recording to execute against"
+  )
+  strace_run_argparser.add_argument("-d", "--syscall-definitions",
+                                        required=True,
+                                        type=str,
+                                        help="Location of posix-omni-parser syscall definitions file"
+  )
+
+  args = parser.parse_args()
+  main(args)
 

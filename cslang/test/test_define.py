@@ -1,6 +1,6 @@
 import os
 import unittest
-from cslang.runner import main as runner_main
+from argparse import Namespace
 from cslang.cslang import main as cslang_main
 from cslang.cslang import containerbuilder
 from cslang.cslang_error import CSlangError
@@ -11,12 +11,20 @@ def get_test_data_path(filename):
   return os.path.join(dir_path, filename)
 
 
-class TestOpen(unittest.TestCase):
+class TestDefine(unittest.TestCase):
 
   def test_define(self):
     test_file = get_test_data_path("define.cslang")
-    preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
-    runner_main(test_file)
+    preamble, automaton, containerbuilder = cslang_main(Namespace(mode="strace",
+                                                        operation="build",
+                                                        cslang_path=get_test_data_path("define.cslang")))
+
+    automaton, datawords = cslang_main(Namespace(mode="strace",
+                                       operation="run",
+                                       strace_path=get_test_data_path("define.strace"),
+                                       syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                                       automaton_path=get_test_data_path("define.auto"),
+                                       preamble_path=get_test_data_path("define.pre")))
     assert "fstat" in containerbuilder.builders
     assert "statbuf" in containerbuilder.builders
 
@@ -33,16 +41,18 @@ class TestOpen(unittest.TestCase):
 
 
   def test_definedup(self):
-    test_file = get_test_data_path("define_dup.cslang")
     with self.assertRaises(CSlangError) as cm:
-      preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
+      cslang_main(Namespace(mode="strace",
+                            operation="build",
+                            cslang_path=get_test_data_path("define_dup.cslang")))
 
     assert "Illegal type redefinition" in str(cm.exception)
 
 
   def test_definenonexistant(self):
-    test_file = get_test_data_path("define_nonexistant.cslang")
     with self.assertRaises(CSlangError) as cm:
-      preamble, datawords, automaton, containerbuilder = cslang_main(test_file)
+      cslang_main(Namespace(mode="strace",
+                            operation="build",
+                            cslang_path=get_test_data_path("define_nonexistant.cslang")))
 
     assert "definition contains undefined type" in str(cm.exception)

@@ -1,6 +1,6 @@
 import os
 import unittest
-from cslang.runner import main as runner_main
+from argparse import Namespace
 from cslang.cslang import main as cslang_main
 from cslang.cslang_error import CSlangError
 
@@ -13,9 +13,16 @@ def get_test_data_path(filename):
 class TestRegisterExpressions(unittest.TestCase):
 
   def test_assign(self):
-    test_file = get_test_data_path("registerassign.cslang")
-    preamble, datawords, _, containerbuilder = cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("registerassign.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("registerassign.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("registerassign.auto"),
+                          preamble_path=get_test_data_path("registerassign.pre")))
     assert automaton.registers["assignstr"] == "hel"
     assert automaton.registers["assignnum"] == 5
     assert automaton.registers["assignidn"] == 4
@@ -23,24 +30,40 @@ class TestRegisterExpressions(unittest.TestCase):
 
   def test_concat(self):
     test_file = get_test_data_path("registerconcat.cslang")
-    preamble, datawords, _, containerbuilder = cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("registerconcat.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("registerconcat.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("registerconcat.auto"),
+                          preamble_path=get_test_data_path("registerconcat.pre")))
     assert automaton.registers["numnum"] == "hello"
     assert automaton.registers["regnum"] == "hello"
     assert automaton.registers["numreg"] == "lohel"
     assert automaton.registers["regreg"] == "helhel"
 
   def test_badadd(self):
-    test_file = get_test_data_path("register_badadd.cslang")
     with self.assertRaises(CSlangError) as cm:
-      preamble, datawords, _, containerbuilder = cslang_main(test_file)
+      cslang_main(Namespace(mode="strace",
+                            operation="build",
+                            cslang_path=get_test_data_path("register_badadd.cslang")))
 
     assert "Type mismatch between registers" in str(cm.exception)
 
   def test_add(self):
-    test_file = get_test_data_path("registeradd.cslang")
-    preamble, datawords, _, containerbuilder = cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("registeradd.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("registeradd.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("registeradd.auto"),
+                          preamble_path=get_test_data_path("registeradd.pre")))
     assert automaton.registers["numnum"] == 7
     assert automaton.registers["regnum"] == 6
     assert automaton.registers["numreg"] == 6
@@ -58,9 +81,16 @@ class TestRegisterExpressions(unittest.TestCase):
 
 
   def test_subtract(self):
-    test_file = get_test_data_path("registersub.cslang")
-    preamble, datawords, _, containerbuilder = cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("registersub.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("registersub.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("registersub.auto"),
+                          preamble_path=get_test_data_path("registersub.pre")))
     assert automaton.registers["numnum"] == 1
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1
@@ -78,9 +108,16 @@ class TestRegisterExpressions(unittest.TestCase):
 
 
   def test_multiply(self):
-    test_file = get_test_data_path("registermul.cslang")
-    preamble, datawords, _, containerbuilder = cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("registermul.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("registermul.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("registermul.auto"),
+                          preamble_path=get_test_data_path("registermul.pre")))
     assert automaton.registers["numnum"] == 12
     assert automaton.registers["regnum"] == 8
     assert automaton.registers["numreg"] == 8
@@ -98,8 +135,16 @@ class TestRegisterExpressions(unittest.TestCase):
 
   def test_divide(self):
     test_file = get_test_data_path("registerdiv.cslang")
-    preamble, datawords, _, containerbuilder = cslang_main(test_file)
-    automaton, datawords_after = runner_main(test_file)
+    cslang_main(Namespace(mode="strace",
+                          operation="build",
+                          cslang_path=get_test_data_path("registerdiv.cslang")))
+
+    automaton, datawords_after = cslang_main(Namespace(mode="strace",
+                          operation="run",
+                          strace_path=get_test_data_path("registerdiv.strace"),
+                          syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                          automaton_path=get_test_data_path("registerdiv.auto"),
+                          preamble_path=get_test_data_path("registerdiv.pre")))
     assert automaton.registers["numnum"] == 3
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1

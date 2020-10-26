@@ -8,4 +8,5 @@ parsetab.pyc
 *.pyc
 *.auto
 *.pickle
+*.pre
 *.dw

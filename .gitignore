@@ -1,2 +1,13 @@
-*.pdf
-*.bin
+cslang.egg-info/
+dist/*
+build/*
+.coverage
+parser.out
+parsetab.py
+parsetab.pyc
+*.pyc
+*.auto
+*.pickle
+*.pre
+*.dw
+*.cb

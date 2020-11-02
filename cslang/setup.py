@@ -13,5 +13,8 @@ setup(
                         "ply",
                         "dill",
                         "posix-omni-parser @ git+https://github.com/pkmoore/posix-omni-parser"],
-    packages=['cslang']
+    packages=['cslang'],
+    entry_points = {
+      "console_scripts": ['cslang = cslang.cslang:main']
+    }
 )

@@ -458,7 +458,7 @@ def p_parameter(p):
 
 
 
-def main(args):
+def main(args=None):
   global t_ignore
   global reserved
   global tokens
@@ -468,6 +468,44 @@ def main(args):
   global automaton
   global preamble
   global containerbuilder
+
+  parser = argparse.ArgumentParser()
+  subparsers = parser.add_subparsers(dest="mode", help="input mode")
+
+  strace_subparser = subparsers.add_parser("strace")
+  strace_build_or_run_subparsers = strace_subparser.add_subparsers(dest="operation", help="build or run")
+
+  strace_build_argparser = strace_build_or_run_subparsers.add_parser("build")
+  strace_build_argparser.add_argument("-c", "--cslang-path",
+                                        required=True,
+                                        type=str,
+                                        help="CSlang file to be compiled"
+  )
+
+  strace_run_argparser = strace_build_or_run_subparsers.add_parser("run")
+  strace_run_argparser.add_argument("-a", "--automaton-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location of CSlang automaton to be used in processing the specified strace file."
+  )
+  strace_run_argparser.add_argument("-p", "--preamble-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location of preamble to be used in processing the specified strace file."
+  )
+  strace_run_argparser.add_argument("-s", "--strace-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location of strace recording to execute against"
+  )
+  strace_run_argparser.add_argument("-d", "--syscall-definitions",
+                                        required=True,
+                                        type=str,
+                                        help="Location of posix-omni-parser syscall definitions file"
+  )
+
+  if not args:
+    args = parser.parse_args()
 
 
   in_preamble = True
@@ -560,41 +598,5 @@ preamble = None
 containerbuilder = None
 
 if __name__ == "__main__":
-  parser = argparse.ArgumentParser()
-  subparsers = parser.add_subparsers(dest="mode", help="input mode")
-
-  strace_subparser = subparsers.add_parser("strace")
-  strace_build_or_run_subparsers = strace_subparser.add_subparsers(dest="operation", help="build or run")
-
-  strace_build_argparser = strace_build_or_run_subparsers.add_parser("build")
-  strace_build_argparser.add_argument("-c", "--cslang-path",
-                                        required=True,
-                                        type=str,
-                                        help="CSlang file to be compiled"
-  )
-
-  strace_run_argparser = strace_build_or_run_subparsers.add_parser("run")
-  strace_run_argparser.add_argument("-a", "--automaton-path",
-                                    required=True,
-                                    type=str,
-                                    help="Location of CSlang automaton to be used in processing the specified strace file."
-  )
-  strace_run_argparser.add_argument("-p", "--preamble-path",
-                                    required=True,
-                                    type=str,
-                                    help="Location of preamble to be used in processing the specified strace file."
-  )
-  strace_run_argparser.add_argument("-s", "--strace-path",
-                                    required=True,
-                                    type=str,
-                                    help="Location of strace recording to execute against"
-  )
-  strace_run_argparser.add_argument("-d", "--syscall-definitions",
-                                        required=True,
-                                        type=str,
-                                        help="Location of posix-omni-parser syscall definitions file"
-  )
-
-  args = parser.parse_args()
-  main(args)
+  main()
 

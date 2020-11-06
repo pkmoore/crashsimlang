@@ -1,6 +1,17 @@
 type update {foo: Numeric@0, bar: Numeric@1};
+type test {baz: Numeric@0, bat: String@1};
 
 ## Match an open call, store the file name and returned file descriptors
 ## to the 'filename' and 'filedesc' registers respectively
-#
+num <- 45;
+str <- "alpha";
+
+
 update({foo: !pone, bar: !ptwo});
+
+f <- 999;
+b <- 888;
+
+test({baz: ?num, bat: ?str});
+
+update({foo: ->f, bar: ->b});

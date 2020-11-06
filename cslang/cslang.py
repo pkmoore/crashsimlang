@@ -653,6 +653,11 @@ def main(args=None):
       print("With registers: " + str(automaton.registers))
 
 
+      for i in datawords:
+        print(j2d.get_mutated_json(i))
+
+
+      return automaton, datawords, j2d
   # This is to parse the program that is going to read the datawords that will be incoming from the preprocessor
   # each dataword parsed defines the transition requirements from the current state to the next
   #  the datawords being generated will have data in them.  The program will only have identifiers

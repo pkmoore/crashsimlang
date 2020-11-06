@@ -23,6 +23,18 @@ class JSONToDatawords(object):
       datawords.append(self.handle_event(i))
     return datawords
 
+  def get_mutated_json(self, dw):
+    out = {}
+    out["jsonrpc"] =  "2.0"
+    out["method"] = dw.container["type"]
+    out["id"] = dw.original_event["id"]
+    out["params"] = dw.original_event["params"]
+    if dw.captured_arguments:
+      for i in dw.captured_arguments:
+        out["params"][int(i["arg_pos"])] = i["members"][0]
+
+    return json.dumps(out)
+
 
   def handle_event(self, event):
     if not any(self.containerbuilder.top_level.values()) \

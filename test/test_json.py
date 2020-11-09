@@ -21,8 +21,7 @@ class TestJSON(unittest.TestCase):
     automaton, datawords, _ = cslang_main(Namespace(mode="run",
                                        format="jsonrpc",
                                        json_path=get_test_data_path("update.json"),
-                                       automaton_path=get_test_data_path("update.auto"),
-                                       containerbuilder_path=get_test_data_path("update.cb")))
+                                       automaton_path=get_test_data_path("update.auto")))
     assert "update" in containerbuilder.builders
     assert "test" in containerbuilder.builders
 

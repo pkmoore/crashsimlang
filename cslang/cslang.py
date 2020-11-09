@@ -490,11 +490,6 @@ def main(args=None):
                                     type=str,
                                     help="Location of CSlang automaton to be used in processing the specified strace file."
   )
-  strace_run_argparser.add_argument("-b", "--containerbuilder-path",
-                                    required=True,
-                                    type=str,
-                                    help="Location of containerbuilder to be used in processing the specified strace file."
-  )
   strace_run_argparser.add_argument("-s", "--strace-path",
                                     required=True,
                                     type=str,
@@ -513,11 +508,6 @@ def main(args=None):
                                      required=True,
                                      type=str,
                                      help="Location of CSlang automaton to be used in processing the specified strace file."
-  )
-  jsonrpc_run_argparser.add_argument("-b", "--containerbuilder-path",
-                                     required=True,
-                                     type=str,
-                                     help="Location of preamble to be used in processing the specified strace file."
   )
   jsonrpc_run_argparser.add_argument("-j", "--json-path",
                                      required=True,
@@ -546,10 +536,7 @@ def main(args=None):
         parser.parse(f.read(), debug=False)
 
       with open(automaton_path, "w") as f:
-        pickle.dump(automaton, f)
-
-      with open(cb_path, "w") as f:
-        pickle.dump(containerbuilder, f)
+        pickle.dump((automaton, containerbuilder), f)
 
       return automaton, containerbuilder
 
@@ -563,17 +550,12 @@ def main(args=None):
 
       strace_path = args.strace_path
       automaton_path = args.automaton_path
-      containerbuilder_path = args.containerbuilder_path
       syscall_definitions = args.syscall_definitions
 
 
       # Load in the automaton
       with open(automaton_path, "r") as f:
-        automaton = pickle.load(f)
-
-      with open(containerbuilder_path, "r") as f:
-        cb = pickle.load(f)
-
+        automaton, cb = pickle.load(f)
 
       s2d = StraceToDatawords(cb, syscall_definitions, strace_path)
       datawords = s2d.get_datawords()
@@ -599,15 +581,10 @@ def main(args=None):
 
       json_path = args.json_path
       automaton_path = args.automaton_path
-      containerbuilder_path = args.containerbuilder_path
-
 
       # Load in the automaton
       with open(automaton_path, "r") as f:
-        automaton = pickle.load(f)
-
-      with open(containerbuilder_path, "r") as f:
-        cb = pickle.load(f)
+        automaton, cb = pickle.load(f)
 
 
       j2d = JSONToDatawords(cb, json_path)

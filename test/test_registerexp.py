@@ -20,8 +20,7 @@ class TestRegisterExpressions(unittest.TestCase):
                           format="strace",
                           strace_path=get_test_data_path("registerassign.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("registerassign.auto"),
-                          containerbuilder_path=get_test_data_path("registerassign.cb")))
+                          automaton_path=get_test_data_path("registerassign.auto")))
     assert automaton.registers["assignstr"] == "hel"
     assert automaton.registers["assignnum"] == 5
     assert automaton.registers["assignidn"] == 4
@@ -36,8 +35,7 @@ class TestRegisterExpressions(unittest.TestCase):
                           format="strace",
                           strace_path=get_test_data_path("registerconcat.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("registerconcat.auto"),
-                          containerbuilder_path=get_test_data_path("registerconcat.cb")))
+                          automaton_path=get_test_data_path("registerconcat.auto")))
     assert automaton.registers["numnum"] == "hello"
     assert automaton.registers["regnum"] == "hello"
     assert automaton.registers["numreg"] == "lohel"
@@ -58,8 +56,7 @@ class TestRegisterExpressions(unittest.TestCase):
                           format="strace",
                           strace_path=get_test_data_path("registeradd.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("registeradd.auto"),
-                          containerbuilder_path=get_test_data_path("registeradd.cb")))
+                          automaton_path=get_test_data_path("registeradd.auto")))
     assert automaton.registers["numnum"] == 7
     assert automaton.registers["regnum"] == 6
     assert automaton.registers["numreg"] == 6
@@ -84,8 +81,7 @@ class TestRegisterExpressions(unittest.TestCase):
                           format="strace",
                           strace_path=get_test_data_path("registersub.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("registersub.auto"),
-                          containerbuilder_path=get_test_data_path("registersub.cb")))
+                          automaton_path=get_test_data_path("registersub.auto")))
     assert automaton.registers["numnum"] == 1
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1
@@ -110,8 +106,7 @@ class TestRegisterExpressions(unittest.TestCase):
                           format="strace",
                           strace_path=get_test_data_path("registermul.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("registermul.auto"),
-                          containerbuilder_path=get_test_data_path("registermul.cb")))
+                          automaton_path=get_test_data_path("registermul.auto")))
     assert automaton.registers["numnum"] == 12
     assert automaton.registers["regnum"] == 8
     assert automaton.registers["numreg"] == 8
@@ -136,8 +131,7 @@ class TestRegisterExpressions(unittest.TestCase):
                           format="strace",
                           strace_path=get_test_data_path("registerdiv.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("registerdiv.auto"),
-                          containerbuilder_path=get_test_data_path("registerdiv.cb")))
+                          automaton_path=get_test_data_path("registerdiv.auto")))
     assert automaton.registers["numnum"] == 3
     assert automaton.registers["regnum"] == 1
     assert automaton.registers["numreg"] == 1

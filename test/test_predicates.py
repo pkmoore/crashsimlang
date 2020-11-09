@@ -13,7 +13,6 @@ class TestPredicates():
   def test_checkfdtrue(self):
     syscall_definitions = get_test_data_path("../cslang/syscall_definitions.pickle")
     automaton_path = get_test_data_path("predicates.auto")
-    containerbuilder_path = get_test_data_path("predicates.cb")
     cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("predicates.cslang")))
 
@@ -21,8 +20,7 @@ class TestPredicates():
                           format="strace",
                           strace_path=get_test_data_path("predicates.strace"),
                           syscall_definitions=syscall_definitions,
-                          automaton_path=automaton_path,
-                          containerbuilder_path=containerbuilder_path))
+                          automaton_path=automaton_path))
     assert automaton.current_state == 4
     assert not automaton.is_accepting()
     assert "foo, bar" in s2d.get_mutated_strace(datawords_after[2])

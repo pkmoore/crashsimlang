@@ -22,8 +22,7 @@ class TestDefine(unittest.TestCase):
                                        format="strace",
                                        strace_path=get_test_data_path("define.strace"),
                                        syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                                       automaton_path=get_test_data_path("define.auto"),
-                                       containerbuilder_path=get_test_data_path("define.cb")))
+                                       automaton_path=get_test_data_path("define.auto")))
     assert "fstat" in containerbuilder.builders
     assert "statbuf" in containerbuilder.builders
 

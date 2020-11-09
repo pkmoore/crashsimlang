@@ -18,8 +18,7 @@ class TestOpen():
                           format="strace",
                           strace_path=get_test_data_path("open.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("open.auto"),
-                          containerbuilder_path=get_test_data_path("open.cb")))
+                          automaton_path=get_test_data_path("open.auto")))
 
     assert automaton.is_accepting
 
@@ -32,7 +31,6 @@ class TestOpen():
                           format="strace",
                           strace_path=get_test_data_path("open_fail_name.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
-                          automaton_path=get_test_data_path("open_fail_name.auto"),
-                          containerbuilder_path=get_test_data_path("open_fail_name.cb")))
+                          automaton_path=get_test_data_path("open_fail_name.auto")))
 
     assert automaton.is_accepting

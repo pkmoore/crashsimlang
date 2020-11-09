@@ -13,12 +13,11 @@ def get_test_data_path(filename):
 class TestRegisterExpressions(unittest.TestCase):
 
   def test_assign(self):
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("registerassign.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("registerassign.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registerassign.auto"),
@@ -30,12 +29,11 @@ class TestRegisterExpressions(unittest.TestCase):
 
   def test_concat(self):
     test_file = get_test_data_path("registerconcat.cslang")
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("registerconcat.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("registerconcat.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registerconcat.auto"),
@@ -47,19 +45,17 @@ class TestRegisterExpressions(unittest.TestCase):
 
   def test_badadd(self):
     with self.assertRaises(CSlangError) as cm:
-      cslang_main(Namespace(mode="strace",
-                            operation="build",
+      cslang_main(Namespace(mode="build",
                             cslang_path=get_test_data_path("register_badadd.cslang")))
 
     assert "Type mismatch between registers" in str(cm.exception)
 
   def test_add(self):
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("registeradd.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("registeradd.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registeradd.auto"),
@@ -81,12 +77,11 @@ class TestRegisterExpressions(unittest.TestCase):
 
 
   def test_subtract(self):
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("registersub.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("registersub.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registersub.auto"),
@@ -108,12 +103,11 @@ class TestRegisterExpressions(unittest.TestCase):
 
 
   def test_multiply(self):
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("registermul.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("registermul.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registermul.auto"),
@@ -135,12 +129,11 @@ class TestRegisterExpressions(unittest.TestCase):
 
   def test_divide(self):
     test_file = get_test_data_path("registerdiv.cslang")
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("registerdiv.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("registerdiv.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("registerdiv.auto"),

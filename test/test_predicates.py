@@ -14,12 +14,11 @@ class TestPredicates():
     syscall_definitions = get_test_data_path("../cslang/syscall_definitions.pickle")
     automaton_path = get_test_data_path("predicates.auto")
     containerbuilder_path = get_test_data_path("predicates.cb")
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("predicates.cslang")))
 
-    automaton, datawords_after, s2d = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, s2d = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("predicates.strace"),
                           syscall_definitions=syscall_definitions,
                           automaton_path=automaton_path,

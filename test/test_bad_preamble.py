@@ -15,8 +15,7 @@ class TestOpen(unittest.TestCase):
 
   def test_late_preamble_statement(self):
     with self.assertRaises(CSlangError) as cm:
-      cslang_main(Namespace(mode="strace",
-                            operation="build",
+      cslang_main(Namespace(mode="build",
                             cslang_path=get_test_data_path("bad_preamble.cslang")))
 
     assert "Found preamble statement after" in str(cm.exception)

@@ -11,12 +11,11 @@ def get_test_data_path(filename):
 class TestOpen():
 
   def test_open(self):
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
                           cslang_path=get_test_data_path("open.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("open.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("open.auto"),
@@ -25,12 +24,12 @@ class TestOpen():
     assert automaton.is_accepting
 
   def test_open_fail_pred(self):
-    cslang_main(Namespace(mode="strace",
-                          operation="build",
+    cslang_main(Namespace(mode="build",
+                          format="strace",
                           cslang_path=get_test_data_path("open_fail_name.cslang")))
 
-    automaton, datawords_after, _ = cslang_main(Namespace(mode="strace",
-                          operation="run",
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                          format="strace",
                           strace_path=get_test_data_path("open_fail_name.strace"),
                           syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                           automaton_path=get_test_data_path("open_fail_name.auto"),

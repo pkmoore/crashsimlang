@@ -15,12 +15,11 @@ class TestJSON(unittest.TestCase):
 
   def test_json(self):
     test_file = get_test_data_path("update.cslang")
-    automaton, containerbuilder = cslang_main(Namespace(mode="jsonrpc",
-                                                        operation="build",
+    automaton, containerbuilder = cslang_main(Namespace(mode="build",
                                                         cslang_path=get_test_data_path("update.cslang")))
 
-    automaton, datawords, _ = cslang_main(Namespace(mode="jsonrpc",
-                                       operation="run",
+    automaton, datawords, _ = cslang_main(Namespace(mode="run",
+                                       format="jsonrpc",
                                        json_path=get_test_data_path("update.json"),
                                        automaton_path=get_test_data_path("update.auto"),
                                        containerbuilder_path=get_test_data_path("update.cb")))

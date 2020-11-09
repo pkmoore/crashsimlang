@@ -15,12 +15,11 @@ class TestDefine(unittest.TestCase):
 
   def test_define(self):
     test_file = get_test_data_path("define.cslang")
-    automaton, containerbuilder = cslang_main(Namespace(mode="strace",
-                                                        operation="build",
+    automaton, containerbuilder = cslang_main(Namespace(mode="build",
                                                         cslang_path=get_test_data_path("define.cslang")))
 
-    automaton, datawords, _ = cslang_main(Namespace(mode="strace",
-                                       operation="run",
+    automaton, datawords, _ = cslang_main(Namespace(mode="run",
+                                       format="strace",
                                        strace_path=get_test_data_path("define.strace"),
                                        syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
                                        automaton_path=get_test_data_path("define.auto"),
@@ -42,8 +41,7 @@ class TestDefine(unittest.TestCase):
 
   def test_definedup(self):
     with self.assertRaises(CSlangError) as cm:
-      cslang_main(Namespace(mode="strace",
-                            operation="build",
+      cslang_main(Namespace(mode="build",
                             cslang_path=get_test_data_path("define_dup.cslang")))
 
     assert "Illegal type redefinition" in str(cm.exception)
@@ -51,8 +49,7 @@ class TestDefine(unittest.TestCase):
 
   def test_definenonexistant(self):
     with self.assertRaises(CSlangError) as cm:
-      cslang_main(Namespace(mode="strace",
-                            operation="build",
+      cslang_main(Namespace(mode="build",
                             cslang_path=get_test_data_path("define_nonexistant.cslang")))
 
     assert "definition contains undefined type" in str(cm.exception)

@@ -472,17 +472,19 @@ def main(args=None):
   parser = argparse.ArgumentParser()
   subparsers = parser.add_subparsers(dest="mode", help="input mode")
 
-  strace_subparser = subparsers.add_parser("strace")
-  strace_build_or_run_subparsers = strace_subparser.add_subparsers(dest="operation", help="build or run")
+  build_argparser = subparsers.add_parser("build")
 
-  strace_build_argparser = strace_build_or_run_subparsers.add_parser("build")
-  strace_build_argparser.add_argument("-c", "--cslang-path",
+  build_argparser.add_argument("-c", "--cslang-path",
                                         required=True,
                                         type=str,
                                         help="CSlang file to be compiled"
   )
 
-  strace_run_argparser = strace_build_or_run_subparsers.add_parser("run")
+  run_subparsers = subparsers.add_parser("run")
+  run_subparsers = run_subparsers.add_subparsers(dest="format", help="input format")
+
+  strace_run_argparser = run_subparsers.add_parser("strace")
+
   strace_run_argparser.add_argument("-a", "--automaton-path",
                                     required=True,
                                     type=str,
@@ -504,16 +506,8 @@ def main(args=None):
                                         help="Location of posix-omni-parser syscall definitions file"
   )
 
-  jsonrpc_subparser = subparsers.add_parser("jsonrpc")
-  jsonrpc_build_or_run_subparsers = jsonrpc_subparser.add_subparsers(dest="operation", help="build or run")
+  jsonrpc_run_argparser = run_subparsers.add_parser("jsonrpc")
 
-  jsonrpc_build_argparser = jsonrpc_build_or_run_subparsers.add_parser("build")
-  jsonrpc_build_argparser.add_argument("-c", "--cslang-path",
-                                        required=True,
-                                        type=str,
-                                        help="CSlang file to be compiled"
-  )
-  jsonrpc_run_argparser = jsonrpc_build_or_run_subparsers.add_parser("run")
 
   jsonrpc_run_argparser.add_argument("-a", "--automaton-path",
                                      required=True,
@@ -542,9 +536,7 @@ def main(args=None):
   automaton = RegisterAutomaton()
   containerbuilder = ContainerBuilder()
 
-  if args.mode == "strace":
-    if args.operation == "build":
-
+  if args.mode == "build":
       basename = os.path.splitext(os.path.basename(args.cslang_path))[0]
       dirname = os.path.dirname(args.cslang_path)
       automaton_path = os.path.join(dirname, basename + ".auto")
@@ -566,7 +558,8 @@ def main(args=None):
 
 
 
-    elif args.operation == "run":
+  elif args.mode == "run":
+    if args.format == "strace":
 
       strace_path = args.strace_path
       automaton_path = args.automaton_path
@@ -602,27 +595,7 @@ def main(args=None):
 
       return automaton, datawords, s2d
 
-  elif args.mode == "jsonrpc":
-    if args.operation == "build":
-
-      basename = os.path.splitext(os.path.basename(args.cslang_path))[0]
-      dirname = os.path.dirname(args.cslang_path)
-      automaton_path = os.path.join(dirname, basename + ".auto")
-      cb_path = os.path.join(dirname, basename + ".cb")
-
-      with open(args.cslang_path, "r") as f:
-        parser.parse(f.read(), debug=False)
-
-      with open(automaton_path, "w") as f:
-        pickle.dump(automaton, f)
-
-      with open(cb_path, "w") as f:
-        pickle.dump(containerbuilder, f)
-
-      return automaton, containerbuilder
-
-
-    elif args.operation == "run":
+    elif args.format == "jsonrpc":
 
       json_path = args.json_path
       automaton_path = args.automaton_path
@@ -658,15 +631,7 @@ def main(args=None):
 
 
       return automaton, datawords, j2d
-  # This is to parse the program that is going to read the datawords that will be incoming from the preprocessor
-  # each dataword parsed defines the transition requirements from the current state to the next
-  #  the datawords being generated will have data in them.  The program will only have identifiers
-  # This thing needs to generate instructions or whatever to do the transitioning and reading registers and all that
-  # output an automaton object
 
-
-
-# The "choice" operatior "|" would be a case where we have a branch in the automaton.
 
 in_preamble = None
 lexer = None

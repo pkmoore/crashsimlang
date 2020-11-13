@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<calls>
+<methodCall>
+    <methodName>getStateName</methodName>
+    <params>
+        <param>
+            <value><i4>41</i4></value>
+        </param>
+        <param>
+            <value><i4>32</i4></value>
+        </param>
+        </params>
+    </methodCall>
+</calls>

@@ -5,6 +5,7 @@ from register_automaton import State
 from register_automaton import Transition
 from strace2datawords import StraceToDatawords
 from jsontodatawords import JSONToDatawords
+from xmltodatawords import XMLToDatawords
 from dataword import DataWord
 from dataword import UninterestingDataWord
 from posix_omni_parser import Trace
@@ -512,8 +513,23 @@ def main(args=None):
   jsonrpc_run_argparser.add_argument("-j", "--json-path",
                                      required=True,
                                      type=str,
-                                     help="Location of strace recording to execute against"
+                                     help="Location of jsonrpc recording to execute against"
   )
+
+  xmlrpc_run_argparser = run_subparsers.add_parser("xmlrpc")
+
+  xmlrpc_run_argparser.add_argument("-a", "--automaton-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location on of CSlang automaton to be used"
+  )
+
+  xmlrpc_run_argparser.add_argument("-x", "--xml-path",
+                                    required=True,
+                                    type=str,
+                                    help="Location of xmlrpc recording to execute against"
+  )
+
 
 
   if not args:
@@ -608,6 +624,39 @@ def main(args=None):
 
 
       return automaton, datawords, j2d
+
+    elif args.format == "xmlrpc":
+
+      xml_path = args.xml_path
+      automaton_path = args.automaton_path
+
+      # Load in the automaton
+      with open(automaton_path, "r") as f:
+        automaton, cb = pickle.load(f)
+
+
+      x2d = XMLToDatawords(cb, xml_path)
+      datawords = x2d.get_datawords()
+
+      # Pass each dataword in the list in series into the automaton
+      for i in datawords:
+        automaton.match(i)
+
+
+      # At the end of everything we have a transformed set of datawords.
+      # We either use them if we ended in an accepting state or drop ignore
+      # them if we haven't ended in an accepting state
+      # Some print goes here
+      print("Automaton ended in state: " + str(automaton.current_state))
+      print("With registers: " + str(automaton.registers))
+
+
+      for i in datawords:
+        print(x2d.get_mutated_xml(i))
+
+
+
+      return automaton, datawords, x2d
 
 
 in_preamble = None

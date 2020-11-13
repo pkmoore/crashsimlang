@@ -7,12 +7,16 @@ class DataWord(object):
       self.type = container["type"]
       self.captured_arguments = container["members"]
     else:
-      # HACK HACK HACK:  we have to find out if we have a system call or a
-      # jsonrpc call as our event
+      # HACK HACK HACK
+      # Strace objects have a name field
       if hasattr(self.original_event, "name"):
         self.type = self.original_event.name
-      else:
+      # JSON objects have a "procedure" key
+      elif "procedure" in self.original_event.keys():
         self.type = self.original_event["procedure"]
+      # XMLRPC object have a methodName
+      elif self.original_event[0].tag == "methodName":
+        self.type = self.original_event[0].text
       self.captured_arguments = None
 
 

@@ -34,6 +34,7 @@ def _get_member_for_name(current_argument, name):
   for i in current_argument:
     if i["arg_name"] == name:
       return i
+  raise CSLangError("Couldn't find member with name {}".format(name))
 
 
 class ContainerBuilder(object):

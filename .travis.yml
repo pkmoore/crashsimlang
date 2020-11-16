@@ -1,0 +1,10 @@
+language: python
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27
+install:
+  - sudo apt-get install man-db manpages-posix manpages-dev manpages-posix-dev
+  - pip install tox .
+script:
+  - tox

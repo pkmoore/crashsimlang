@@ -12,6 +12,7 @@ setup(
     install_requires = ["setuptools",
                         "ply",
                         "dill",
+                        "lxml",
                         "posix-omni-parser @ git+https://github.com/pkmoore/posix-omni-parser"],
     packages=['cslang'],
     entry_points = {

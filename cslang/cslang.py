@@ -6,15 +6,15 @@ from register_automaton import Transition
 from strace2datawords import StraceToDatawords
 from jsontodatawords import JSONToDatawords
 from xmltodatawords import XMLToDatawords
-from dataword import DataWord
-from dataword import UninterestingDataWord
 from posix_omni_parser import Trace
 from adt import ContainerBuilder
+import automaton_builder
 from cslang_error import CSlangError
 import dill as pickle
 import os
 import sys
 import argparse
+import pprint
 
 
 reserved = {
@@ -75,7 +75,7 @@ def t_NUM_LITERAL(t):
 
 def t_STRING_LITERAL(t):
   "\"[^\"]+\""
-  t.value = ("STRING", t.value[1:-1])
+  t.value = ("STRING_LITERAL", t.value[1:-1])
   return t
 
 t_ignore = " \t\n"
@@ -111,12 +111,16 @@ def p_statementlist(p):
   ''' statementlist : statement  statementlist
                     | statement
   '''
-  automaton.states[-1].is_accepting = True
+  if len(p) == 3:
+    p[0] = [p[1]] + p[2]
+  else:
+    p[0] = [p[1]]
 
 def p_statement(p):
   ''' statement : preamblestatement
                 | bodystatement
   '''
+  p[0] = p[1]
 
 def p_preamblestatement(p):
   ''' preamblestatement : typedefinition ';'
@@ -125,19 +129,21 @@ def p_preamblestatement(p):
   if not in_preamble:
     raise CSlangError("Found preamble statement after preamble processing has ended")
 
+  p[0] = p[1]
+
 def p_bodystatement(p):
   ''' bodystatement : dataword ';'
                     | registerassignment ';'
   '''
   global in_preamble
-  global preamble
-  global containerbuilder
   # If this is true, we have encountered our first body statement.
   # This means we have seen all the type definitions we are going to see
   # and it is time for the preamble object to read through the generated
   # data structure and figure out what stuff it needs to capture
   if in_preamble:
     in_preamble = False
+
+  p[0] = p[1]
 
 
 def p_typeexpression(p):
@@ -164,8 +170,7 @@ def p_typedefinition(p):
 
   '''
 
-  global containerbuilder
-  containerbuilder.define_type(p[2][1], p[4])
+  p[0] = ("TYPEDEF", p[2][1], p[4])
 
 
 def p_predpath(p):
@@ -208,16 +213,7 @@ def p_registerassignment(p):
                          | IDENTIFIER ASSIGNOP registerexp
   '''
 
-  global automaton
-  register_name = p[1][1]
-  if p[3][0] == 'IDENTIFIER':
-    automaton.registers[register_name] = automaton.registers[p[3][1]]
-  elif p[3][0] in ['NUM_LITERAL', 'NUMERIC']:
-    automaton.registers[register_name] = float(p[3][1])
-  elif p[3][0] == 'STRING':
-    automaton.registers[register_name] = str(p[3][1])
-  else:
-    raise CSlangError("Bad type in register assignment: {}".format(p[3]))
+  p[0] = ('REGASSIGN', p[1], p[3])
 
 def p_registerexp(p):
   ''' registerexp : registeradd
@@ -228,25 +224,13 @@ def p_registerexp(p):
                   | registeraddorconcat
   '''
 
-  p[0] = p[1]
+  p[0] = ("REGEXP", p[1])
 
 def p_registeraddorconcat(p):
   ''' registeraddorconcat : IDENTIFIER '+' IDENTIFIER
   '''
 
-  lhs = automaton.registers[p[1][1]]
-  rhs = automaton.registers[p[3][1]]
-
-  if type(lhs) != type(rhs):
-    raise CSlangError("Type mismatch between registers {} and {}"
-                      .format(p[1][1], p[3][1]))
-
-  if type(lhs) == str:
-    p[0] = ('STRING', str(lhs) + str(rhs))
-  elif type(rhs) == float:
-    p[0] = ('NUMERIC', float(lhs) + float(rhs))
-  else:
-    raise CSlangError("Bad type in string concatenation: {}".format(p[1]))
+  p[0] = ("REGADD", p[1], p[2], p[3])
 
 
 def p_registerconcat(p):
@@ -255,21 +239,7 @@ def p_registerconcat(p):
                      | STRING_LITERAL '+' STRING_LITERAL
   '''
 
-  if p[1][0] == "IDENTIFIER":
-    lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == "STRING":
-    lhs = p[1][1]
-  else:
-    raise CSlangError("Bad type in string concatenation: {}".format(p[1]))
-
-  if p[3][0] == "IDENTIFIER":
-    rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == "STRING":
-    rhs = p[3][1]
-  else:
-    raise CSlangError("Bad type in string concatenation: {}".format(p[1]))
-
-  p[0] = ('STRING', str(lhs) + str(rhs))
+  p[0] = ("REGCONCAT", p[1], p[2], p[3])
 
 
 def p_registeradd(p):
@@ -278,21 +248,8 @@ def p_registeradd(p):
                   | NUM_LITERAL '+' NUM_LITERAL
   '''
 
-  if p[1][0] == 'IDENTIFIER':
-    lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUM_LITERAL':
-    lhs = p[1][1]
-  else:
-    raise CSlangError("Bad type in addition: {}".format(p[1]))
+  p[0] = ("REGADD", p[1], p[2], p[3])
 
-  if p[3][0] == 'IDENTIFIER':
-    rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUM_LITERAL':
-    rhs = p[3][1]
-  else:
-    raise CSlangError("Bad type in addition: {}".format(p[3]))
-
-  p[0] = ('NUMERIC', float(lhs) + float(rhs))
 
 def p_registersub(p):
   ''' registersub : IDENTIFIER '-' IDENTIFIER
@@ -301,21 +258,8 @@ def p_registersub(p):
                   | NUM_LITERAL '-' NUM_LITERAL
   '''
 
-  if p[1][0] == 'IDENTIFIER':
-    lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUM_LITERAL':
-    lhs = p[1][1]
-  else:
-    raise CSlangError("Bad type in substraction: {}".format(p[1]))
+  p[0] = ("REGSUB", p[1], p[2], p[3])
 
-  if p[3][0] == 'IDENTIFIER':
-    rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUM_LITERAL':
-    rhs = p[3][1]
-  else:
-    raise CSlangError("Bad type in substraction: {}".format(p[3]))
-
-  p[0] = ('NUMERIC', float(lhs) - float(rhs))
 
 def p_registermul(p):
   ''' registermul : IDENTIFIER '*' IDENTIFIER
@@ -324,21 +268,8 @@ def p_registermul(p):
                   | NUM_LITERAL '*' NUM_LITERAL
   '''
 
-  if p[1][0] == 'IDENTIFIER':
-    lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUM_LITERAL':
-    lhs = p[1][1]
-  else:
-    raise CSlangError("Bad type in substraction: {}".format(p[1]))
+  p[0] = ("REGMUL", p[1], p[2], p[3])
 
-  if p[3][0] == 'IDENTIFIER':
-    rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUM_LITERAL':
-    rhs = p[3][1]
-  else:
-    raise CSlangError("Bad type in substraction: {}".format(p[3]))
-
-  p[0] = ('NUMERIC', float(lhs) * float(rhs))
 
 def p_registerdiv(p):
   ''' registerdiv : IDENTIFIER '/' IDENTIFIER
@@ -346,21 +277,7 @@ def p_registerdiv(p):
                   | NUM_LITERAL '/' IDENTIFIER
                   | NUM_LITERAL '/' NUM_LITERAL
   '''
-  if p[1][0] == 'IDENTIFIER':
-    lhs = automaton.registers[p[1][1]]
-  elif p[1][0] == 'NUM_LITERAL':
-    lhs = p[1][1]
-  else:
-    raise CSlangError("Bad type in substraction: {}".format(p[1]))
-
-  if p[3][0] == 'IDENTIFIER':
-    rhs = automaton.registers[p[3][1]]
-  elif p[3][0] == 'NUM_LITERAL':
-    rhs = p[3][1]
-  else:
-    raise CSlangError("Bad type in substraction: {}".format(p[3]))
-
-  p[0] = ('NUMERIC', float(lhs) / float(rhs))
+  p[0] = ("REGDIV", p[1], p[2], p[3])
 
 
 def p_dataword(p):
@@ -370,54 +287,17 @@ def p_dataword(p):
                | IDENTIFIER '(' parameterexpression ')' WITH predexpressionlist
   '''
 
-  global preamble
-  global automaton
+
   if p[1][1] == "NOT":
-    not_dataword = True
-    syscall_name = p[2][1]
-    operations = p[4][1]
     if len(p) == 8:
-      predicates = p[7][1:]
+      p[0] = ('DATAWORD', p[1][1], p[2][1], p[4], p[7])
     else:
-      predicates = None
+      p[0] = ('DATAWORD', p[1][1], p[2][1], p[4])
   else:
-    not_dataword = False
-    syscall_name = p[1][1]
-    operations = p[3][1]
     if len(p) == 7:
-      predicates = p[6][1:]
+      p[0] = ('DATAWORD', p[1][1], p[3], p[6])
     else:
-      predicates = None
-
-
-  if not_dataword:
-    #  This is a not dataword so we create our NOT state
-    automaton.states.append(State(syscall_name, tags=["NOT"]))
-
-    # And make a transition to it with appropriate register_matches
-    automaton.states[-2].transitions.append(Transition(syscall_name,
-                                            len(automaton.states) - 1,
-                                            operations=operations))
-
-  else:
-    # We encountered a new dataword so we make a new state
-    automaton.states.append(State(syscall_name, operations))
-
-    # We create a transition to this state on the previous state
-
-    # The state we just added is in automaton.states[-1] so we need to start
-    # with automaton.states[-2] and keep searching back until we hit a non-NOT
-    # state.  This is the state to which we will add a transition to the new state
-    # we just added.
-
-    neg_index = -2
-    while "NOT" in automaton.states[neg_index].tags:
-      neg_index -= 1
-
-    automaton.states[neg_index].transitions.append(Transition(syscall_name,
-                                                              len(automaton.states) - 1,
-                                                              operations=operations,
-                                                              predicates=predicates))
+      p[0] = ('DATAWORD', p[1][1], p[3])
 
 def p_parameterexpression(p):
   ''' parameterexpression : '{' parameterlist '}'
@@ -466,12 +346,21 @@ def main(args=None):
   global in_preamble
   global lexer
   global parser
-  global automaton
-  global preamble
-  global containerbuilder
 
   parser = argparse.ArgumentParser()
   subparsers = parser.add_subparsers(dest="mode", help="input mode")
+
+  parse_argparser = subparsers.add_parser("parse")
+  parse_argparser.add_argument("-c", "--cslang-path",
+                                        required=False,
+                                        type=str,
+                                        help="CSlang file to be parsed"
+  )
+  parse_argparser.add_argument("-s", "--string",
+                                        required=False,
+                                        type=str,
+                                        help="String to parse"
+  )
 
   build_argparser = subparsers.add_parser("build")
 
@@ -539,8 +428,20 @@ def main(args=None):
   in_preamble = True
   lexer = lex.lex()
   parser = yacc.yacc()
-  automaton = RegisterAutomaton()
-  containerbuilder = ContainerBuilder()
+
+
+  if args.mode == "parse":
+    if args.cslang_path:
+      with open(args.cslang_path, "r") as f:
+        data = f.read()
+
+    if args.string:
+      data = args.string
+
+    result = parser.parse(data)
+    pp = pprint.PrettyPrinter(indent=2)
+    pp.pprint(result)
+    return result
 
   if args.mode == "build":
       basename = os.path.splitext(os.path.basename(args.cslang_path))[0]
@@ -549,10 +450,13 @@ def main(args=None):
       cb_path = os.path.join(dirname, basename + ".cb")
 
       with open(args.cslang_path, "r") as f:
-        parser.parse(f.read(), debug=False)
+        ast = parser.parse(f.read(), debug=False)
+
+      automaton, containerbuilder = automaton_builder.process_root(ast)
 
       with open(automaton_path, "w") as f:
         pickle.dump((automaton, containerbuilder), f)
+
 
       return automaton, containerbuilder
 
@@ -662,8 +566,6 @@ def main(args=None):
 in_preamble = None
 lexer = None
 parser = None
-automaton = None
-containerbuilder = None
 
 if __name__ == "__main__":
   main()

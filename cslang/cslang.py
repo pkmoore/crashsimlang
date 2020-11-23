@@ -111,11 +111,16 @@ def p_statementlist(p):
                     | statement
   '''
   automaton.states[-1].is_accepting = True
+  if len(p) == 4:
+    p[0] = [p[1]] + p[2]
+  else:
+    p[0] = [p[1]]
 
 def p_statement(p):
   ''' statement : preamblestatement
                 | bodystatement
   '''
+  p[0] = p[1]
 
 def p_preamblestatement(p):
   ''' preamblestatement : typedefinition ';'
@@ -123,6 +128,8 @@ def p_preamblestatement(p):
   global in_preamble
   if not in_preamble:
     raise CSlangError("Found preamble statement after preamble processing has ended")
+
+  p[0] = p[1]
 
 def p_bodystatement(p):
   ''' bodystatement : dataword ';'
@@ -137,6 +144,8 @@ def p_bodystatement(p):
   # data structure and figure out what stuff it needs to capture
   if in_preamble:
     in_preamble = False
+
+  p[0] = p[1]
 
 
 def p_typeexpression(p):
@@ -217,6 +226,8 @@ def p_registerassignment(p):
     automaton.registers[register_name] = str(p[3][1])
   else:
     raise CSlangError("Bad type in register assignment: {}".format(p[3]))
+
+  p[0] = ('REGASSIGN', p[1], p[3])
 
 def p_registerexp(p):
   ''' registerexp : registeradd
@@ -472,6 +483,18 @@ def main(args=None):
   parser = argparse.ArgumentParser()
   subparsers = parser.add_subparsers(dest="mode", help="input mode")
 
+  parse_argparser = subparsers.add_parser("parse")
+  parse_argparser.add_argument("-c", "--cslang-path",
+                                        required=False,
+                                        type=str,
+                                        help="CSlang file to be parsed"
+  )
+  parse_argparser.add_argument("-s", "--string",
+                                        required=False,
+                                        type=str,
+                                        help="String to parse"
+  )
+
   build_argparser = subparsers.add_parser("build")
 
   build_argparser.add_argument("-c", "--cslang-path",
@@ -525,6 +548,18 @@ def main(args=None):
   parser = yacc.yacc()
   automaton = RegisterAutomaton()
   containerbuilder = ContainerBuilder()
+
+
+  if args.mode == "parse":
+    if args.cslang_path:
+      with open(args.file, "r") as f:
+        data = f.read()
+
+    if args.string:
+      data = args.string
+
+    result = parser.parse(data)
+    return result
 
   if args.mode == "build":
       basename = os.path.splitext(os.path.basename(args.cslang_path))[0]

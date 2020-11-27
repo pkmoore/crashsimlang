@@ -14,6 +14,7 @@ import dill as pickle
 import os
 import sys
 import argparse
+import pprint
 
 
 reserved = {
@@ -111,7 +112,7 @@ def p_statementlist(p):
                     | statement
   '''
   automaton.states[-1].is_accepting = True
-  if len(p) == 4:
+  if len(p) == 3:
     p[0] = [p[1]] + p[2]
   else:
     p[0] = [p[1]]
@@ -174,6 +175,7 @@ def p_typedefinition(p):
 
   global containerbuilder
   containerbuilder.define_type(p[2][1], p[4])
+  p[0] = ("TYPEDEF", p[2][1], p[4])
 
 
 def p_predpath(p):
@@ -380,6 +382,7 @@ def p_dataword(p):
                | IDENTIFIER '(' parameterexpression ')' WITH predexpressionlist
   '''
 
+
   global preamble
   global automaton
   if p[1][1] == "NOT":
@@ -388,16 +391,20 @@ def p_dataword(p):
     operations = p[4][1]
     if len(p) == 8:
       predicates = p[7][1:]
+      p[0] = (p[1][1], p[2][1], p[4], p[7])
     else:
       predicates = None
+      p[0] = (p[1][1], p[2][1], p[4])
   else:
     not_dataword = False
     syscall_name = p[1][1]
     operations = p[3][1]
     if len(p) == 7:
       predicates = p[6][1:]
+      p[0] = (p[1][1], p[3], p[6])
     else:
       predicates = None
+      p[0] = (p[1][1], p[3])
 
 
   if not_dataword:
@@ -552,13 +559,15 @@ def main(args=None):
 
   if args.mode == "parse":
     if args.cslang_path:
-      with open(args.file, "r") as f:
+      with open(args.cslang_path, "r") as f:
         data = f.read()
 
     if args.string:
       data = args.string
 
     result = parser.parse(data)
+    pp = pprint.PrettyPrinter(indent=2)
+    pp.pprint(result)
     return result
 
   if args.mode == "build":

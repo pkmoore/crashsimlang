@@ -279,25 +279,123 @@ def p_registerdiv(p):
   '''
   p[0] = ("REGDIV", p[1], p[2], p[3])
 
+def p_empty(p):
+  '''empty :'''
+  pass
+
+def p_withexpression(p):
+  ''' withexpression : WITH predexpressionlist
+  '''
+  p[0] = ('WITHEXPRESSION', p[2])
+
+
+def p_outputexpression(p):
+  ''' outputexpression : WRITEOP IDENTIFIER '(' parameterexpression ')'
+  '''
+  p[0] = ('OUTPUTEXPRESSION', p[2], p[4])
+
+def p_withoutputexpression(p):
+  ''' withoutputexpression : empty
+                           | withexpression
+                           | outputexpression
+                           | withexpression outputexpression
+  '''
+  if not p[1]:
+    p[0] = (None, None)
+  elif len(p) == 2:
+    if p[1][0] == 'WITHEXPRESSION':
+      p[0] = (p[1], None)
+    elif p[1][0] == 'OUTPUTEXPRESSION':
+      p[0] = (None, p[1])
+    else:
+      p[0] = (None, None)
+  else:
+    p[0] = (p[1], p[2])
+
+
+def p_datawordidentifier(p):
+  ''' datawordidentifier : NOT IDENTIFIER
+                         | IDENTIFIER
+  '''
+  if len(p) == 3:
+    p[0] = (p[1], p[2])
+  else:
+    p[0] = (None, p[1])
+
+
+def p_optnot(p):
+  ''' optnot : NOT
+             | empty
+  '''
+  if p[1]:
+    p[0] = "NOT"
+  else:
+    p[0] = None
+
 
 def p_dataword(p):
-  ''' dataword : NOT IDENTIFIER '(' parameterexpression ')'
-               | IDENTIFIER '(' parameterexpression ')'
-               | NOT IDENTIFIER '(' parameterexpression ')' WITH predexpressionlist
-               | IDENTIFIER '(' parameterexpression ')' WITH predexpressionlist
+  ''' dataword : datawordidentifier '(' parameterexpression ')' withoutputexpression
+  '''
+  p[0] = ('WITHEXPRESSION', p[2])
+
+
+def p_outputexpression(p):
+  ''' outputexpression : WRITEOP IDENTIFIER '(' parameterexpression ')'
+  '''
+  p[0] = ('OUTPUTEXPRESSION', p[2], p[4])
+
+def p_withoutputexpression(p):
+  ''' withoutputexpression : empty
+                           | withexpression
+                           | outputexpression
+                           | withexpression outputexpression
+  '''
+  if not p[1]:
+    p[0] = (None, None)
+  elif len(p) == 2:
+    if p[1][0] == 'WITHEXPRESSION':
+      p[0] = (p[1], None)
+    elif p[1][0] == 'OUTPUTEXPRESSION':
+      p[0] = (None, p[1])
+    else:
+      p[0] = (None, None)
+  else:
+    p[0] = (p[1], p[2])
+
+
+def p_datawordidentifier(p):
+  ''' datawordidentifier : NOT IDENTIFIER
+                         | IDENTIFIER
+  '''
+  if len(p) == 3:
+    p[0] = (p[1], p[2])
+  else:
+    p[0] = (None, p[1])
+
+
+def p_optnot(p):
+  ''' optnot : NOT
+             | empty
+  '''
+  if p[1]:
+    p[0] = "NOT"
+  else:
+    p[0] = None
+
+
+def p_dataword(p):
+  ''' dataword : datawordidentifier '(' parameterexpression ')' withoutputexpression
   '''
 
+  result = ('DATAWORD', )
+  result += (p[1][0], p[1][1])
 
-  if p[1][1] == "NOT":
-    if len(p) == 8:
-      p[0] = ('DATAWORD', p[1][1], p[2][1], p[4], p[7])
-    else:
-      p[0] = ('DATAWORD', p[1][1], p[2][1], p[4])
-  else:
-    if len(p) == 7:
-      p[0] = ('DATAWORD', p[1][1], p[3], p[6])
-    else:
-      p[0] = ('DATAWORD', p[1][1], p[3])
+  result += (p[3],)
+
+  result += p[5]
+
+  p[0] = result
+
 
 def p_parameterexpression(p):
   ''' parameterexpression : '{' parameterlist '}'
@@ -438,7 +536,7 @@ def main(args=None):
     if args.string:
       data = args.string
 
-    result = parser.parse(data)
+    result = parser.parse(data, debug=True)
     pp = pprint.PrettyPrinter(indent=2)
     pp.pprint(result)
     return result

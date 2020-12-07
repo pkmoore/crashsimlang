@@ -31,11 +31,12 @@ class RegisterAutomaton:
 
 
 class State:
-  def __init__(self, name, operations=None, transitions=None, is_accepting=False, tags=None):
+  def __init__(self, name, operations=None, outputs=None, transitions=None, is_accepting=False, tags=None):
     self.name = name
     self.transitions = transitions if transitions is not None else []
     self.is_accepting = is_accepting
     self.operations = operations if operations is not None else []
+    self.outputs = outputs if outputs is not None else []
     self.tags = tags if tags is not None else []
 
   def match(self, incoming_dataword, registers):
@@ -61,6 +62,15 @@ class State:
         if match_paths:
           for i in match_paths:
             self._write_register_to_path(incoming_dataword, i[0], registers, i[1])
+
+    for i in self.outputs:
+    # OUTPUTS
+      for i in self.outputs:
+        match_paths = _extract_paths("", (i, ), "->")
+        if match_paths:
+          for i in match_paths:
+            self._write_register_to_path(incoming_dataword, i[0], registers, i[1])
+
 
   def _write_register_to_path(self, dataword, path, registers, register):
     adt.write_nested_member_for_path(dataword.captured_arguments, path, registers[register])

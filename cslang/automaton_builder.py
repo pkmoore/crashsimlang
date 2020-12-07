@@ -107,36 +107,30 @@ def handle_typedef(cb, type_name, type_definition):
   cb.define_type(type_name, type_definition)
 
 def handle_dataword(automaton, params):
-  if params[0] == "NOT":
-    not_dataword = True
-    syscall_name = params[1]
-    operations = params[2][1]
-    if len(params) == 4:
-      predicates = params[3][1:]
-    else:
-      predicates = None
+  not_dataword = params[0] and params[0][1] == "NOT"
+  syscall_name = params[1][1]
+  operations = params[2][1]
+  if params[3]:
+    predicates = tuple(x[1] for x in params[3][1:])
   else:
-    not_dataword = False
-    syscall_name = params[0]
-    operations = params[1][1]
-    if len(params) == 3:
-      predicates = params[2][1:]
-    else:
-      predicates = None
-
-
+    predicates = None
+  if params[4]:
+    outputs = params[4][2][1]
+  else:
+    outputs = None
   if not_dataword:
     #  This is a not dataword so we create our NOT state
-    automaton.states.append(State(syscall_name, tags=["NOT"]))
+    automaton.states.append(State(syscall_name, tags=["NOT"], operations=operations, outputs=outputs))
 
     # And make a transition to it with appropriate register_matches
     automaton.states[-2].transitions.append(Transition(syscall_name,
                                             len(automaton.states) - 1,
-                                            operations=operations))
+                                            operations=operations,
+                                            predicates=predicates))
 
   else:
     # We encountered a new dataword so we make a new state
-    automaton.states.append(State(syscall_name, operations))
+    automaton.states.append(State(syscall_name, operations=operations, outputs=outputs))
 
     # We create a transition to this state on the previous state
 

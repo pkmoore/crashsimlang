@@ -9,6 +9,7 @@ from xmltodatawords import XMLToDatawords
 from posix_omni_parser import Trace
 from adt import ContainerBuilder
 import automaton_builder
+import type_checker
 from cslang_error import CSlangError
 import dill as pickle
 import os
@@ -323,66 +324,6 @@ def p_datawordidentifier(p):
     p[0] = (None, p[1])
 
 
-def p_optnot(p):
-  ''' optnot : NOT
-             | empty
-  '''
-  if p[1]:
-    p[0] = "NOT"
-  else:
-    p[0] = None
-
-
-def p_dataword(p):
-  ''' dataword : datawordidentifier '(' parameterexpression ')' withoutputexpression
-  '''
-  p[0] = ('WITHEXPRESSION', p[2])
-
-
-def p_outputexpression(p):
-  ''' outputexpression : WRITEOP IDENTIFIER '(' parameterexpression ')'
-  '''
-  p[0] = ('OUTPUTEXPRESSION', p[2], p[4])
-
-def p_withoutputexpression(p):
-  ''' withoutputexpression : empty
-                           | withexpression
-                           | outputexpression
-                           | withexpression outputexpression
-  '''
-  if not p[1]:
-    p[0] = (None, None)
-  elif len(p) == 2:
-    if p[1][0] == 'WITHEXPRESSION':
-      p[0] = (p[1], None)
-    elif p[1][0] == 'OUTPUTEXPRESSION':
-      p[0] = (None, p[1])
-    else:
-      p[0] = (None, None)
-  else:
-    p[0] = (p[1], p[2])
-
-
-def p_datawordidentifier(p):
-  ''' datawordidentifier : NOT IDENTIFIER
-                         | IDENTIFIER
-  '''
-  if len(p) == 3:
-    p[0] = (p[1], p[2])
-  else:
-    p[0] = (None, p[1])
-
-
-def p_optnot(p):
-  ''' optnot : NOT
-             | empty
-  '''
-  if p[1]:
-    p[0] = "NOT"
-  else:
-    p[0] = None
-
-
 def p_dataword(p):
   ''' dataword : datawordidentifier '(' parameterexpression ')' withoutputexpression
   '''
@@ -459,6 +400,11 @@ def main(args=None):
                                         type=str,
                                         help="String to parse"
   )
+  parse_argparser.add_argument("-k", "--check",
+                                        required=False,
+                                        action="store_true",
+                                        help="Perform type checking after parsing"
+  )
 
   build_argparser = subparsers.add_parser("build")
 
@@ -529,17 +475,24 @@ def main(args=None):
 
 
   if args.mode == "parse":
-    if args.cslang_path:
+    data = None
+    ast = None
+    if hasattr(args, "cslang_path"):
       with open(args.cslang_path, "r") as f:
         data = f.read()
 
-    if args.string:
+    if hasattr(args, "string"):
       data = args.string
 
-    result = parser.parse(data, debug=True)
-    pp = pprint.PrettyPrinter(indent=2)
-    pp.pprint(result)
-    return result
+    if data:
+      ast = parser.parse(data, debug=True)
+      pp = pprint.PrettyPrinter(indent=2)
+      pp.pprint(ast)
+
+      if hasattr(args, "check"):
+        type_checker.check_ast(ast)
+
+    return ast
 
   if args.mode == "build":
       basename = os.path.splitext(os.path.basename(args.cslang_path))[0]
@@ -550,6 +503,7 @@ def main(args=None):
       with open(args.cslang_path, "r") as f:
         ast = parser.parse(f.read(), debug=False)
 
+      type_checker.check_ast(ast)
       automaton, containerbuilder = automaton_builder.process_root(ast)
 
       with open(automaton_path, "w") as f:

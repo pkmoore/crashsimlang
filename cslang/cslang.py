@@ -468,6 +468,10 @@ def main(args=None):
   if not args:
     args = parser.parse_args()
 
+  if (hasattr(args, "cslang_path") and args.cslang_path is not None) and (hasattr(args, "string") and args.string is not None):
+    parse_argparser.print_help()
+    raise CSlangError("-c and -s may not be used together")
+
 
   in_preamble = True
   lexer = lex.lex()
@@ -477,11 +481,11 @@ def main(args=None):
   if args.mode == "parse":
     data = None
     ast = None
-    if hasattr(args, "cslang_path"):
+    if hasattr(args, "cslang_path") and args.cslang_path is not None:
       with open(args.cslang_path, "r") as f:
         data = f.read()
 
-    if hasattr(args, "string"):
+    if hasattr(args, "string") and args.string is not None:
       data = args.string
 
     if data:
@@ -489,7 +493,7 @@ def main(args=None):
       pp = pprint.PrettyPrinter(indent=2)
       pp.pprint(ast)
 
-      if hasattr(args, "check"):
+      if hasattr(args, "check") and args.check == True:
         type_checker.check_ast(ast)
 
     return ast

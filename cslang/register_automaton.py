@@ -93,21 +93,23 @@ class State:
 
 
 class Transition:
-  def __init__(self, dataword_name, to_state, operations=None, predicates=None):
-    self.dataword_name = dataword_name
+  def __init__(self, acceptable_names, to_state, operations=None, predicates=None):
+    self.acceptable_names = acceptable_names
     self.to_state = to_state
     self.operations = operations if operations is not None else []
     self.predicates = predicates if predicates is not None else []
 
   def __str__(self):
     tmp = ""
-    tmp += "        dataword_name: " + self.dataword_name + "\n"
+    tmp += "        acceptable_names: " + self.acceptable_names + "\n"
     tmp += "        operations: " + str() + "\n"
     tmp += "        to_state: " + str(self.to_state) + "\n"
     return tmp
 
   def match(self, current_dataword, registers):
-    if current_dataword.get_name() == self.dataword_name \
+    # First we must determine whether the name we are matching against is a concrete type
+    # If this check fails, we need to see if we have a variant name and match using either of the variants
+    if current_dataword.get_name() in self.acceptable_names \
        and self._pass_predicates(current_dataword) \
        and self._pass_operations(current_dataword, registers):
       return self.to_state

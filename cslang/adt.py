@@ -42,12 +42,21 @@ class ContainerBuilder(object):
     self.builders = {"Numeric": self.primative, "String": self.primative}
     self.primatives = ["Numeric", "String"]
     self.top_level = {"Numeric": False, "String": False}
+    self.variants = {}
 
   def primative(self, in_data):
     incoming_type = in_data[0]
     incoming_arg = in_data[1]
     incoming_arg_name = in_data[2]
     return {"type": incoming_type, "arg_pos": incoming_arg, "members": [], "arg_name": incoming_arg_name}
+
+  def define_variant(self, variant_name, variant_definition):
+    if variant_name in self.variants:
+      raise CSlangError("Illegal variant redefinition for variant: {}".format(variant_name))
+    self.variants[variant_name] = []
+    for i in variant_definition:
+      self.variants[variant_name].append(i[0])
+
 
   def define_type(self, container_type, types):
     # It is an error for us to already have a builder for the type we're defining

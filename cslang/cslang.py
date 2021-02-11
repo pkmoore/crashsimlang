@@ -36,7 +36,7 @@ tokens = ["IDENTIFIER",
           "STRING_LITERAL"
 ] + list(reserved.values())
 
-literals = ['.', '{', '}', ':', '@', '/', '*', '-', '+', ';',',','(', ')' ]
+literals = ['.', '{', '}', ':', '@', '/', '*', '-', '+', ';',',','(', ')', '|']
 
 precedence = (
     ('left', 'ASSIGNOP'),
@@ -125,6 +125,7 @@ def p_statement(p):
 
 def p_preamblestatement(p):
   ''' preamblestatement : typedefinition ';'
+                        | variantdefinition ';'
   '''
   global in_preamble
   if not in_preamble:
@@ -161,18 +162,36 @@ def p_typeexpressionlist(p):
   '''
 
   if len(p) == 4:
-    p[0] = [p[1]] + p[3]
+    p[0] = (p[1], ) + p[3]
   else:
-    p[0] = [p[1]]
+    p[0] = (p[1], )
 
 
 def p_typedefinition(p):
   ''' typedefinition : TYPE IDENTIFIER '{' typeexpressionlist '}'
-
   '''
-
   p[0] = ("TYPEDEF", p[2][1], p[4])
 
+
+def p_variantdefinition(p):
+  ''' variantdefinition : TYPE IDENTIFIER variantlist
+  '''
+  p[0] = ("VARIANTDEF", p[2][1], p[3])
+
+
+def p_variantlist(p):
+  ''' variantlist : variant '|' variantlist
+                  | variant
+  '''
+  if len(p) == 4:
+    p[0] =  ((p[1][1], p[1][2]), ) + (p[3], )
+  else:
+    p[0] = (p[1][1], p[1][2], )
+
+def p_variant(p):
+  ''' variant : '{' IDENTIFIER typeexpressionlist '}'
+  '''
+  p[0] = ("VARIANT", p[2][1], p[3])
 
 def p_predpath(p):
   ''' predpath : IDENTIFIER "." predpath

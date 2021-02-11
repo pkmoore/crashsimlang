@@ -16,13 +16,37 @@ def process_root(ast_root):
     elif i[0] == "TYPEDEF":
       # type_name, list of contained types
       handle_typedef(container_builder, i[1], i[2])
+    elif i[0] == "VARIANTDEF":
+      handle_variantdef(container_builder, i[1], i[2])
     elif i[0] == "DATAWORD":
       # HACK: "the rest of the stuff to build a dataword"
-      handle_dataword(automaton, i[1:])
+      handle_dataword(automaton, container_builder, i[1:])
     else:
       raise NotImplementedError("Not implemented node: {}".format(i[0]))
-  automaton.states[-1].is_accepting = True
+
+  # At this point we have finished building the automaton and can do any
+  # post-build configuration and cleanup
+
+  
+  # If the last state is a NOT state, we need to search backward through
+  # the states until we reach a non-NOT state and make that our accepting state 
+  if 'NOT' in automaton.states[-1].tags:  
+    non_NOT_state = _find_first_non_NOT_state(automaton)
+    automaton.states[non_NOT_state].is_accepting = True
+  else:
+    automaton.states[-1].is_accepting = True
   return automaton, container_builder
+
+def _find_first_non_NOT_state(automaton):
+  cur = -1
+  # This loop is safe because the starting state is always a non-NOT state
+  # In the case where every dataword statement creates a NOT state
+  # we will end up only accepting inputs that never advance out of the starting state
+  while "NOT" in automaton.states[cur].tags:
+    cur -= 1
+  return cur
+
+  
 
 def handle_regassign(automaton, register_name, value):
   if value[0] == 'IDENTIFIER':
@@ -106,9 +130,23 @@ def _to_num_or_str(val):
 def handle_typedef(cb, type_name, type_definition):
   cb.define_type(type_name, type_definition)
 
-def handle_dataword(automaton, params):
+def handle_variantdef(cb, variant_name, variant_definition):
+  for i in variant_definition:
+    # Define a type for each of the variant's possiblities
+    # i[0] -> the type's name i[1] -> the type's definition
+    cb.define_type(i[0], i[1])
+  cb.define_variant(variant_name, variant_definition)
+
+def _get_name_or_variants(container_builder, name):
+  if name in container_builder.variants:
+    return container_builder.variants[name]
+  else:
+    # HACK: do we need to check if the name exists as a type here?
+    return [name]
+
+def handle_dataword(automaton, container_builder, params):
   not_dataword = params[0] and params[0][1] == "NOT"
-  syscall_name = params[1][1]
+  type_name = params[1][1]
   operations = params[2][1]
   if params[3]:
     predicates = tuple(x[1] for x in params[3][1:])
@@ -120,17 +158,17 @@ def handle_dataword(automaton, params):
     outputs = None
   if not_dataword:
     #  This is a not dataword so we create our NOT state
-    automaton.states.append(State(syscall_name, tags=["NOT"], operations=operations, outputs=outputs))
+    automaton.states.append(State(type_name, tags=["NOT"], operations=operations, outputs=outputs))
 
     # And make a transition to it with appropriate register_matches
-    automaton.states[-2].transitions.append(Transition(syscall_name,
+    automaton.states[-2].transitions.append(Transition(_get_name_or_variants(container_builder, type_name),
                                             len(automaton.states) - 1,
                                             operations=operations,
                                             predicates=predicates))
 
   else:
     # We encountered a new dataword so we make a new state
-    automaton.states.append(State(syscall_name, operations=operations, outputs=outputs))
+    automaton.states.append(State(type_name, operations=operations, outputs=outputs))
 
     # We create a transition to this state on the previous state
 
@@ -143,8 +181,7 @@ def handle_dataword(automaton, params):
     while "NOT" in automaton.states[neg_index].tags:
       neg_index -= 1
 
-    automaton.states[neg_index].transitions.append(Transition(syscall_name,
+    automaton.states[neg_index].transitions.append(Transition(_get_name_or_variants(container_builder, type_name),
                                                               len(automaton.states) - 1,
                                                               operations=operations,
                                                               predicates=predicates))
-

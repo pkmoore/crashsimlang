@@ -180,13 +180,13 @@ def p_variantdefinition(p):
 
 
 def p_variantlist(p):
-  ''' variantlist : IDENTIFIER
-                  | IDENTIFIER '|' variantlist
+  ''' variantlist : IDENTIFIER '|' variantlist
+                  | IDENTIFIER
   '''
   if len(p) == 4:
-    p[0] = ("VARIANTLIST", p[1][1:]) + p[3][1:]
+    p[0] =  (p[1][1], ) + p[3]
   else:
-    p[0] = ("VARIANTLIST", p[1][1:])
+    p[0] = (p[1][1], )
 
 
 def p_predpath(p):

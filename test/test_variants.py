@@ -17,29 +17,31 @@ class TestVariants(unittest.TestCase):
                                 check=True,
                                 cslang_path=None,
                                 string="""
-type read {filedesc: Numeric@0};
-type otherread read;
+type otherread {read filedesc: Numeric@0};
 """))
-    assert ast[0][0] == "TYPEDEF"
-    assert ast[0][1] == "read"
-    assert ast[1][0] == "VARIANTDEF"
-    assert ast[1][1] == "otherread"
-    assert ast[1][2] == ("read",)
+
+    assert ast[0][0] == "VARIANTDEF"
+    assert ast[0][1] == "otherread"
+    assert ast[0][2][0] == "read"
+    assert ast[0][2][1][0][0] == "Numeric"
+    assert ast[0][2][1][0][1] == "0"
+    assert ast[0][2][1][0][2] == "filedesc"
 
   def test_many_variants(self):
     ast = cslang_main(Namespace(mode="parse",
                                 check=True,
                                 cslang_path=None,
                                 string="""
-type read {filedesc: Numeric@0};
-type otherread {fildesc: Numeric@0};
-type bothread read | otherread;
+type bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
 """))
 
-    assert ast[0][0] == "TYPEDEF"
-    assert ast[0][1] == "read"
-    assert ast[1][0] == "TYPEDEF"
-    assert ast[1][1] == "otherread"
-    assert ast[2][0] == "VARIANTDEF"
-    assert ast[2][1] == "bothread"
-    assert ast[2][2] == ("read", "otherread")
+    assert ast[0][0] == "VARIANTDEF"
+    assert ast[0][1] == "bothread"
+    assert ast[0][2][0][0] == "read"
+    assert ast[0][2][0][1][0][0] == "Numeric"
+    assert ast[0][2][0][1][0][1] == "0"
+    assert ast[0][2][0][1][0][2] == "filedesc"
+    assert ast[0][2][1][0] == "otherread"
+    assert ast[0][2][1][1][0][0] == "Numeric"
+    assert ast[0][2][1][1][0][1] == "0"
+    assert ast[0][2][1][1][0][2] == "filedesc"

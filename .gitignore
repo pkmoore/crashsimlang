@@ -11,3 +11,6 @@ parsetab.pyc
 *.pre
 *.dw
 *.cb
+.pytest_cache
+.devcontainer
+.vscode

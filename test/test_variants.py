@@ -45,3 +45,36 @@ type bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
     assert ast[0][2][1][1][0][0] == "Numeric"
     assert ast[0][2][1][1][0][1] == "0"
     assert ast[0][2][1][1][0][2] == "filedesc"
+
+
+  syscall_definitions = get_test_data_path("../cslang/syscall_definitions.pickle")
+
+  
+  def test_simple_variant(self):
+    automaton_path = get_test_data_path("variantread.auto")
+    syscall_definitions = get_test_data_path("syscall_definitions.pickle")
+    cslang_main(Namespace(mode="build",
+                          cslang_path=get_test_data_path("variantread.cslang")))
+  
+    automaton_read, datawords_after_read, s2d_read = cslang_main(Namespace(mode="run",
+                                                                          format="strace",
+                                                                          strace_path=get_test_data_path("variantread.strace"),
+                                                                          syscall_definitions=syscall_definitions,
+                                                                          automaton_path=automaton_path))
+  
+    automaton_recv, datawords_after_recv, s2d_recv = cslang_main(Namespace(mode="run",
+                                                                           format="strace",
+                                                                           strace_path=get_test_data_path("variantrecv.strace"),
+                                                                           syscall_definitions=syscall_definitions,
+                                                                           automaton_path=automaton_path))
+
+    # Make sure the automata have the correct number of states
+    assert len(automaton_read.states) == 3
+    assert len(automaton_recv.states) == 3      
+
+    # Make sure the automata both end in the correct state (having accepted read/recv correctly)
+    assert automata_read.current_state == 2
+    assert automata_read.current_state == 2                                                   
+
+  
+                                                         

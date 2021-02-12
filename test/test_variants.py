@@ -49,7 +49,7 @@ type bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
 
   syscall_definitions = get_test_data_path("../cslang/syscall_definitions.pickle")
 
-  
+
   def test_simple_variant(self):
     automaton_path = get_test_data_path("variantread.auto")
     syscall_definitions = get_test_data_path("syscall_definitions.pickle")
@@ -73,8 +73,32 @@ type bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
     assert len(automaton_recv.states) == 3      
 
     # Make sure the automata both end in the correct state (having accepted read/recv correctly)
-    assert automata_read.current_state == 2
-    assert automata_read.current_state == 2                                                   
+    assert automaton_read.current_state == 2
+    assert automaton_recv.current_state == 2                                                   
 
+  def test_not_variant(self):
+    automaton_path = get_test_data_path("variantreadnot.auto")
+    syscall_definitions = get_test_data_path("syscall_definitions.pickle")
+    cslang_main(Namespace(mode="build",
+                          cslang_path=get_test_data_path("variantreadnot.cslang")))
   
+    automaton_read, datawords_after_read, s2d_read = cslang_main(Namespace(mode="run",
+                                                                          format="strace",
+                                                                          strace_path=get_test_data_path("variantread.strace"),
+                                                                          syscall_definitions=syscall_definitions,
+                                                                          automaton_path=automaton_path))
+  
+    automaton_recv, datawords_after_recv, s2d_recv = cslang_main(Namespace(mode="run",
+                                                                           format="strace",
+                                                                           strace_path=get_test_data_path("variantrecv.strace"),
+                                                                           syscall_definitions=syscall_definitions,
+                                                                           automaton_path=automaton_path))
+
+    # Make sure the automata have the correct number of states
+    assert len(automaton_read.states) == 3
+    assert len(automaton_recv.states) == 3      
+
+    # Make sure the automata both end in the correct state (having accepted read/recv correctly)
+    assert not automaton_read.states[automaton_read.current_state].is_accepting
+    assert not automaton_recv.states[automaton_recv.current_state].is_accepting   
                                                          

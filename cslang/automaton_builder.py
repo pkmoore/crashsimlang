@@ -23,8 +23,30 @@ def process_root(ast_root):
       handle_dataword(automaton, container_builder, i[1:])
     else:
       raise NotImplementedError("Not implemented node: {}".format(i[0]))
-  automaton.states[-1].is_accepting = True
+
+  # At this point we have finished building the automaton and can do any
+  # post-build configuration and cleanup
+
+  
+  # If the last state is a NOT state, we need to search backward through
+  # the states until we reach a non-NOT state and make that our accepting state 
+  if 'NOT' in automaton.states[-1].tags:  
+    non_NOT_state = _find_first_non_NOT_state(automaton)
+    automaton.states[non_NOT_state].is_accepting = True
+  else:
+    automaton.states[-1].is_accepting = True
   return automaton, container_builder
+
+def _find_first_non_NOT_state(automaton):
+  cur = -1
+  # This loop is safe because the starting state is always a non-NOT state
+  # In the case where every dataword statement creates a NOT state
+  # we will end up only accepting inputs that never advance out of the starting state
+  while "NOT" in automaton.states[cur].tags:
+    cur -= 1
+  return cur
+
+  
 
 def handle_regassign(automaton, register_name, value):
   if value[0] == 'IDENTIFIER':

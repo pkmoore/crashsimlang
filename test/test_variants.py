@@ -76,7 +76,7 @@ type bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
     assert automaton_read.current_state == 2
     assert automaton_recv.current_state == 2                                                   
 
-  def test_not_variant(self):
+  def test_NOT_variant(self):
     automaton_path = get_test_data_path("variantreadnot.auto")
     syscall_definitions = get_test_data_path("syscall_definitions.pickle")
     cslang_main(Namespace(mode="build",
@@ -101,4 +101,69 @@ type bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
     # Make sure the automata both end in the correct state (having accepted read/recv correctly)
     assert not automaton_read.states[automaton_read.current_state].is_accepting
     assert not automaton_recv.states[automaton_recv.current_state].is_accepting   
-                                                         
+
+  def test_variant_with_predicates(self):
+    automaton_path = get_test_data_path("variantreadpred.auto")
+    syscall_definitions = get_test_data_path("syscall_definitions.pickle")
+    cslang_main(Namespace(mode="build",
+                          cslang_path=get_test_data_path("variantreadpred.cslang")))
+  
+    automaton_read, datawords_after_read, s2d_read = cslang_main(Namespace(mode="run",
+                                                                          format="strace",
+                                                                          strace_path=get_test_data_path("variantread.strace"),
+                                                                          syscall_definitions=syscall_definitions,
+                                                                          automaton_path=automaton_path))
+  
+    automaton_recv, datawords_after_recv, s2d_recv = cslang_main(Namespace(mode="run",
+                                                                           format="strace",
+                                                                           strace_path=get_test_data_path("variantrecv.strace"),
+                                                                           syscall_definitions=syscall_definitions,
+                                                                           automaton_path=automaton_path))
+
+    # Make sure the automata have the correct number of states
+    assert len(automaton_read.states) == 3
+    assert len(automaton_recv.states) == 3      
+
+    # Make sure the automata both end in the correct state (having accepted read/recv correctly)
+    assert automaton_read.states[automaton_read.current_state].is_accepting
+    assert automaton_recv.states[automaton_recv.current_state].is_accepting
+
+    # Check register values are stored correctly
+    assert automaton_read.registers["name"] == "test.txt"
+    assert automaton_read.registers["fd"] == 3
+    
+    assert automaton_recv.registers["name"] == "test.txt"
+    assert automaton_recv.registers["fd"] == 3
+
+  def test_NOT_variant_with_predicates(self):
+    automaton_path = get_test_data_path("variantreadpred.auto")
+    syscall_definitions = get_test_data_path("syscall_definitions.pickle")
+    cslang_main(Namespace(mode="build",
+                          cslang_path=get_test_data_path("variantreadpred.cslang")))
+  
+    automaton_read, datawords_after_read, s2d_read = cslang_main(Namespace(mode="run",
+                                                                          format="strace",
+                                                                          strace_path=get_test_data_path("variantread.strace"),
+                                                                          syscall_definitions=syscall_definitions,
+                                                                          automaton_path=automaton_path))
+  
+    automaton_recv, datawords_after_recv, s2d_recv = cslang_main(Namespace(mode="run",
+                                                                           format="strace",
+                                                                           strace_path=get_test_data_path("variantrecv.strace"),
+                                                                           syscall_definitions=syscall_definitions,
+                                                                           automaton_path=automaton_path))
+
+    # Make sure the automata have the correct number of states
+    assert len(automaton_read.states) == 3
+    assert len(automaton_recv.states) == 3      
+
+    # Make sure the automata both end in the correct state (having accepted read/recv correctly)
+    assert automaton_read.states[automaton_read.current_state].is_accepting
+    assert automaton_recv.states[automaton_recv.current_state].is_accepting
+
+    # Make sure registers are not set
+    assert automaton_read.registers["name"] == "test.txt"
+    assert automaton_read.registers["fd"] == 3
+    
+    assert automaton_recv.registers["name"] == "test.txt"
+    assert automaton_recv.registers["fd"] == 3

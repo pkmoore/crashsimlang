@@ -1,0 +1,7 @@
+type open {filename: String@0 };
+type readvariant {read filedesc: Numeric@0} | {recv filedesc: Numeric@0};
+
+
+open({filename: !name});
+NOT readvariant({filedesc: !fd})
+with filedesc == 3;

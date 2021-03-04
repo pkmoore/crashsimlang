@@ -1,0 +1,123 @@
+S -> statementlist
+
+statementlist -> statement statementlist
+                 | statement
+* Generate automaton with start state
+
+statement -> preamblestatement
+             | bodystatement
+
+preamblestatement -> typedefinition
+                     | variantdefinition
+
+typedefinition -> IDENTIFIER typeexpressionlist
+
+variantdefinition -> IDENTIFIER variantlist
+
+
+typexpressionlist -> typexpression typexpressionlist
+                     | typexpression
+
+variantlist -> variant variantlist
+               | variant
+
+typexpression -> IDENTIFIER IDENTIFIER NUM_LITERAL
+* "Type" is probably the wrong name for these. Constructor?
+* First identifier is type name
+* Second identifier is the "type" of the parameter located at NUM_LITERAL
+
+variant -> IDENTIFIER typexpressionlist
+
+bodystatement -> dataword
+                 | registerassignment
+
+dataword -> datawordidentifier parameterexpression withoutputexpression
+* This is where the bulk of the work happens
+* Create a new state (or states in the case of a NOT dataword) on the automaton,
+  set up proper transitions respecting predicates and required output
+
+datawordidentifier -> IDENTIFIER
+                    | NOT IDENTIFIER
+* This is used to capture events that transition to a reject state if
+  encountered
+
+parameterexpression -> parameterlist
+                      | <empty>
+* <empty> is allowed here for cases where we want to match on an event and don't
+  care about any of its parameters
+* e.g. close({})
+
+parameterlist -> parameter parameterlist
+                 | parameter
+
+parameter -> IDENTIFIER READOP IDENTIFIER
+             | IDENTIFIER STOREOP IDENTIFIER
+             | IDENTIFIER WRITEOP IDENTIFIER
+             | IDENTIFIER parameterexpression
+* Production with parameterexpression is used in cases where we are looking
+  inside a structure
+* i.e. stat({statstruct: {st_mode: !myregister}})
+
+withoutputexpression -> <empty>
+                        | withexpression
+                        | outputexpression
+                        | withexpression outputexpression
+
+withexpression -> predexpressionlist
+
+predexpressionlist -> predexpression predexpressionlist
+                      | predexpression
+
+predexpression -> predpath COMPARISON NUM_LITERAL
+                  | predpath COMPARISON STRING_LITERAL
+                  | predpath COMPARSION identifier *not implemented
+* COMPARISON limited to "=="
+* predpath describes how to "drill down" into nested structures to find the
+  member to compare against
+
+predpath -> IDENTIFIER predpath
+            | identifier
+
+* i.e. "myval" or "mystruct.myval" or "mystruct.innerstruct.myval"
+
+
+outputexpression -> WRITEOP IDENTIFIER parameterexpression
+* Output an event including the parameters described in parameterexpression
+
+
+registerassignment -> IDENTIFIER ASSIGNOP NUM_LITERAL
+                      | IDENTIFIER ASSIGNOP STRING_LITERAL
+                      | IDENTIFIER ASSIGNOP IDENTIFIER
+                      | IDENTIFIER ASSIGNOP registerexp
+* Store value of right hand side into left hand side
+
+registerexp -> registeradd
+               | registersub
+               | registermul
+               | registerdiv
+               | registerconcat
+               | registeraddorconcat
+
+registeraddorconcat -> IDENTIFIER PLUS_OP IDENTIFIER
+
+registeradd -> IDENTIFIER PLUS_OP NUM_LITERAL
+               | NUM_LITERAL PLUS_OP IDENTIFIER
+               | NUM_LITERAL PLUS_OP NUM_LITERAL
+
+registerconcat -> IDENTIFIER PLUS_OP STRING_LITERAL
+                  | STRING_LITERAL PLUS_OP IDENTIFIER
+                  | STRING_LITERAL PLUS_OP STRING_LITERAL
+
+registersub -> IDENTIFIER SUB_OP NUM_LITERAL
+
+               | NUM_LITERAL SUB_OP IDENTIFIER
+               | NUM_LITERAL SUB_OP NUM_LITERAL
+
+registermul -> IDENTIFIER MUL_OP NUM_LITERAL
+               | NUM_LITERAL MUL_OP IDENTIFIER
+               | NUM_LITERAL MUL_OP NUM_LITERAL
+
+registerdiv -> IDENTIFIER DIV_OP NUM_LITERAL
+               | NUM_LITERAL DIV_OP IDENTIFIER
+               | NUM_LITERAL DIV_OP NUM_LITERAL
+

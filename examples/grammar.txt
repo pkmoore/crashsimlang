@@ -21,10 +21,10 @@ typexpressionlist -> typexpression typexpressionlist
 variantlist -> variant variantlist
                | variant
 
-typexpression -> IDENTIFIER IDENTIFIER NUM_LITERAL
+typexpression -> IDENTIFIER IDENTIFIER <e>
 * "Type" is probably the wrong name for these. Constructor?
 * First identifier is type name
-* Second identifier is the "type" of the parameter located at NUM_LITERAL
+* Second identifier is the "type" of the parameter located at <e>
 
 variant -> IDENTIFIER typexpressionlist
 
@@ -68,8 +68,7 @@ withexpression -> predexpressionlist
 predexpressionlist -> predexpression predexpressionlist
                       | predexpression
 
-predexpression -> predpath COMPARISON NUM_LITERAL
-                  | predpath COMPARISON STRING_LITERAL
+predexpression -> predpath COMPARISON <e>
                   | predpath COMPARSION identifier *not implemented
 * COMPARISON limited to "=="
 * predpath describes how to "drill down" into nested structures to find the
@@ -85,8 +84,7 @@ outputexpression -> WRITEOP IDENTIFIER parameterexpression
 * Output an event including the parameters described in parameterexpression
 
 
-registerassignment -> IDENTIFIER ASSIGNOP NUM_LITERAL
-                      | IDENTIFIER ASSIGNOP STRING_LITERAL
+registerassignment -> IDENTIFIER ASSIGNOP <e>
                       | IDENTIFIER ASSIGNOP IDENTIFIER
                       | IDENTIFIER ASSIGNOP registerexp
 * Store value of right hand side into left hand side
@@ -100,24 +98,23 @@ registerexp -> registeradd
 
 registeraddorconcat -> IDENTIFIER PLUS_OP IDENTIFIER
 
-registeradd -> IDENTIFIER PLUS_OP NUM_LITERAL
-               | NUM_LITERAL PLUS_OP IDENTIFIER
-               | NUM_LITERAL PLUS_OP NUM_LITERAL
+registeradd -> IDENTIFIER PLUS_OP <e>
+               | <e> PLUS_OP IDENTIFIER
+               | <e> PLUS_OP <e>
 
-registerconcat -> IDENTIFIER PLUS_OP STRING_LITERAL
-                  | STRING_LITERAL PLUS_OP IDENTIFIER
-                  | STRING_LITERAL PLUS_OP STRING_LITERAL
+registerconcat -> IDENTIFIER PLUS_OP <e>
+                  | <e> PLUS_OP IDENTIFIER
+                  | <e> PLUS_OP <e>
 
-registersub -> IDENTIFIER SUB_OP NUM_LITERAL
+registersub -> IDENTIFIER SUB_OP <e>
+               | <e> SUB_OP IDENTIFIER
+               | <e> SUB_OP <e>
 
-               | NUM_LITERAL SUB_OP IDENTIFIER
-               | NUM_LITERAL SUB_OP NUM_LITERAL
+registermul -> IDENTIFIER MUL_OP <e>
+               | <e> MUL_OP IDENTIFIER
+               | <e> MUL_OP <e>
 
-registermul -> IDENTIFIER MUL_OP NUM_LITERAL
-               | NUM_LITERAL MUL_OP IDENTIFIER
-               | NUM_LITERAL MUL_OP NUM_LITERAL
-
-registerdiv -> IDENTIFIER DIV_OP NUM_LITERAL
-               | NUM_LITERAL DIV_OP IDENTIFIER
-               | NUM_LITERAL DIV_OP NUM_LITERAL
+registerdiv -> IDENTIFIER DIV_OP <e>
+               | <e> DIV_OP IDENTIFIER
+               | <e> DIV_OP <e>
 

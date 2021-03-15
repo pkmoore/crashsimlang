@@ -1,120 +1,35 @@
 S -> statementlist
 
-statementlist -> statement statementlist
+statementlist -> statement statmentlist
                  | statement
 * Generate automaton with start state
 
-statement -> preamblestatement
-             | bodystatement
+statement -> eventdefinition
+             | variantdefinition
+             | assignment
+             | dataword
 
-preamblestatement -> typedefinition
-                     | variantdefinition
+eventdefinition -> id (id_1, t_1, l_1),...,(id_n, t_n, l_n)
+* Describe an event you want to look for in the stream and the specific
+  parameters you are interested in
 
-typedefinition -> IDENTIFIER typeexpressionlist
+variantdefinition -> var_id ed_1,...ed_n
+* Give a single name to a collection of events
 
-variantdefinition -> IDENTIFIER variantlist
+assignment -> x <- <e>
+* Assign a value, either a literal or expression result, to a register
 
+dataword -> id paramexp predexp outputexp
+* Define a state that should be entered when a dataword matching id and paramexp
+  is encountered.
+* Also define any register operations that should occur when entering this state
+* Optionally describe any predicates that must be matched in order to enter the
+  state
+* Optionally describe any output that should be produced when the state is
+  entered
 
-typexpressionlist -> typexpression typexpressionlist
-                     | typexpression
+paramexp -> (pid_1, op_1, regid_1),...,(pid_n, op_n, regid_n)
 
-variantlist -> variant variantlist
-               | variant
+predexp -> (lhs_1, cmp_1, rhs_1),...,(lhs_n, cmp_n, rhs_n)
 
-typexpression -> IDENTIFIER IDENTIFIER <e>
-* "Type" is probably the wrong name for these. Constructor?
-* First identifier is type name
-* Second identifier is the "type" of the parameter located at <e>
-
-variant -> IDENTIFIER typexpressionlist
-
-bodystatement -> dataword
-                 | registerassignment
-
-dataword -> datawordidentifier parameterexpression withoutputexpression
-* This is where the bulk of the work happens
-* Create a new state (or states in the case of a NOT dataword) on the automaton,
-  set up proper transitions respecting predicates and required output
-
-datawordidentifier -> IDENTIFIER
-                    | NOT IDENTIFIER
-* This is used to capture events that transition to a reject state if
-  encountered
-
-parameterexpression -> parameterlist
-                      | <empty>
-* <empty> is allowed here for cases where we want to match on an event and don't
-  care about any of its parameters
-* e.g. close({})
-
-parameterlist -> parameter parameterlist
-                 | parameter
-
-parameter -> IDENTIFIER READOP IDENTIFIER
-             | IDENTIFIER STOREOP IDENTIFIER
-             | IDENTIFIER WRITEOP IDENTIFIER
-             | IDENTIFIER parameterexpression
-* Production with parameterexpression is used in cases where we are looking
-  inside a structure
-* i.e. stat({statstruct: {st_mode: !myregister}})
-
-withoutputexpression -> <empty>
-                        | withexpression
-                        | outputexpression
-                        | withexpression outputexpression
-
-withexpression -> predexpressionlist
-
-predexpressionlist -> predexpression predexpressionlist
-                      | predexpression
-
-predexpression -> predpath COMPARISON <e>
-                  | predpath COMPARSION identifier *not implemented
-* COMPARISON limited to "=="
-* predpath describes how to "drill down" into nested structures to find the
-  member to compare against
-
-predpath -> IDENTIFIER predpath
-            | identifier
-
-* i.e. "myval" or "mystruct.myval" or "mystruct.innerstruct.myval"
-
-
-outputexpression -> WRITEOP IDENTIFIER parameterexpression
-* Output an event including the parameters described in parameterexpression
-
-
-registerassignment -> IDENTIFIER ASSIGNOP <e>
-                      | IDENTIFIER ASSIGNOP IDENTIFIER
-                      | IDENTIFIER ASSIGNOP registerexp
-* Store value of right hand side into left hand side
-
-registerexp -> registeradd
-               | registersub
-               | registermul
-               | registerdiv
-               | registerconcat
-               | registeraddorconcat
-
-registeraddorconcat -> IDENTIFIER PLUS_OP IDENTIFIER
-
-registeradd -> IDENTIFIER PLUS_OP <e>
-               | <e> PLUS_OP IDENTIFIER
-               | <e> PLUS_OP <e>
-
-registerconcat -> IDENTIFIER PLUS_OP <e>
-                  | <e> PLUS_OP IDENTIFIER
-                  | <e> PLUS_OP <e>
-
-registersub -> IDENTIFIER SUB_OP <e>
-               | <e> SUB_OP IDENTIFIER
-               | <e> SUB_OP <e>
-
-registermul -> IDENTIFIER MUL_OP <e>
-               | <e> MUL_OP IDENTIFIER
-               | <e> MUL_OP <e>
-
-registerdiv -> IDENTIFIER DIV_OP <e>
-               | <e> DIV_OP IDENTIFIER
-               | <e> DIV_OP <e>
-
+outputexp -> dataword

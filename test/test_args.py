@@ -22,3 +22,15 @@ type read {filedesc: Numeric@0};
 bad <- 4;
 NOT read({}) -> read({filedesc: ->bad});
 """))
+
+  def test_skip(self):
+    cslang_main(Namespace(mode="build",
+                          cslang_path=get_test_data_path("open.cslang")))
+    automaton, datawords_after, _ = cslang_main(Namespace(mode="run",
+                                                         format="strace",
+                                                         skip=2,
+                                                         strace_path=get_test_data_path("openclose.strace"),
+                                                         syscall_definitions=get_test_data_path("../cslang/syscall_definitions.pickle"),
+                                                         automaton_path=get_test_data_path("open.auto")))
+    assert len(datawords_after) == 1
+

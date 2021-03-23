@@ -10,7 +10,8 @@ from dataword import DataWord
 from dataword import UninterestingDataWord
 
 class StraceToDatawords(object):
-  def __init__(self, containerbuilder, syscall_definitions, strace_path):
+  def __init__(self, containerbuilder, syscall_definitions, strace_path, skip=0):
+    self.skip = skip
     self.containerbuilder = containerbuilder
     self.syscall_definitions = syscall_definitions
     self.strace_path = strace_path
@@ -19,7 +20,7 @@ class StraceToDatawords(object):
   def get_datawords(self):
     t = Trace.Trace(self.strace_path, self.syscall_definitions)
     datawords = []
-    for i in t.syscalls:
+    for i in t.syscalls[self.skip:]:
       datawords.append(self.handle_event(i))
     return datawords
 

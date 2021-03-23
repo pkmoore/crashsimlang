@@ -453,6 +453,11 @@ def main(args=None):
                                         type=str,
                                         help="Location of posix-omni-parser syscall definitions file"
   )
+  strace_run_argparser.add_argument("-k", "--skip",
+                                        required=False,
+                                        type=int,
+                                        help="Number of system calls in trace to skip before processing"
+  )
 
   jsonrpc_run_argparser = run_subparsers.add_parser("jsonrpc")
 
@@ -552,7 +557,11 @@ def main(args=None):
       with open(automaton_path, "r") as f:
         automaton, cb = pickle.load(f)
 
-      s2d = StraceToDatawords(cb, syscall_definitions, strace_path)
+      if (hasattr(args, "skip") and args.skip is not None):
+        skip = args.skip
+      else:
+        skip = 0
+      s2d = StraceToDatawords(cb, syscall_definitions, strace_path, skip)
       datawords = s2d.get_datawords()
 
       # Pass each dataword in the list in series into the automaton

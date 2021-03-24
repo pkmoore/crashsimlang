@@ -1,0 +1,6 @@
+type statbuf {mode: String@2};
+type stat {file: String@0, sb: statbuf@1};
+
+newmode <- "st_mode=S_IFBLK";
+
+stat({}) -> stat({sb: {mode: ->newmode}});

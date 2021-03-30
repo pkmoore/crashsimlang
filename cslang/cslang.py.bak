@@ -1,6 +1,5 @@
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import str
 from ply import lex
 from ply import yacc
 from .register_automaton import RegisterAutomaton

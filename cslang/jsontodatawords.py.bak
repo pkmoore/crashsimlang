@@ -1,63 +1,54 @@
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import str
-from builtins import object
 import sys
 import dill as pickle
 import os
 from collections import OrderedDict
 from . import adt
-from lxml import etree
-
+import json
 
 from .dataword import DataWord
 from .dataword import UninterestingDataWord
 
-class XMLToDatawords(object):
-  def __init__(self, containerbuilder, xml_path):
+class JSONToDatawords(object):
+  def __init__(self, containerbuilder, json_path):
     self.containerbuilder = containerbuilder
-    self.xml_path = xml_path
+    self.json_path = json_path
 
 
   def get_datawords(self):
-    with open(self.xml_path, "r") as f:
-      root = etree.fromstring(f.read())
+    with open(self.json_path, "r") as f:
+      j = json.loads(f.read())
     datawords = []
-    for child in root:
-      datawords.append(self.handle_event(child))
+    for i in j:
+      datawords.append(self.handle_event(i))
     return datawords
 
-  def get_mutated_xml(self, dw):
-    root = etree.Element("methodCall")
-    mn = etree.Element("methodName")
-    mn.text = dw.type
-    root.append(mn)
-    params = dw.original_event.find("params")
+  def get_mutated_json(self, dw):
+    out = {}
+    out["jsonrpc"] =  "2.0"
+    out["method"] = dw.container["type"]
+    out["id"] = dw.original_event["id"]
+    out["params"] = dw.original_event["params"]
     if dw.captured_arguments:
       for i in dw.captured_arguments:
-        params[int(i["arg_pos"])][0][0].text = str(i["members"][0])
-    root.append(params)
-    return etree.tostring(root)
+        out["params"][int(i["arg_pos"])] = i["members"][0]
+
+    return json.dumps(out)
 
 
   def handle_event(self, event):
-    mn = event.find("methodName")
-    method_name = mn.text
-    params = event.find("params")
-    p = []
-    for param in params:
-      xml_value = param[0][0].text
-      p.append(xml_value)
-
     if not any(self.containerbuilder.top_level.values()) \
-      or not self.containerbuilder.top_level.get(method_name):
+      or not self.containerbuilder.top_level.get(event["method"]):
       # Right now, we define a system call we aren't interested in as
       # any system call with no captured arguments
       return UninterestingDataWord(event)
     else:
-      argslist = p
+      argslist = list(event["params"])
+      # JSON flavored operation here to get the return value from result
+      # message
       # argslist.append(event.ret[0])
-      container = self.containerbuilder.instantiate_type(method_name)
+      container = self.containerbuilder.instantiate_type(event["method"])
       container = self._capture_args(container, argslist)
       return DataWord(event, container)
 

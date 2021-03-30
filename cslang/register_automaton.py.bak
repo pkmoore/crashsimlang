@@ -1,9 +1,7 @@
 from __future__ import absolute_import
-from builtins import str
-from builtins import object
 from . import adt
 
-class RegisterAutomaton(object):
+class RegisterAutomaton:
   def __init__(self):
     self.states = []
     self.states.append(State("startstate"))
@@ -33,7 +31,7 @@ class RegisterAutomaton(object):
     return self.states[self.current_state].is_accepting
 
 
-class State(object):
+class State:
   def __init__(self, name, operations=None, outputs=None, transitions=None, is_accepting=False, tags=None):
     self.name = name
     self.transitions = transitions if transitions is not None else []
@@ -95,7 +93,7 @@ class State(object):
     return tmp
 
 
-class Transition(object):
+class Transition:
   def __init__(self, dataword_name, to_state, operations=None, predicates=None):
     self.dataword_name = dataword_name
     self.to_state = to_state

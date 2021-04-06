@@ -513,7 +513,7 @@ def main(args=None):
       type_checker.check_ast(ast)
       automaton, containerbuilder = automaton_builder.process_root(ast)
 
-      with open(automaton_path, "w") as f:
+      with open(automaton_path, "wb") as f:
         pickle.dump((automaton, containerbuilder), f)
 
 
@@ -533,7 +533,7 @@ def main(args=None):
 
 
       # Load in the automaton
-      with open(automaton_path, "r") as f:
+      with open(automaton_path, "rb") as f:
         automaton, cb = pickle.load(f)
 
       s2d = StraceToDatawords(cb, syscall_definitions, strace_path)
@@ -562,7 +562,7 @@ def main(args=None):
       automaton_path = args.automaton_path
 
       # Load in the automaton
-      with open(automaton_path, "r") as f:
+      with open(automaton_path, "rb") as f:
         automaton, cb = pickle.load(f)
 
 

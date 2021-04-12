@@ -1,13 +1,15 @@
 from __future__ import print_function
+from __future__ import absolute_import
+from builtins import object
 import sys
 import dill as pickle
 import os
 from collections import OrderedDict
-import adt
+from . import adt
 import json
 
-from dataword import DataWord
-from dataword import UninterestingDataWord
+from .dataword import DataWord
+from .dataword import UninterestingDataWord
 
 class JSONToDatawords(object):
   def __init__(self, containerbuilder, json_path):

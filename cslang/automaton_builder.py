@@ -1,9 +1,11 @@
-from register_automaton import RegisterAutomaton
-from register_automaton import State
-from register_automaton import Transition
-from dataword import DataWord
-from adt import ContainerBuilder
-from cslang_error import CSlangError
+from __future__ import absolute_import
+from builtins import str
+from .register_automaton import RegisterAutomaton
+from .register_automaton import State
+from .register_automaton import Transition
+from .dataword import DataWord
+from .adt import ContainerBuilder
+from .cslang_error import CSlangError
 import dill as pickle
 
 def process_root(ast_root):

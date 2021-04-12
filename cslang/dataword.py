@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 class DataWord(object):
   def __init__(self, event, container):
     self.original_event = event
@@ -12,7 +14,7 @@ class DataWord(object):
       if hasattr(self.original_event, "name"):
         self.type = self.original_event.name
       # JSON objects have a "procedure" key
-      elif "procedure" in self.original_event.keys():
+      elif "procedure" in list(self.original_event.keys()):
         self.type = self.original_event["procedure"]
       # XMLRPC object have a methodName
       elif self.original_event[0].tag == "methodName":

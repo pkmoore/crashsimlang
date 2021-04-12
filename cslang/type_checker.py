@@ -1,5 +1,6 @@
 from __future__ import print_function
-from cslang_error import CSlangError
+from __future__ import absolute_import
+from .cslang_error import CSlangError
 
 def check_ast(ast):
   check_no_output_on_not_dataword(ast)

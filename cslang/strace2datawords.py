@@ -1,13 +1,17 @@
 from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 import sys
 import dill as pickle
 import os
 from collections import OrderedDict
-import adt
+from . import adt
 
 from posix_omni_parser import Trace
-from dataword import DataWord
-from dataword import UninterestingDataWord
+from .dataword import DataWord
+from .dataword import UninterestingDataWord
 
 class StraceToDatawords(object):
   def __init__(self, containerbuilder, syscall_definitions, strace_path, skip=0):

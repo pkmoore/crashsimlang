@@ -1,3 +1,4 @@
+from builtins import object
 import os
 from argparse import Namespace
 from cslang.cslang import main as cslang_main
@@ -8,7 +9,7 @@ def get_test_data_path(filename):
   return os.path.join(dir_path, filename)
 
 
-class TestPredicates():
+class TestPredicates(object):
 
   def test_checkfdtrue(self):
     syscall_definitions = get_test_data_path("../cslang/syscall_definitions.pickle")

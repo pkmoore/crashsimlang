@@ -1,5 +1,9 @@
 from __future__ import print_function
-from cslang_error import CSlangError
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
+from .cslang_error import CSlangError
 import pprint
 
 def get_nested_member_for_path(container, path):

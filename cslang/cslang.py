@@ -1,16 +1,19 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
 from ply import lex
 from ply import yacc
-from register_automaton import RegisterAutomaton
-from register_automaton import State
-from register_automaton import Transition
-from strace2datawords import StraceToDatawords
-from jsontodatawords import JSONToDatawords
-from xmltodatawords import XMLToDatawords
+from .register_automaton import RegisterAutomaton
+from .register_automaton import State
+from .register_automaton import Transition
+from .strace2datawords import StraceToDatawords
+from .jsontodatawords import JSONToDatawords
+from .xmltodatawords import XMLToDatawords
 from posix_omni_parser import Trace
-from adt import ContainerBuilder
-import automaton_builder
-import type_checker
-from cslang_error import CSlangError
+from .adt import ContainerBuilder
+from . import automaton_builder
+from . import type_checker
+from .cslang_error import CSlangError
 import dill as pickle
 import os
 import sys
@@ -534,7 +537,7 @@ def main(args=None):
       type_checker.check_ast(ast)
       automaton, containerbuilder = automaton_builder.process_root(ast)
 
-      with open(automaton_path, "w") as f:
+      with open(automaton_path, "wb") as f:
         pickle.dump((automaton, containerbuilder), f)
 
 
@@ -554,7 +557,7 @@ def main(args=None):
 
 
       # Load in the automaton
-      with open(automaton_path, "r") as f:
+      with open(automaton_path, "rb") as f:
         automaton, cb = pickle.load(f)
 
       if (hasattr(args, "skip") and args.skip is not None):
@@ -587,7 +590,7 @@ def main(args=None):
       automaton_path = args.automaton_path
 
       # Load in the automaton
-      with open(automaton_path, "r") as f:
+      with open(automaton_path, "rb") as f:
         automaton, cb = pickle.load(f)
 
 
@@ -619,7 +622,7 @@ def main(args=None):
       automaton_path = args.automaton_path
 
       # Load in the automaton
-      with open(automaton_path, "r") as f:
+      with open(automaton_path, "rb") as f:
         automaton, cb = pickle.load(f)
 
 

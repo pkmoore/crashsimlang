@@ -1,3 +1,4 @@
+from builtins import str
 import os
 import unittest
 from argparse import Namespace

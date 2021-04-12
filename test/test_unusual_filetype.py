@@ -24,6 +24,3 @@ class TestUnusualFiletype(unittest.TestCase):
     assert automaton
     assert len(automaton.states) == 2
     assert automaton.states[1].name == "stat"
-
-    assert 1 == 2
-

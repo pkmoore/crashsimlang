@@ -1,3 +1,4 @@
+from builtins import object
 import os
 from argparse import Namespace
 from cslang.cslang import main as cslang_main
@@ -8,7 +9,7 @@ def get_test_data_path(filename):
   return os.path.join(dir_path, filename)
 
 
-class TestOpen():
+class TestOpen(object):
 
   def test_open(self):
     cslang_main(Namespace(mode="build",

@@ -182,7 +182,7 @@ def p_typeexpressionlist(p):
 
 
 def p_typedefinition(p):
-    """typedefinition : TYPE IDENTIFIER '{' typeexpressionlist '}' """
+    """typedefinition : TYPE IDENTIFIER '{' typeexpressionlist '}'"""
     p[0] = ("TYPEDEF", p[2][1], p[4])
 
 
@@ -196,16 +196,18 @@ def p_variantlist(p):
     | variant
     """
     if len(p) == 4:
-        p[0] = ((p[1][1], p[1][2]),) + (p[3],)
+        p[0] = ((p[1][1], p[1][2]),) + p[3]
     else:
         p[0] = (
-            p[1][1],
-            p[1][2],
+            (
+                p[1][1],
+                p[1][2],
+            ),
         )
 
 
 def p_variant(p):
-    """variant : '{' IDENTIFIER typeexpressionlist '}' """
+    """variant : '{' IDENTIFIER typeexpressionlist '}'"""
     p[0] = ("VARIANT", p[2][1], p[3])
 
 
@@ -325,7 +327,7 @@ def p_withexpression(p):
 
 
 def p_outputexpression(p):
-    """outputexpression : WRITEOP IDENTIFIER '(' parameterexpression ')' """
+    """outputexpression : WRITEOP IDENTIFIER '(' parameterexpression ')'"""
     p[0] = ("OUTPUTEXPRESSION", p[2], p[4])
 
 

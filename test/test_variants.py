@@ -25,10 +25,10 @@ type otherread {read filedesc: Numeric@0};
 
         assert ast[0][0] == "VARIANTDEF"
         assert ast[0][1] == "otherread"
-        assert ast[0][2][0] == "read"
-        assert ast[0][2][1][0][0] == "Numeric"
-        assert ast[0][2][1][0][1] == "0"
-        assert ast[0][2][1][0][2] == "filedesc"
+        assert ast[0][2][0][0] == "read"
+        assert ast[0][2][0][1][0][0] == "Numeric"
+        assert ast[0][2][0][1][0][1] == "0"
+        assert ast[0][2][0][1][0][2] == "filedesc"
 
     def test_many_variants(self):
         ast = cslang_main(

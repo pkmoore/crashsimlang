@@ -1,0 +1,43 @@
+172   fcntl(0, F_GETFD)                 = 0
+172   socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP) = 3
+172   setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+172   setsockopt(3, SOL_IPV6, IPV6_V6ONLY, [1], 4) = 0
+172   bind(3, {sa_family=AF_INET6, sin6_port=htons(8080), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::", &sin6_addr), sin6_scope_id=0}, 28) = 0
+172   listen(3, 10)                     = 0
+172   write(2, "Ncat: ", 6)             = 6
+172   write(2, "Listening on :::8080\n", 21) = 21
+172   fcntl(3, F_GETFL)                 = 0x2 (flags O_RDWR)
+172   fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+172   socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) = 4
+172   setsockopt(4, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+172   bind(4, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
+172   listen(4, 10)                     = 0
+172   write(2, "Ncat: ", 6)             = 6
+172   write(2, "Listening on 0.0.0.0:8080\n", 26) = 26
+172   fcntl(4, F_GETFL)                 = 0x2 (flags O_RDWR)
+172   fcntl(4, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+172   select(5, [3 4], [], NULL, NULL)  = 1 (in [4])
+172   accept(4, {sa_family=AF_INET, sin_port=htons(58650), sin_addr=inet_addr("172.17.0.1")}, [128->16]) = 5
+172   write(2, "Ncat: ", 6)             = 6
+172   write(2, "Connection from 172.17.0.1.\n", 28) = 28
+172   close(3)                          = 0
+172   close(4)                          = 0
+172   write(2, "Ncat: ", 6)             = 6
+172   write(2, "Connection from 172.17.0.1:58650.\n", 34) = 34
+172   fcntl(5, F_GETFL)                 = 0x2 (flags O_RDWR)
+172   fcntl(5, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+172   select(6, [0 5], [], NULL, NULL)  = 1 (in [5])
+172   recvfrom(5, "test\n", 8192, 0, NULL, NULL) = 5
+172   write(1, "test\n", 5)             = 5
+172   select(6, [0 5], [], NULL, NULL)  = 1 (in [0])
+172   read(0, "reply\n", 8192)          = 6
+172   fcntl(5, F_GETFL)                 = 0x802 (flags O_RDWR|O_NONBLOCK)
+172   fcntl(5, F_SETFL, O_RDWR)         = 0
+172   sendto(5, "reply\n", 6, 0, NULL, 0) = 6
+172   fcntl(5, F_GETFL)                 = 0x2 (flags O_RDWR)
+172   fcntl(5, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+172   select(6, [0 5], [], NULL, NULL)  = 1 (in [5])
+172   recvfrom(5, "", 8192, 0, NULL, NULL) = 0
+172   close(5)                          = 0
+172   exit_group(0)                     = ?
+172   +++ exited with 0 +++

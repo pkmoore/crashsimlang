@@ -1,0 +1,13 @@
+type accept { accept fd: Numeric@ret} | { accept4 fd: Numeric@ret};
+type anyrecv { recvfrom fd: Numeric@0} | { read fd: Numeric@0} | { recv fd: Numeric@0};
+
+type anysend {sendto fd: Numeric@0} | { write fd: Numeric@0} | { send fd: Numeric@0};
+
+type close {fd: Numeric@0};
+
+accept({fd: !storefd});
+anyrecv({fd: ?storefd});
+anysend({fd: ?storefd});
+close({fd: ?storefd});
+
+

@@ -1,0 +1,7 @@
+type fstat {filedesc: Numeric@0};
+type stat {filename: String@0};
+type open {filename: String@0, filedesc: Numeric@ret};
+
+stat({filename: !fn});
+open({filename: ?fn, filedesc: !fd});
+fstat({fildesc: ?fd});

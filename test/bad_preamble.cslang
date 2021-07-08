@@ -1,3 +1,0 @@
-type fstat {filedesc: Numeric@0};
-fstat({});
-type another {filedesc: Numeric@0};

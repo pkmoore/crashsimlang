@@ -1,2 +1,0 @@
-35388 open("test.txt", O_RDONLY, 0) = 3
-35388 recv(3, "Hello world", 11, 0) = 11

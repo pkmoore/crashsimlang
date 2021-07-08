@@ -1,2 +1,0 @@
-type fstat {filedesc: Numeric@0};
-

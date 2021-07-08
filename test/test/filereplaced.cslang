@@ -1,7 +1,0 @@
-event fstat {filedesc: Numeric@0};
-event stat {filename: String@0};
-event open {filename: String@0, filedesc: Numeric@ret};
-
-stat({filename: !fn});
-open({filename: ?fn, filedesc: !fd});
-fstat({fildesc: ?fd});

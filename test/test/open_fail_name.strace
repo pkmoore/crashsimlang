@@ -1,1 +1,0 @@
-35388 open("bad.txt", O_RDONLY, 0)    = 3

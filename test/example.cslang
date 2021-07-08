@@ -1,4 +1,0 @@
-# Note, we don't support <object>.<procedure> yet
-type getStateName {paramone: Numeric@0};
-
-getStateName({paramone: !pone});

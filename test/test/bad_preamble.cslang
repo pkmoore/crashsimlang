@@ -1,3 +1,0 @@
-event fstat {filedesc: Numeric@0};
-fstat({});
-event another {filedesc: Numeric@0};

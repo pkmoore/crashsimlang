@@ -1,0 +1,1303 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> statementlist
+Rule 1     statementlist -> statement statementlist
+Rule 2     statementlist -> statement
+Rule 3     statement -> preamblestatement
+Rule 4     statement -> bodystatement
+Rule 5     preamblestatement -> typedefinition ;
+Rule 6     preamblestatement -> variantdefinition ;
+Rule 7     bodystatement -> dataword ;
+Rule 8     bodystatement -> registerassignment ;
+Rule 9     typeexpression -> IDENTIFIER : IDENTIFIER @ NUM_LITERAL
+Rule 10    typeexpression -> IDENTIFIER : IDENTIFIER @ RET
+Rule 11    typeexpressionlist -> typeexpression , typeexpressionlist
+Rule 12    typeexpressionlist -> typeexpression
+Rule 13    typedefinition -> EVENT IDENTIFIER { typeexpressionlist }
+Rule 14    variantdefinition -> EVENT IDENTIFIER variantlist
+Rule 15    variantlist -> variant | variantlist
+Rule 16    variantlist -> variant
+Rule 17    variant -> { IDENTIFIER typeexpressionlist }
+Rule 18    predpath -> IDENTIFIER . predpath
+Rule 19    predpath -> IDENTIFIER
+Rule 20    predexpressionlist -> predexpression AND predexpressionlist
+Rule 21    predexpressionlist -> predexpression
+Rule 22    predexpression -> predpath EQUALSOP NUM_LITERAL
+Rule 23    predexpression -> predpath EQUALSOP STRING_LITERAL
+Rule 24    registerassignment -> IDENTIFIER ASSIGNOP NUM_LITERAL
+Rule 25    registerassignment -> IDENTIFIER ASSIGNOP STRING_LITERAL
+Rule 26    registerassignment -> IDENTIFIER ASSIGNOP IDENTIFIER
+Rule 27    registerassignment -> IDENTIFIER ASSIGNOP registerexp
+Rule 28    registerexp -> registeradd
+Rule 29    registerexp -> registersub
+Rule 30    registerexp -> registermul
+Rule 31    registerexp -> registerdiv
+Rule 32    registerexp -> registerconcat
+Rule 33    registerexp -> registeraddorconcat
+Rule 34    registeraddorconcat -> IDENTIFIER + IDENTIFIER
+Rule 35    registerconcat -> IDENTIFIER + STRING_LITERAL
+Rule 36    registerconcat -> STRING_LITERAL + IDENTIFIER
+Rule 37    registerconcat -> STRING_LITERAL + STRING_LITERAL
+Rule 38    registeradd -> IDENTIFIER + NUM_LITERAL
+Rule 39    registeradd -> NUM_LITERAL + IDENTIFIER
+Rule 40    registeradd -> NUM_LITERAL + NUM_LITERAL
+Rule 41    registersub -> IDENTIFIER - IDENTIFIER
+Rule 42    registersub -> IDENTIFIER - NUM_LITERAL
+Rule 43    registersub -> NUM_LITERAL - IDENTIFIER
+Rule 44    registersub -> NUM_LITERAL - NUM_LITERAL
+Rule 45    registermul -> IDENTIFIER * IDENTIFIER
+Rule 46    registermul -> IDENTIFIER * NUM_LITERAL
+Rule 47    registermul -> NUM_LITERAL * IDENTIFIER
+Rule 48    registermul -> NUM_LITERAL * NUM_LITERAL
+Rule 49    registerdiv -> IDENTIFIER / IDENTIFIER
+Rule 50    registerdiv -> IDENTIFIER / NUM_LITERAL
+Rule 51    registerdiv -> NUM_LITERAL / IDENTIFIER
+Rule 52    registerdiv -> NUM_LITERAL / NUM_LITERAL
+Rule 53    empty -> <empty>
+Rule 54    withexpression -> WITH predexpressionlist
+Rule 55    outputexpression -> WRITEOP IDENTIFIER ( parameterexpression )
+Rule 56    withoutputexpression -> empty
+Rule 57    withoutputexpression -> withexpression
+Rule 58    withoutputexpression -> outputexpression
+Rule 59    withoutputexpression -> withexpression outputexpression
+Rule 60    datawordidentifier -> NOT IDENTIFIER
+Rule 61    datawordidentifier -> IDENTIFIER
+Rule 62    dataword -> datawordidentifier ( parameterexpression ) withoutputexpression
+Rule 63    parameterexpression -> { parameterlist }
+Rule 64    parameterexpression -> { }
+Rule 65    parameterlist -> parameter , parameterlist
+Rule 66    parameterlist -> parameter
+Rule 67    parameter -> IDENTIFIER : READOP IDENTIFIER
+Rule 68    parameter -> IDENTIFIER : STOREOP IDENTIFIER
+Rule 69    parameter -> IDENTIFIER : WRITEOP IDENTIFIER
+Rule 70    parameter -> IDENTIFIER : parameterexpression
+
+Terminals, with rules where they appear
+
+(                    : 55 62
+)                    : 55 62
+*                    : 45 46 47 48
++                    : 34 35 36 37 38 39 40
+,                    : 11 65
+-                    : 41 42 43 44
+.                    : 18
+/                    : 49 50 51 52
+:                    : 9 10 67 68 69 70
+;                    : 5 6 7 8
+@                    : 9 10
+AND                  : 20
+ASSIGNOP             : 24 25 26 27
+EQUALSOP             : 22 23
+EVENT                : 13 14
+IDENTIFIER           : 9 9 10 10 13 14 17 18 19 24 25 26 26 27 34 34 35 36 38 39 41 41 42 43 45 45 46 47 49 49 50 51 55 60 61 67 67 68 68 69 69 70
+NOT                  : 60
+NUM_LITERAL          : 9 22 24 38 39 40 40 42 43 44 44 46 47 48 48 50 51 52 52
+READOP               : 67
+RET                  : 10
+STOREOP              : 68
+STRING_LITERAL       : 23 25 35 36 37 37
+WITH                 : 54
+WRITEOP              : 55 69
+error                : 
+{                    : 13 17 63 64
+|                    : 15
+}                    : 13 17 63 64
+
+Nonterminals, with rules where they appear
+
+bodystatement        : 4
+dataword             : 7
+datawordidentifier   : 62
+empty                : 56
+outputexpression     : 58 59
+parameter            : 65 66
+parameterexpression  : 55 62 70
+parameterlist        : 63 65
+preamblestatement    : 3
+predexpression       : 20 21
+predexpressionlist   : 20 54
+predpath             : 18 22 23
+registeradd          : 28
+registeraddorconcat  : 33
+registerassignment   : 8
+registerconcat       : 32
+registerdiv          : 31
+registerexp          : 27
+registermul          : 30
+registersub          : 29
+statement            : 1 2
+statementlist        : 1 0
+typedefinition       : 5
+typeexpression       : 11 12
+typeexpressionlist   : 11 13 17
+variant              : 15 16
+variantdefinition    : 6
+variantlist          : 14 15
+withexpression       : 57 59
+withoutputexpression : 62
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . statementlist
+    (1) statementlist -> . statement statementlist
+    (2) statementlist -> . statement
+    (3) statement -> . preamblestatement
+    (4) statement -> . bodystatement
+    (5) preamblestatement -> . typedefinition ;
+    (6) preamblestatement -> . variantdefinition ;
+    (7) bodystatement -> . dataword ;
+    (8) bodystatement -> . registerassignment ;
+    (13) typedefinition -> . EVENT IDENTIFIER { typeexpressionlist }
+    (14) variantdefinition -> . EVENT IDENTIFIER variantlist
+    (62) dataword -> . datawordidentifier ( parameterexpression ) withoutputexpression
+    (24) registerassignment -> . IDENTIFIER ASSIGNOP NUM_LITERAL
+    (25) registerassignment -> . IDENTIFIER ASSIGNOP STRING_LITERAL
+    (26) registerassignment -> . IDENTIFIER ASSIGNOP IDENTIFIER
+    (27) registerassignment -> . IDENTIFIER ASSIGNOP registerexp
+    (60) datawordidentifier -> . NOT IDENTIFIER
+    (61) datawordidentifier -> . IDENTIFIER
+
+    EVENT           shift and go to state 9
+    IDENTIFIER      shift and go to state 10
+    NOT             shift and go to state 12
+
+    statementlist                  shift and go to state 1
+    statement                      shift and go to state 2
+    preamblestatement              shift and go to state 3
+    bodystatement                  shift and go to state 4
+    typedefinition                 shift and go to state 5
+    variantdefinition              shift and go to state 6
+    dataword                       shift and go to state 7
+    registerassignment             shift and go to state 8
+    datawordidentifier             shift and go to state 11
+
+state 1
+
+    (0) S' -> statementlist .
+
+
+
+state 2
+
+    (1) statementlist -> statement . statementlist
+    (2) statementlist -> statement .
+    (1) statementlist -> . statement statementlist
+    (2) statementlist -> . statement
+    (3) statement -> . preamblestatement
+    (4) statement -> . bodystatement
+    (5) preamblestatement -> . typedefinition ;
+    (6) preamblestatement -> . variantdefinition ;
+    (7) bodystatement -> . dataword ;
+    (8) bodystatement -> . registerassignment ;
+    (13) typedefinition -> . EVENT IDENTIFIER { typeexpressionlist }
+    (14) variantdefinition -> . EVENT IDENTIFIER variantlist
+    (62) dataword -> . datawordidentifier ( parameterexpression ) withoutputexpression
+    (24) registerassignment -> . IDENTIFIER ASSIGNOP NUM_LITERAL
+    (25) registerassignment -> . IDENTIFIER ASSIGNOP STRING_LITERAL
+    (26) registerassignment -> . IDENTIFIER ASSIGNOP IDENTIFIER
+    (27) registerassignment -> . IDENTIFIER ASSIGNOP registerexp
+    (60) datawordidentifier -> . NOT IDENTIFIER
+    (61) datawordidentifier -> . IDENTIFIER
+
+    $end            reduce using rule 2 (statementlist -> statement .)
+    EVENT           shift and go to state 9
+    IDENTIFIER      shift and go to state 10
+    NOT             shift and go to state 12
+
+    statement                      shift and go to state 2
+    statementlist                  shift and go to state 13
+    preamblestatement              shift and go to state 3
+    bodystatement                  shift and go to state 4
+    typedefinition                 shift and go to state 5
+    variantdefinition              shift and go to state 6
+    dataword                       shift and go to state 7
+    registerassignment             shift and go to state 8
+    datawordidentifier             shift and go to state 11
+
+state 3
+
+    (3) statement -> preamblestatement .
+
+    EVENT           reduce using rule 3 (statement -> preamblestatement .)
+    IDENTIFIER      reduce using rule 3 (statement -> preamblestatement .)
+    NOT             reduce using rule 3 (statement -> preamblestatement .)
+    $end            reduce using rule 3 (statement -> preamblestatement .)
+
+
+state 4
+
+    (4) statement -> bodystatement .
+
+    EVENT           reduce using rule 4 (statement -> bodystatement .)
+    IDENTIFIER      reduce using rule 4 (statement -> bodystatement .)
+    NOT             reduce using rule 4 (statement -> bodystatement .)
+    $end            reduce using rule 4 (statement -> bodystatement .)
+
+
+state 5
+
+    (5) preamblestatement -> typedefinition . ;
+
+    ;               shift and go to state 14
+
+
+state 6
+
+    (6) preamblestatement -> variantdefinition . ;
+
+    ;               shift and go to state 15
+
+
+state 7
+
+    (7) bodystatement -> dataword . ;
+
+    ;               shift and go to state 16
+
+
+state 8
+
+    (8) bodystatement -> registerassignment . ;
+
+    ;               shift and go to state 17
+
+
+state 9
+
+    (13) typedefinition -> EVENT . IDENTIFIER { typeexpressionlist }
+    (14) variantdefinition -> EVENT . IDENTIFIER variantlist
+
+    IDENTIFIER      shift and go to state 18
+
+
+state 10
+
+    (24) registerassignment -> IDENTIFIER . ASSIGNOP NUM_LITERAL
+    (25) registerassignment -> IDENTIFIER . ASSIGNOP STRING_LITERAL
+    (26) registerassignment -> IDENTIFIER . ASSIGNOP IDENTIFIER
+    (27) registerassignment -> IDENTIFIER . ASSIGNOP registerexp
+    (61) datawordidentifier -> IDENTIFIER .
+
+    ASSIGNOP        shift and go to state 19
+    (               reduce using rule 61 (datawordidentifier -> IDENTIFIER .)
+
+
+state 11
+
+    (62) dataword -> datawordidentifier . ( parameterexpression ) withoutputexpression
+
+    (               shift and go to state 20
+
+
+state 12
+
+    (60) datawordidentifier -> NOT . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 21
+
+
+state 13
+
+    (1) statementlist -> statement statementlist .
+
+    $end            reduce using rule 1 (statementlist -> statement statementlist .)
+
+
+state 14
+
+    (5) preamblestatement -> typedefinition ; .
+
+    EVENT           reduce using rule 5 (preamblestatement -> typedefinition ; .)
+    IDENTIFIER      reduce using rule 5 (preamblestatement -> typedefinition ; .)
+    NOT             reduce using rule 5 (preamblestatement -> typedefinition ; .)
+    $end            reduce using rule 5 (preamblestatement -> typedefinition ; .)
+
+
+state 15
+
+    (6) preamblestatement -> variantdefinition ; .
+
+    EVENT           reduce using rule 6 (preamblestatement -> variantdefinition ; .)
+    IDENTIFIER      reduce using rule 6 (preamblestatement -> variantdefinition ; .)
+    NOT             reduce using rule 6 (preamblestatement -> variantdefinition ; .)
+    $end            reduce using rule 6 (preamblestatement -> variantdefinition ; .)
+
+
+state 16
+
+    (7) bodystatement -> dataword ; .
+
+    EVENT           reduce using rule 7 (bodystatement -> dataword ; .)
+    IDENTIFIER      reduce using rule 7 (bodystatement -> dataword ; .)
+    NOT             reduce using rule 7 (bodystatement -> dataword ; .)
+    $end            reduce using rule 7 (bodystatement -> dataword ; .)
+
+
+state 17
+
+    (8) bodystatement -> registerassignment ; .
+
+    EVENT           reduce using rule 8 (bodystatement -> registerassignment ; .)
+    IDENTIFIER      reduce using rule 8 (bodystatement -> registerassignment ; .)
+    NOT             reduce using rule 8 (bodystatement -> registerassignment ; .)
+    $end            reduce using rule 8 (bodystatement -> registerassignment ; .)
+
+
+state 18
+
+    (13) typedefinition -> EVENT IDENTIFIER . { typeexpressionlist }
+    (14) variantdefinition -> EVENT IDENTIFIER . variantlist
+    (15) variantlist -> . variant | variantlist
+    (16) variantlist -> . variant
+    (17) variant -> . { IDENTIFIER typeexpressionlist }
+
+    {               shift and go to state 22
+
+    variantlist                    shift and go to state 23
+    variant                        shift and go to state 24
+
+state 19
+
+    (24) registerassignment -> IDENTIFIER ASSIGNOP . NUM_LITERAL
+    (25) registerassignment -> IDENTIFIER ASSIGNOP . STRING_LITERAL
+    (26) registerassignment -> IDENTIFIER ASSIGNOP . IDENTIFIER
+    (27) registerassignment -> IDENTIFIER ASSIGNOP . registerexp
+    (28) registerexp -> . registeradd
+    (29) registerexp -> . registersub
+    (30) registerexp -> . registermul
+    (31) registerexp -> . registerdiv
+    (32) registerexp -> . registerconcat
+    (33) registerexp -> . registeraddorconcat
+    (38) registeradd -> . IDENTIFIER + NUM_LITERAL
+    (39) registeradd -> . NUM_LITERAL + IDENTIFIER
+    (40) registeradd -> . NUM_LITERAL + NUM_LITERAL
+    (41) registersub -> . IDENTIFIER - IDENTIFIER
+    (42) registersub -> . IDENTIFIER - NUM_LITERAL
+    (43) registersub -> . NUM_LITERAL - IDENTIFIER
+    (44) registersub -> . NUM_LITERAL - NUM_LITERAL
+    (45) registermul -> . IDENTIFIER * IDENTIFIER
+    (46) registermul -> . IDENTIFIER * NUM_LITERAL
+    (47) registermul -> . NUM_LITERAL * IDENTIFIER
+    (48) registermul -> . NUM_LITERAL * NUM_LITERAL
+    (49) registerdiv -> . IDENTIFIER / IDENTIFIER
+    (50) registerdiv -> . IDENTIFIER / NUM_LITERAL
+    (51) registerdiv -> . NUM_LITERAL / IDENTIFIER
+    (52) registerdiv -> . NUM_LITERAL / NUM_LITERAL
+    (35) registerconcat -> . IDENTIFIER + STRING_LITERAL
+    (36) registerconcat -> . STRING_LITERAL + IDENTIFIER
+    (37) registerconcat -> . STRING_LITERAL + STRING_LITERAL
+    (34) registeraddorconcat -> . IDENTIFIER + IDENTIFIER
+
+    NUM_LITERAL     shift and go to state 26
+    STRING_LITERAL  shift and go to state 27
+    IDENTIFIER      shift and go to state 25
+
+    registerexp                    shift and go to state 28
+    registeradd                    shift and go to state 29
+    registersub                    shift and go to state 30
+    registermul                    shift and go to state 31
+    registerdiv                    shift and go to state 32
+    registerconcat                 shift and go to state 33
+    registeraddorconcat            shift and go to state 34
+
+state 20
+
+    (62) dataword -> datawordidentifier ( . parameterexpression ) withoutputexpression
+    (63) parameterexpression -> . { parameterlist }
+    (64) parameterexpression -> . { }
+
+    {               shift and go to state 36
+
+    parameterexpression            shift and go to state 35
+
+state 21
+
+    (60) datawordidentifier -> NOT IDENTIFIER .
+
+    (               reduce using rule 60 (datawordidentifier -> NOT IDENTIFIER .)
+
+
+state 22
+
+    (13) typedefinition -> EVENT IDENTIFIER { . typeexpressionlist }
+    (17) variant -> { . IDENTIFIER typeexpressionlist }
+    (11) typeexpressionlist -> . typeexpression , typeexpressionlist
+    (12) typeexpressionlist -> . typeexpression
+    (9) typeexpression -> . IDENTIFIER : IDENTIFIER @ NUM_LITERAL
+    (10) typeexpression -> . IDENTIFIER : IDENTIFIER @ RET
+
+    IDENTIFIER      shift and go to state 37
+
+    typeexpressionlist             shift and go to state 38
+    typeexpression                 shift and go to state 39
+
+state 23
+
+    (14) variantdefinition -> EVENT IDENTIFIER variantlist .
+
+    ;               reduce using rule 14 (variantdefinition -> EVENT IDENTIFIER variantlist .)
+
+
+state 24
+
+    (15) variantlist -> variant . | variantlist
+    (16) variantlist -> variant .
+
+    |               shift and go to state 40
+    ;               reduce using rule 16 (variantlist -> variant .)
+
+
+state 25
+
+    (26) registerassignment -> IDENTIFIER ASSIGNOP IDENTIFIER .
+    (38) registeradd -> IDENTIFIER . + NUM_LITERAL
+    (41) registersub -> IDENTIFIER . - IDENTIFIER
+    (42) registersub -> IDENTIFIER . - NUM_LITERAL
+    (45) registermul -> IDENTIFIER . * IDENTIFIER
+    (46) registermul -> IDENTIFIER . * NUM_LITERAL
+    (49) registerdiv -> IDENTIFIER . / IDENTIFIER
+    (50) registerdiv -> IDENTIFIER . / NUM_LITERAL
+    (35) registerconcat -> IDENTIFIER . + STRING_LITERAL
+    (34) registeraddorconcat -> IDENTIFIER . + IDENTIFIER
+
+    ;               reduce using rule 26 (registerassignment -> IDENTIFIER ASSIGNOP IDENTIFIER .)
+    +               shift and go to state 41
+    -               shift and go to state 42
+    *               shift and go to state 43
+    /               shift and go to state 44
+
+
+state 26
+
+    (24) registerassignment -> IDENTIFIER ASSIGNOP NUM_LITERAL .
+    (39) registeradd -> NUM_LITERAL . + IDENTIFIER
+    (40) registeradd -> NUM_LITERAL . + NUM_LITERAL
+    (43) registersub -> NUM_LITERAL . - IDENTIFIER
+    (44) registersub -> NUM_LITERAL . - NUM_LITERAL
+    (47) registermul -> NUM_LITERAL . * IDENTIFIER
+    (48) registermul -> NUM_LITERAL . * NUM_LITERAL
+    (51) registerdiv -> NUM_LITERAL . / IDENTIFIER
+    (52) registerdiv -> NUM_LITERAL . / NUM_LITERAL
+
+    ;               reduce using rule 24 (registerassignment -> IDENTIFIER ASSIGNOP NUM_LITERAL .)
+    +               shift and go to state 45
+    -               shift and go to state 46
+    *               shift and go to state 47
+    /               shift and go to state 48
+
+
+state 27
+
+    (25) registerassignment -> IDENTIFIER ASSIGNOP STRING_LITERAL .
+    (36) registerconcat -> STRING_LITERAL . + IDENTIFIER
+    (37) registerconcat -> STRING_LITERAL . + STRING_LITERAL
+
+    ;               reduce using rule 25 (registerassignment -> IDENTIFIER ASSIGNOP STRING_LITERAL .)
+    +               shift and go to state 49
+
+
+state 28
+
+    (27) registerassignment -> IDENTIFIER ASSIGNOP registerexp .
+
+    ;               reduce using rule 27 (registerassignment -> IDENTIFIER ASSIGNOP registerexp .)
+
+
+state 29
+
+    (28) registerexp -> registeradd .
+
+    ;               reduce using rule 28 (registerexp -> registeradd .)
+
+
+state 30
+
+    (29) registerexp -> registersub .
+
+    ;               reduce using rule 29 (registerexp -> registersub .)
+
+
+state 31
+
+    (30) registerexp -> registermul .
+
+    ;               reduce using rule 30 (registerexp -> registermul .)
+
+
+state 32
+
+    (31) registerexp -> registerdiv .
+
+    ;               reduce using rule 31 (registerexp -> registerdiv .)
+
+
+state 33
+
+    (32) registerexp -> registerconcat .
+
+    ;               reduce using rule 32 (registerexp -> registerconcat .)
+
+
+state 34
+
+    (33) registerexp -> registeraddorconcat .
+
+    ;               reduce using rule 33 (registerexp -> registeraddorconcat .)
+
+
+state 35
+
+    (62) dataword -> datawordidentifier ( parameterexpression . ) withoutputexpression
+
+    )               shift and go to state 50
+
+
+state 36
+
+    (63) parameterexpression -> { . parameterlist }
+    (64) parameterexpression -> { . }
+    (65) parameterlist -> . parameter , parameterlist
+    (66) parameterlist -> . parameter
+    (67) parameter -> . IDENTIFIER : READOP IDENTIFIER
+    (68) parameter -> . IDENTIFIER : STOREOP IDENTIFIER
+    (69) parameter -> . IDENTIFIER : WRITEOP IDENTIFIER
+    (70) parameter -> . IDENTIFIER : parameterexpression
+
+    }               shift and go to state 52
+    IDENTIFIER      shift and go to state 54
+
+    parameterlist                  shift and go to state 51
+    parameter                      shift and go to state 53
+
+state 37
+
+    (17) variant -> { IDENTIFIER . typeexpressionlist }
+    (9) typeexpression -> IDENTIFIER . : IDENTIFIER @ NUM_LITERAL
+    (10) typeexpression -> IDENTIFIER . : IDENTIFIER @ RET
+    (11) typeexpressionlist -> . typeexpression , typeexpressionlist
+    (12) typeexpressionlist -> . typeexpression
+    (9) typeexpression -> . IDENTIFIER : IDENTIFIER @ NUM_LITERAL
+    (10) typeexpression -> . IDENTIFIER : IDENTIFIER @ RET
+
+    :               shift and go to state 57
+    IDENTIFIER      shift and go to state 55
+
+    typeexpressionlist             shift and go to state 56
+    typeexpression                 shift and go to state 39
+
+state 38
+
+    (13) typedefinition -> EVENT IDENTIFIER { typeexpressionlist . }
+
+    }               shift and go to state 58
+
+
+state 39
+
+    (11) typeexpressionlist -> typeexpression . , typeexpressionlist
+    (12) typeexpressionlist -> typeexpression .
+
+    ,               shift and go to state 59
+    }               reduce using rule 12 (typeexpressionlist -> typeexpression .)
+
+
+state 40
+
+    (15) variantlist -> variant | . variantlist
+    (15) variantlist -> . variant | variantlist
+    (16) variantlist -> . variant
+    (17) variant -> . { IDENTIFIER typeexpressionlist }
+
+    {               shift and go to state 61
+
+    variant                        shift and go to state 24
+    variantlist                    shift and go to state 60
+
+state 41
+
+    (38) registeradd -> IDENTIFIER + . NUM_LITERAL
+    (35) registerconcat -> IDENTIFIER + . STRING_LITERAL
+    (34) registeraddorconcat -> IDENTIFIER + . IDENTIFIER
+
+    NUM_LITERAL     shift and go to state 63
+    STRING_LITERAL  shift and go to state 64
+    IDENTIFIER      shift and go to state 62
+
+
+state 42
+
+    (41) registersub -> IDENTIFIER - . IDENTIFIER
+    (42) registersub -> IDENTIFIER - . NUM_LITERAL
+
+    IDENTIFIER      shift and go to state 65
+    NUM_LITERAL     shift and go to state 66
+
+
+state 43
+
+    (45) registermul -> IDENTIFIER * . IDENTIFIER
+    (46) registermul -> IDENTIFIER * . NUM_LITERAL
+
+    IDENTIFIER      shift and go to state 67
+    NUM_LITERAL     shift and go to state 68
+
+
+state 44
+
+    (49) registerdiv -> IDENTIFIER / . IDENTIFIER
+    (50) registerdiv -> IDENTIFIER / . NUM_LITERAL
+
+    IDENTIFIER      shift and go to state 69
+    NUM_LITERAL     shift and go to state 70
+
+
+state 45
+
+    (39) registeradd -> NUM_LITERAL + . IDENTIFIER
+    (40) registeradd -> NUM_LITERAL + . NUM_LITERAL
+
+    IDENTIFIER      shift and go to state 72
+    NUM_LITERAL     shift and go to state 71
+
+
+state 46
+
+    (43) registersub -> NUM_LITERAL - . IDENTIFIER
+    (44) registersub -> NUM_LITERAL - . NUM_LITERAL
+
+    IDENTIFIER      shift and go to state 74
+    NUM_LITERAL     shift and go to state 73
+
+
+state 47
+
+    (47) registermul -> NUM_LITERAL * . IDENTIFIER
+    (48) registermul -> NUM_LITERAL * . NUM_LITERAL
+
+    IDENTIFIER      shift and go to state 76
+    NUM_LITERAL     shift and go to state 75
+
+
+state 48
+
+    (51) registerdiv -> NUM_LITERAL / . IDENTIFIER
+    (52) registerdiv -> NUM_LITERAL / . NUM_LITERAL
+
+    IDENTIFIER      shift and go to state 78
+    NUM_LITERAL     shift and go to state 77
+
+
+state 49
+
+    (36) registerconcat -> STRING_LITERAL + . IDENTIFIER
+    (37) registerconcat -> STRING_LITERAL + . STRING_LITERAL
+
+    IDENTIFIER      shift and go to state 80
+    STRING_LITERAL  shift and go to state 79
+
+
+state 50
+
+    (62) dataword -> datawordidentifier ( parameterexpression ) . withoutputexpression
+    (56) withoutputexpression -> . empty
+    (57) withoutputexpression -> . withexpression
+    (58) withoutputexpression -> . outputexpression
+    (59) withoutputexpression -> . withexpression outputexpression
+    (53) empty -> .
+    (54) withexpression -> . WITH predexpressionlist
+    (55) outputexpression -> . WRITEOP IDENTIFIER ( parameterexpression )
+
+    ;               reduce using rule 53 (empty -> .)
+    WITH            shift and go to state 85
+    WRITEOP         shift and go to state 86
+
+    withoutputexpression           shift and go to state 81
+    empty                          shift and go to state 82
+    withexpression                 shift and go to state 83
+    outputexpression               shift and go to state 84
+
+state 51
+
+    (63) parameterexpression -> { parameterlist . }
+
+    }               shift and go to state 87
+
+
+state 52
+
+    (64) parameterexpression -> { } .
+
+    )               reduce using rule 64 (parameterexpression -> { } .)
+    ,               reduce using rule 64 (parameterexpression -> { } .)
+    }               reduce using rule 64 (parameterexpression -> { } .)
+
+
+state 53
+
+    (65) parameterlist -> parameter . , parameterlist
+    (66) parameterlist -> parameter .
+
+    ,               shift and go to state 88
+    }               reduce using rule 66 (parameterlist -> parameter .)
+
+
+state 54
+
+    (67) parameter -> IDENTIFIER . : READOP IDENTIFIER
+    (68) parameter -> IDENTIFIER . : STOREOP IDENTIFIER
+    (69) parameter -> IDENTIFIER . : WRITEOP IDENTIFIER
+    (70) parameter -> IDENTIFIER . : parameterexpression
+
+    :               shift and go to state 89
+
+
+state 55
+
+    (9) typeexpression -> IDENTIFIER . : IDENTIFIER @ NUM_LITERAL
+    (10) typeexpression -> IDENTIFIER . : IDENTIFIER @ RET
+
+    :               shift and go to state 57
+
+
+state 56
+
+    (17) variant -> { IDENTIFIER typeexpressionlist . }
+
+    }               shift and go to state 90
+
+
+state 57
+
+    (9) typeexpression -> IDENTIFIER : . IDENTIFIER @ NUM_LITERAL
+    (10) typeexpression -> IDENTIFIER : . IDENTIFIER @ RET
+
+    IDENTIFIER      shift and go to state 91
+
+
+state 58
+
+    (13) typedefinition -> EVENT IDENTIFIER { typeexpressionlist } .
+
+    ;               reduce using rule 13 (typedefinition -> EVENT IDENTIFIER { typeexpressionlist } .)
+
+
+state 59
+
+    (11) typeexpressionlist -> typeexpression , . typeexpressionlist
+    (11) typeexpressionlist -> . typeexpression , typeexpressionlist
+    (12) typeexpressionlist -> . typeexpression
+    (9) typeexpression -> . IDENTIFIER : IDENTIFIER @ NUM_LITERAL
+    (10) typeexpression -> . IDENTIFIER : IDENTIFIER @ RET
+
+    IDENTIFIER      shift and go to state 55
+
+    typeexpression                 shift and go to state 39
+    typeexpressionlist             shift and go to state 92
+
+state 60
+
+    (15) variantlist -> variant | variantlist .
+
+    ;               reduce using rule 15 (variantlist -> variant | variantlist .)
+
+
+state 61
+
+    (17) variant -> { . IDENTIFIER typeexpressionlist }
+
+    IDENTIFIER      shift and go to state 93
+
+
+state 62
+
+    (34) registeraddorconcat -> IDENTIFIER + IDENTIFIER .
+
+    ;               reduce using rule 34 (registeraddorconcat -> IDENTIFIER + IDENTIFIER .)
+
+
+state 63
+
+    (38) registeradd -> IDENTIFIER + NUM_LITERAL .
+
+    ;               reduce using rule 38 (registeradd -> IDENTIFIER + NUM_LITERAL .)
+
+
+state 64
+
+    (35) registerconcat -> IDENTIFIER + STRING_LITERAL .
+
+    ;               reduce using rule 35 (registerconcat -> IDENTIFIER + STRING_LITERAL .)
+
+
+state 65
+
+    (41) registersub -> IDENTIFIER - IDENTIFIER .
+
+    ;               reduce using rule 41 (registersub -> IDENTIFIER - IDENTIFIER .)
+
+
+state 66
+
+    (42) registersub -> IDENTIFIER - NUM_LITERAL .
+
+    ;               reduce using rule 42 (registersub -> IDENTIFIER - NUM_LITERAL .)
+
+
+state 67
+
+    (45) registermul -> IDENTIFIER * IDENTIFIER .
+
+    ;               reduce using rule 45 (registermul -> IDENTIFIER * IDENTIFIER .)
+
+
+state 68
+
+    (46) registermul -> IDENTIFIER * NUM_LITERAL .
+
+    ;               reduce using rule 46 (registermul -> IDENTIFIER * NUM_LITERAL .)
+
+
+state 69
+
+    (49) registerdiv -> IDENTIFIER / IDENTIFIER .
+
+    ;               reduce using rule 49 (registerdiv -> IDENTIFIER / IDENTIFIER .)
+
+
+state 70
+
+    (50) registerdiv -> IDENTIFIER / NUM_LITERAL .
+
+    ;               reduce using rule 50 (registerdiv -> IDENTIFIER / NUM_LITERAL .)
+
+
+state 71
+
+    (40) registeradd -> NUM_LITERAL + NUM_LITERAL .
+
+    ;               reduce using rule 40 (registeradd -> NUM_LITERAL + NUM_LITERAL .)
+
+
+state 72
+
+    (39) registeradd -> NUM_LITERAL + IDENTIFIER .
+
+    ;               reduce using rule 39 (registeradd -> NUM_LITERAL + IDENTIFIER .)
+
+
+state 73
+
+    (44) registersub -> NUM_LITERAL - NUM_LITERAL .
+
+    ;               reduce using rule 44 (registersub -> NUM_LITERAL - NUM_LITERAL .)
+
+
+state 74
+
+    (43) registersub -> NUM_LITERAL - IDENTIFIER .
+
+    ;               reduce using rule 43 (registersub -> NUM_LITERAL - IDENTIFIER .)
+
+
+state 75
+
+    (48) registermul -> NUM_LITERAL * NUM_LITERAL .
+
+    ;               reduce using rule 48 (registermul -> NUM_LITERAL * NUM_LITERAL .)
+
+
+state 76
+
+    (47) registermul -> NUM_LITERAL * IDENTIFIER .
+
+    ;               reduce using rule 47 (registermul -> NUM_LITERAL * IDENTIFIER .)
+
+
+state 77
+
+    (52) registerdiv -> NUM_LITERAL / NUM_LITERAL .
+
+    ;               reduce using rule 52 (registerdiv -> NUM_LITERAL / NUM_LITERAL .)
+
+
+state 78
+
+    (51) registerdiv -> NUM_LITERAL / IDENTIFIER .
+
+    ;               reduce using rule 51 (registerdiv -> NUM_LITERAL / IDENTIFIER .)
+
+
+state 79
+
+    (37) registerconcat -> STRING_LITERAL + STRING_LITERAL .
+
+    ;               reduce using rule 37 (registerconcat -> STRING_LITERAL + STRING_LITERAL .)
+
+
+state 80
+
+    (36) registerconcat -> STRING_LITERAL + IDENTIFIER .
+
+    ;               reduce using rule 36 (registerconcat -> STRING_LITERAL + IDENTIFIER .)
+
+
+state 81
+
+    (62) dataword -> datawordidentifier ( parameterexpression ) withoutputexpression .
+
+    ;               reduce using rule 62 (dataword -> datawordidentifier ( parameterexpression ) withoutputexpression .)
+
+
+state 82
+
+    (56) withoutputexpression -> empty .
+
+    ;               reduce using rule 56 (withoutputexpression -> empty .)
+
+
+state 83
+
+    (57) withoutputexpression -> withexpression .
+    (59) withoutputexpression -> withexpression . outputexpression
+    (55) outputexpression -> . WRITEOP IDENTIFIER ( parameterexpression )
+
+    ;               reduce using rule 57 (withoutputexpression -> withexpression .)
+    WRITEOP         shift and go to state 86
+
+    outputexpression               shift and go to state 94
+
+state 84
+
+    (58) withoutputexpression -> outputexpression .
+
+    ;               reduce using rule 58 (withoutputexpression -> outputexpression .)
+
+
+state 85
+
+    (54) withexpression -> WITH . predexpressionlist
+    (20) predexpressionlist -> . predexpression AND predexpressionlist
+    (21) predexpressionlist -> . predexpression
+    (22) predexpression -> . predpath EQUALSOP NUM_LITERAL
+    (23) predexpression -> . predpath EQUALSOP STRING_LITERAL
+    (18) predpath -> . IDENTIFIER . predpath
+    (19) predpath -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 98
+
+    predexpressionlist             shift and go to state 95
+    predexpression                 shift and go to state 96
+    predpath                       shift and go to state 97
+
+state 86
+
+    (55) outputexpression -> WRITEOP . IDENTIFIER ( parameterexpression )
+
+    IDENTIFIER      shift and go to state 99
+
+
+state 87
+
+    (63) parameterexpression -> { parameterlist } .
+
+    )               reduce using rule 63 (parameterexpression -> { parameterlist } .)
+    ,               reduce using rule 63 (parameterexpression -> { parameterlist } .)
+    }               reduce using rule 63 (parameterexpression -> { parameterlist } .)
+
+
+state 88
+
+    (65) parameterlist -> parameter , . parameterlist
+    (65) parameterlist -> . parameter , parameterlist
+    (66) parameterlist -> . parameter
+    (67) parameter -> . IDENTIFIER : READOP IDENTIFIER
+    (68) parameter -> . IDENTIFIER : STOREOP IDENTIFIER
+    (69) parameter -> . IDENTIFIER : WRITEOP IDENTIFIER
+    (70) parameter -> . IDENTIFIER : parameterexpression
+
+    IDENTIFIER      shift and go to state 54
+
+    parameter                      shift and go to state 53
+    parameterlist                  shift and go to state 100
+
+state 89
+
+    (67) parameter -> IDENTIFIER : . READOP IDENTIFIER
+    (68) parameter -> IDENTIFIER : . STOREOP IDENTIFIER
+    (69) parameter -> IDENTIFIER : . WRITEOP IDENTIFIER
+    (70) parameter -> IDENTIFIER : . parameterexpression
+    (63) parameterexpression -> . { parameterlist }
+    (64) parameterexpression -> . { }
+
+    READOP          shift and go to state 101
+    STOREOP         shift and go to state 102
+    WRITEOP         shift and go to state 103
+    {               shift and go to state 36
+
+    parameterexpression            shift and go to state 104
+
+state 90
+
+    (17) variant -> { IDENTIFIER typeexpressionlist } .
+
+    |               reduce using rule 17 (variant -> { IDENTIFIER typeexpressionlist } .)
+    ;               reduce using rule 17 (variant -> { IDENTIFIER typeexpressionlist } .)
+
+
+state 91
+
+    (9) typeexpression -> IDENTIFIER : IDENTIFIER . @ NUM_LITERAL
+    (10) typeexpression -> IDENTIFIER : IDENTIFIER . @ RET
+
+    @               shift and go to state 105
+
+
+state 92
+
+    (11) typeexpressionlist -> typeexpression , typeexpressionlist .
+
+    }               reduce using rule 11 (typeexpressionlist -> typeexpression , typeexpressionlist .)
+
+
+state 93
+
+    (17) variant -> { IDENTIFIER . typeexpressionlist }
+    (11) typeexpressionlist -> . typeexpression , typeexpressionlist
+    (12) typeexpressionlist -> . typeexpression
+    (9) typeexpression -> . IDENTIFIER : IDENTIFIER @ NUM_LITERAL
+    (10) typeexpression -> . IDENTIFIER : IDENTIFIER @ RET
+
+    IDENTIFIER      shift and go to state 55
+
+    typeexpressionlist             shift and go to state 56
+    typeexpression                 shift and go to state 39
+
+state 94
+
+    (59) withoutputexpression -> withexpression outputexpression .
+
+    ;               reduce using rule 59 (withoutputexpression -> withexpression outputexpression .)
+
+
+state 95
+
+    (54) withexpression -> WITH predexpressionlist .
+
+    WRITEOP         reduce using rule 54 (withexpression -> WITH predexpressionlist .)
+    ;               reduce using rule 54 (withexpression -> WITH predexpressionlist .)
+
+
+state 96
+
+    (20) predexpressionlist -> predexpression . AND predexpressionlist
+    (21) predexpressionlist -> predexpression .
+
+    AND             shift and go to state 106
+    WRITEOP         reduce using rule 21 (predexpressionlist -> predexpression .)
+    ;               reduce using rule 21 (predexpressionlist -> predexpression .)
+
+
+state 97
+
+    (22) predexpression -> predpath . EQUALSOP NUM_LITERAL
+    (23) predexpression -> predpath . EQUALSOP STRING_LITERAL
+
+    EQUALSOP        shift and go to state 107
+
+
+state 98
+
+    (18) predpath -> IDENTIFIER . . predpath
+    (19) predpath -> IDENTIFIER .
+
+    .               shift and go to state 108
+    EQUALSOP        reduce using rule 19 (predpath -> IDENTIFIER .)
+
+
+state 99
+
+    (55) outputexpression -> WRITEOP IDENTIFIER . ( parameterexpression )
+
+    (               shift and go to state 109
+
+
+state 100
+
+    (65) parameterlist -> parameter , parameterlist .
+
+    }               reduce using rule 65 (parameterlist -> parameter , parameterlist .)
+
+
+state 101
+
+    (67) parameter -> IDENTIFIER : READOP . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 110
+
+
+state 102
+
+    (68) parameter -> IDENTIFIER : STOREOP . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 111
+
+
+state 103
+
+    (69) parameter -> IDENTIFIER : WRITEOP . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 112
+
+
+state 104
+
+    (70) parameter -> IDENTIFIER : parameterexpression .
+
+    ,               reduce using rule 70 (parameter -> IDENTIFIER : parameterexpression .)
+    }               reduce using rule 70 (parameter -> IDENTIFIER : parameterexpression .)
+
+
+state 105
+
+    (9) typeexpression -> IDENTIFIER : IDENTIFIER @ . NUM_LITERAL
+    (10) typeexpression -> IDENTIFIER : IDENTIFIER @ . RET
+
+    NUM_LITERAL     shift and go to state 113
+    RET             shift and go to state 114
+
+
+state 106
+
+    (20) predexpressionlist -> predexpression AND . predexpressionlist
+    (20) predexpressionlist -> . predexpression AND predexpressionlist
+    (21) predexpressionlist -> . predexpression
+    (22) predexpression -> . predpath EQUALSOP NUM_LITERAL
+    (23) predexpression -> . predpath EQUALSOP STRING_LITERAL
+    (18) predpath -> . IDENTIFIER . predpath
+    (19) predpath -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 98
+
+    predexpression                 shift and go to state 96
+    predexpressionlist             shift and go to state 115
+    predpath                       shift and go to state 97
+
+state 107
+
+    (22) predexpression -> predpath EQUALSOP . NUM_LITERAL
+    (23) predexpression -> predpath EQUALSOP . STRING_LITERAL
+
+    NUM_LITERAL     shift and go to state 116
+    STRING_LITERAL  shift and go to state 117
+
+
+state 108
+
+    (18) predpath -> IDENTIFIER . . predpath
+    (18) predpath -> . IDENTIFIER . predpath
+    (19) predpath -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 98
+
+    predpath                       shift and go to state 118
+
+state 109
+
+    (55) outputexpression -> WRITEOP IDENTIFIER ( . parameterexpression )
+    (63) parameterexpression -> . { parameterlist }
+    (64) parameterexpression -> . { }
+
+    {               shift and go to state 36
+
+    parameterexpression            shift and go to state 119
+
+state 110
+
+    (67) parameter -> IDENTIFIER : READOP IDENTIFIER .
+
+    ,               reduce using rule 67 (parameter -> IDENTIFIER : READOP IDENTIFIER .)
+    }               reduce using rule 67 (parameter -> IDENTIFIER : READOP IDENTIFIER .)
+
+
+state 111
+
+    (68) parameter -> IDENTIFIER : STOREOP IDENTIFIER .
+
+    ,               reduce using rule 68 (parameter -> IDENTIFIER : STOREOP IDENTIFIER .)
+    }               reduce using rule 68 (parameter -> IDENTIFIER : STOREOP IDENTIFIER .)
+
+
+state 112
+
+    (69) parameter -> IDENTIFIER : WRITEOP IDENTIFIER .
+
+    ,               reduce using rule 69 (parameter -> IDENTIFIER : WRITEOP IDENTIFIER .)
+    }               reduce using rule 69 (parameter -> IDENTIFIER : WRITEOP IDENTIFIER .)
+
+
+state 113
+
+    (9) typeexpression -> IDENTIFIER : IDENTIFIER @ NUM_LITERAL .
+
+    ,               reduce using rule 9 (typeexpression -> IDENTIFIER : IDENTIFIER @ NUM_LITERAL .)
+    }               reduce using rule 9 (typeexpression -> IDENTIFIER : IDENTIFIER @ NUM_LITERAL .)
+
+
+state 114
+
+    (10) typeexpression -> IDENTIFIER : IDENTIFIER @ RET .
+
+    ,               reduce using rule 10 (typeexpression -> IDENTIFIER : IDENTIFIER @ RET .)
+    }               reduce using rule 10 (typeexpression -> IDENTIFIER : IDENTIFIER @ RET .)
+
+
+state 115
+
+    (20) predexpressionlist -> predexpression AND predexpressionlist .
+
+    WRITEOP         reduce using rule 20 (predexpressionlist -> predexpression AND predexpressionlist .)
+    ;               reduce using rule 20 (predexpressionlist -> predexpression AND predexpressionlist .)
+
+
+state 116
+
+    (22) predexpression -> predpath EQUALSOP NUM_LITERAL .
+
+    AND             reduce using rule 22 (predexpression -> predpath EQUALSOP NUM_LITERAL .)
+    WRITEOP         reduce using rule 22 (predexpression -> predpath EQUALSOP NUM_LITERAL .)
+    ;               reduce using rule 22 (predexpression -> predpath EQUALSOP NUM_LITERAL .)
+
+
+state 117
+
+    (23) predexpression -> predpath EQUALSOP STRING_LITERAL .
+
+    AND             reduce using rule 23 (predexpression -> predpath EQUALSOP STRING_LITERAL .)
+    WRITEOP         reduce using rule 23 (predexpression -> predpath EQUALSOP STRING_LITERAL .)
+    ;               reduce using rule 23 (predexpression -> predpath EQUALSOP STRING_LITERAL .)
+
+
+state 118
+
+    (18) predpath -> IDENTIFIER . predpath .
+
+    EQUALSOP        reduce using rule 18 (predpath -> IDENTIFIER . predpath .)
+
+
+state 119
+
+    (55) outputexpression -> WRITEOP IDENTIFIER ( parameterexpression . )
+
+    )               shift and go to state 120
+
+
+state 120
+
+    (55) outputexpression -> WRITEOP IDENTIFIER ( parameterexpression ) .
+
+    ;               reduce using rule 55 (outputexpression -> WRITEOP IDENTIFIER ( parameterexpression ) .)
+

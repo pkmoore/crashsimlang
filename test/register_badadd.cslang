@@ -1,4 +1,0 @@
-tmp <- "hel";
-badnum <- 3;
-
-tmpbadnum <- tmp + badnum;

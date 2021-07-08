@@ -1,6 +1,6 @@
-type statbuf {dev: String@0, stino: String@1, mode: String@2};
-type fstat {filedesc: Numeric@0, statstruct: statbuf@1};
-type read {filedesc: Numeric@0};
+event statbuf {dev: String@0, stino: String@1, mode: String@2};
+event fstat {filedesc: Numeric@0, statstruct: statbuf@1};
+event read {filedesc: Numeric@0};
 
 finddev <- "st_dev=makedev(0, 4)";
 findino <- "st_ino=4026532069";

@@ -1,6 +1,6 @@
-type open {filename: String@0, filedesc: Numeric@ret};
-type read {filedesc: Numeric@0};
-type close {filedesc: Numeric@0, retval: Numeric@ret};
+event open {filename: String@0, filedesc: Numeric@ret};
+event read {filedesc: Numeric@0};
+event close {filedesc: Numeric@0, retval: Numeric@ret};
 
 # Register initialization.  Registers do not have to be initialized before use
 retval <- "-1";

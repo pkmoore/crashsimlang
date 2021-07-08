@@ -1,3 +1,3 @@
-type fstat {filedesc: Numeric@0};
+event fstat {filedesc: Numeric@0};
 fstat({});
-type another {filedesc: Numeric@0};
+event another {filedesc: Numeric@0};

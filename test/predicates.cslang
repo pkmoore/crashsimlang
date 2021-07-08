@@ -1,0 +1,19 @@
+event statbuf {dev: String@0, stino: String@1, mode: String@2};
+event fstat {filedesc: Numeric@0, statstruct: statbuf@1};
+event read {filedesc: Numeric@0};
+
+finddev <- "st_dev=makedev(0, 4)";
+findino <- "st_ino=4026532069";
+
+obvious1 <- "foo";
+obvious2 <- "bar";
+
+fstat({statstruct: {dev: ?finddev, stino: ?findino}})
+with filedesc == 3;
+NOT read({}) with filedesc == 3;
+fstat({statstruct: {dev: !finddev2, stino: !findino2}})
+with filedesc == 4 and statstruct.dev == "st_dev=makedev(0, 4)";
+fstat({statstruct: {dev: ->obvious1, stino: ->obvious2}})
+with filedesc == 5 and statstruct.stino == "st_ino=4026532069";
+fstat({statstruct: {dev: ->obvious1, stino: ->obvious2}})
+with statstruct.stino == "bad";

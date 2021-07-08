@@ -1,0 +1,4 @@
+# Note, we don't support <object>.<procedure> yet
+event getStateName {paramone: Numeric@0};
+
+getStateName({paramone: !pone});

@@ -1,0 +1,4 @@
+event fstat {filedesc: Numeric@0};
+
+fstat({});
+

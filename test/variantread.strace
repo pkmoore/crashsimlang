@@ -1,2 +1,0 @@
-35388 open("test.txt", O_RDONLY, 0) = 3
-35388 read(3, "Hello world", 11) = 11

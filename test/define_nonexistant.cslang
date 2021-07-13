@@ -1,4 +1,4 @@
-type fstat {filedesc: Numeric@0, statstruct: statbuf@1};
+event fstat {filedesc: Numeric@0, statstruct: statbuf@1};
 
 finddev <- "st_dev=makedev(0, 4)";
 findino <- "st_ino=4026532069";

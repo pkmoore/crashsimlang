@@ -1,2 +1,2 @@
-type fstat {filedesc: Numeric@0};
+event fstat {filedesc: Numeric@0};
 

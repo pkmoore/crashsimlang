@@ -1,5 +1,5 @@
-type open {filename: String@0 };
-type readvariant {read filedesc: Numeric@0} | {recv filedesc: Numeric@0};
+event open {filename: String@0 };
+event readvariant {read filedesc: Numeric@0} | {recv filedesc: Numeric@0};
 
 
 open({filename: !name});

@@ -21,7 +21,7 @@ import argparse
 import pprint
 
 
-reserved = {"NOT": "NOT", "ret": "RET", "type": "TYPE", "with": "WITH", "and": "AND"}
+reserved = {"NOT": "NOT", "ret": "RET", "event": "EVENT", "with": "WITH", "and": "AND"}
 
 tokens = [
     "IDENTIFIER",
@@ -182,12 +182,12 @@ def p_typeexpressionlist(p):
 
 
 def p_typedefinition(p):
-    """typedefinition : TYPE IDENTIFIER '{' typeexpressionlist '}'"""
+    """typedefinition : EVENT IDENTIFIER '{' typeexpressionlist '}'"""
     p[0] = ("TYPEDEF", p[2][1], p[4])
 
 
 def p_variantdefinition(p):
-    """variantdefinition : TYPE IDENTIFIER variantlist"""
+    """variantdefinition : EVENT IDENTIFIER variantlist"""
     p[0] = ("VARIANTDEF", p[2][1], p[3])
 
 

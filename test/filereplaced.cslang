@@ -1,6 +1,6 @@
-type fstat {filedesc: Numeric@0};
-type stat {filename: String@0};
-type open {filename: String@0, filedesc: Numeric@ret};
+event fstat {filedesc: Numeric@0};
+event stat {filename: String@0};
+event open {filename: String@0, filedesc: Numeric@ret};
 
 stat({filename: !fn});
 open({filename: ?fn, filedesc: !fd});

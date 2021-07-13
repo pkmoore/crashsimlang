@@ -18,7 +18,7 @@ class TestVariants(unittest.TestCase):
                 check=True,
                 cslang_path=None,
                 string="""
-type otherread {read filedesc: Numeric@0};
+event otherread {read filedesc: Numeric@0};
 """,
             )
         )
@@ -37,7 +37,7 @@ type otherread {read filedesc: Numeric@0};
                 check=True,
                 cslang_path=None,
                 string="""
-type bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
+event bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
 """,
             )
         )

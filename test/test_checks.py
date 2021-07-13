@@ -18,7 +18,7 @@ class TestChecks(unittest.TestCase):
                     mode="parse",
                     check=True,
                     string="""
-type read {filedesc: Numeric@0};
+event read {filedesc: Numeric@0};
 bad <- 4;
 NOT read({}) -> read({filedesc: ->bad});
 """,

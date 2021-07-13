@@ -19,7 +19,7 @@ class TestArgs(unittest.TestCase):
                     cslang_file="test/bad.cslang",
                     check=True,
                     string="""
-type read {filedesc: Numeric@0};
+event read {filedesc: Numeric@0};
 bad <- 4;
 NOT read({}) -> read({filedesc: ->bad});
 """,

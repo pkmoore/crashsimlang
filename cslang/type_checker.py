@@ -17,50 +17,41 @@ def check_no_output_on_not_dataword(ast):
                 print(node)
                 raise CSlangError("Output expressions are not allowed on NOT datawords")
 
-                
 
-#one of them this helper function
-#if one thing is called twice it is not top level
+# one of them this helper function
+# if one thing is called twice it is not top level
 def check_top_level_event(ast):
-    
-    top_level = {"Numeric": False, "String": False}    
-               
+
+    top_level = {"Numeric": False, "String": False}
+
     for node in ast:
-    
-    
-        #check if the node is defining a type   
+
+        # check if the node is defining a type
         if node[0] == "TYPEDEF":
             node_event_type = node[1]
             top_level[node_event_type] = True
-        
-            #if a type is used in an event, it is not a top level event
+
+            # if a type is used in an event, it is not a top level event
             for member in node[2]:
                 top_level[member[0]] = False
-    
 
-            
-    return top_level    
-            
-
-
+    return top_level
 
 
 def check_no_ret_in_none_top_level_event(ast):
 
-    #get the top level event list
+    # get the top level event list
     top_level = check_top_level_event(ast)
     print(top_level)
-    
+
     for node in ast:
-        if node[0] == "TYPEDEF":   
+        if node[0] == "TYPEDEF":
             node_event_type = node[1]
             for member in node[2]:
-                if member[1] == 'ret':
-                    #check if a structure is accessing the value at ret position, which will raise an error
+                if member[1] == "ret":
+                    # check if a structure is accessing the value at ret position, which will raise an error
                     if top_level[node_event_type] == False:
                         print(node)
-                        raise CSlangError("A structure does not have return value position") 
-             
-            
-    
-
+                        raise CSlangError(
+                            "A structure does not have return value position"
+                        )

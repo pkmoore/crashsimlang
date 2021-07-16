@@ -9,6 +9,7 @@ from .register_automaton import Transition
 from .strace2datawords import StraceToDatawords
 from .jsontodatawords import JSONToDatawords
 from .xmltodatawords import XMLToDatawords
+from .csvtodatawords import CSVToDatawords
 from posix_omni_parser import Trace
 from .adt import ContainerBuilder
 from . import automaton_builder
@@ -513,6 +514,23 @@ def main(args=None):
         help="Location of xmlrpc recording to execute against",
     )
 
+    csvrpc_run_argparser = run_subparsers.add_parser("csv")
+
+    csvrpc_run_argparser.add_argument(
+        "-a",
+        "--automaton-path",
+        required=True,
+        type=str,
+        help="Location of CSlang automaton to be used in processing the specified strace file.",
+    )
+    csvrpc_run_argparser.add_argument(
+        "-c",
+        "--csv-path",
+        required=True,
+        type=str,
+        help="Location of csv recording to execute against",
+    )
+
     if not args:
         args = parser.parse_args()
 
@@ -597,7 +615,7 @@ def main(args=None):
 
             return automaton, datawords, s2d
 
-        elif args.format == "jsonrpc":
+        elif args.format == "jsonrpc":              
 
             json_path = args.json_path
             automaton_path = args.automaton_path
@@ -606,7 +624,7 @@ def main(args=None):
             with open(automaton_path, "rb") as f:
                 automaton, cb = pickle.load(f)
 
-            j2d = JSONToDatawords(cb, json_path)
+            j2d = JSONToDatawords(cb, json_path)      
             datawords = j2d.get_datawords()
 
             # Pass each dataword in the list in series into the automaton
@@ -621,8 +639,7 @@ def main(args=None):
             print("With registers: " + str(automaton.registers))
 
             for i in datawords:
-                print(j2d.get_mutated_json(i))
-
+                print(j2d.get_mutated_json(i))           
             return automaton, datawords, j2d
 
         elif args.format == "xmlrpc":
@@ -652,8 +669,35 @@ def main(args=None):
                 print(x2d.get_mutated_xml(i))
 
             return automaton, datawords, x2d
+            
+        elif args.format == "csv":               #copy this and make it for csv
 
+            csv_path = args.csv_path
+            automaton_path = args.automaton_path
 
+            # Load in the automaton
+            with open(automaton_path, "rb") as f:
+                automaton, cb = pickle.load(f)
+
+            c2d = CSVToDatawords(cb, csv_path)       #change to csv
+            datawords = c2d.get_datawords()
+
+            # Pass each dataword in the list in series into the automaton
+            for i in datawords:
+                automaton.match(i)
+
+            # At the end of everything we have a transformed set of datawords.
+            # We either use them if we ended in an accepting state or drop ignore
+            # them if we haven't ended in an accepting state
+            # Some print goes here
+            print("Automaton ended in state: " + str(automaton.current_state))
+            print("With registers: " + str(automaton.registers))
+
+            for i in datawords:
+                print(c2d.get_mutated_csv(i))                       
+
+            return automaton, datawords, c2d
+        
 in_preamble = None
 lexer = None
 parser = None

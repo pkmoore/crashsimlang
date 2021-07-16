@@ -37,6 +37,7 @@ class StraceToDatawords(object):
             return UninterestingDataWord(event)
         else:
             argslist = list(event.args)
+            # we append ret here because posix_omni_parser separates ret from args
             argslist.append(event.ret[0])
             container = self.containerbuilder.instantiate_type(event.name)
             container = self._capture_args(container, argslist)

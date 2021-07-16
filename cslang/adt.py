@@ -79,10 +79,9 @@ class ContainerBuilder(object):
             raise CSlangError(
                 "Illegal type redefinition for type: {}".format(container_type)
             )
-            
-	    	
+
         member_types = [t[0] for t in types]
-        
+
         # It is an error for types list to contain a type that has not been defined
         for t in member_types:
             if t not in self.builders:
@@ -98,7 +97,6 @@ class ContainerBuilder(object):
         for t in member_types:
             self.top_level[t] = False
         member_builders = [self.builders[t[0]] for t in types]
-       
 
         def t_func(in_data):
             incoming_type = container_type

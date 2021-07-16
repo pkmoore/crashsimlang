@@ -1,0 +1,6 @@
+event write{fd: String@0, buffer:String@1, size:String@2};
+
+f <- "fd=999";
+b <- "data=what's up world";
+
+write({fd: ->f, buffer: -> b});

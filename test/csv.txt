@@ -1,0 +1,1 @@
+34384,12:02:36.269827674,2,echo,(7896),>,write,fd=1(/dev/pts/3),data=hello world.,size=12,res=12 

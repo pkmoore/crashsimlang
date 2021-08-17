@@ -21,7 +21,7 @@ class TestCSV(unittest.TestCase):
             Namespace(
                 mode="run",
                 format="csv",
-                csv_path=get_test_data_path("csv.txt"),                                    #watch out for the file that need to be changed
+                csv_path=get_test_data_path("write.csv"),
                 automaton_path=get_test_data_path("csv.auto"),
             )
         )
@@ -37,4 +37,3 @@ class TestCSV(unittest.TestCase):
 
         assert automaton.is_accepting
         assert automaton.current_state == 1
-

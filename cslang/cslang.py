@@ -615,7 +615,7 @@ def main(args=None):
 
             return automaton, datawords, s2d
 
-        elif args.format == "jsonrpc":              
+        elif args.format == "jsonrpc":
 
             json_path = args.json_path
             automaton_path = args.automaton_path
@@ -624,7 +624,7 @@ def main(args=None):
             with open(automaton_path, "rb") as f:
                 automaton, cb = pickle.load(f)
 
-            j2d = JSONToDatawords(cb, json_path)      
+            j2d = JSONToDatawords(cb, json_path)
             datawords = j2d.get_datawords()
 
             # Pass each dataword in the list in series into the automaton
@@ -639,7 +639,7 @@ def main(args=None):
             print("With registers: " + str(automaton.registers))
 
             for i in datawords:
-                print(j2d.get_mutated_json(i))           
+                print(j2d.get_mutated_json(i))
             return automaton, datawords, j2d
 
         elif args.format == "xmlrpc":
@@ -669,8 +669,8 @@ def main(args=None):
                 print(x2d.get_mutated_xml(i))
 
             return automaton, datawords, x2d
-            
-        elif args.format == "csv":               #copy this and make it for csv
+
+        elif args.format == "csv":  # copy this and make it for csv
 
             csv_path = args.csv_path
             automaton_path = args.automaton_path
@@ -679,7 +679,7 @@ def main(args=None):
             with open(automaton_path, "rb") as f:
                 automaton, cb = pickle.load(f)
 
-            c2d = CSVToDatawords(cb, csv_path)       #change to csv
+            c2d = CSVToDatawords(cb, csv_path)  # change to csv
             datawords = c2d.get_datawords()
 
             # Pass each dataword in the list in series into the automaton
@@ -694,10 +694,11 @@ def main(args=None):
             print("With registers: " + str(automaton.registers))
 
             for i in datawords:
-                print(c2d.get_mutated_csv(i))                       
+                print(c2d.get_mutated_csv(i))
 
             return automaton, datawords, c2d
-        
+
+
 in_preamble = None
 lexer = None
 parser = None

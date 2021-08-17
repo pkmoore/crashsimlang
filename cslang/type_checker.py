@@ -18,8 +18,6 @@ def check_no_output_on_not_dataword(ast):
                 raise CSlangError("Output expressions are not allowed on NOT datawords")
 
 
-# one of them this helper function
-# if one thing is called twice it is not top level
 def check_top_level_event(ast):
 
     top_level = {"Numeric": False, "String": False}

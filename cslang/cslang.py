@@ -35,6 +35,7 @@ tokens = [
     "STRING_LITERAL",
 ] + list(reserved.values())
 
+<<<<<<< HEAD
 literals = [
     ".",
     "{",
@@ -53,6 +54,9 @@ literals = [
     "[",
     "]",
 ]
+=======
+literals = [".", "{", "}", ":", "@", "/", "*", "-", "+", ";", ",", "(", ")", "|", '[', ']']
+>>>>>>> Repetition syntax with single dataword
 
 precedence = (
     ("left", "ASSIGNOP"),
@@ -166,6 +170,7 @@ def p_preamblestatement(p):
 
 
 def p_repetition(p):
+<<<<<<< HEAD
     """repetition : '[' datawordlist ']' NUM_LITERAL
     | '[' datawordlist ']' '*'"""
 
@@ -183,6 +188,13 @@ def p_datawordlist(p):
         p[0] = (p[1],) + p[3]
     else:
         p[0] = (p[1],)
+=======
+    """repetition : '[' dataword ';' ']'
+
+    """
+
+    p[0] = ('REPETITION', p[2])
+>>>>>>> Repetition syntax with single dataword
 
 
 def p_bodystatement(p):

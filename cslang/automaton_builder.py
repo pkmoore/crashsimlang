@@ -41,6 +41,7 @@ def process_root(ast_root):
             else:
                 iterations = int(i[2])
             handle_subautomaton(automaton, sub_automaton, iterations)
+            raise NotImplementedError("We hit a repitition")
         else:
             raise NotImplementedError("Not implemented node: {}".format(i[0]))
 

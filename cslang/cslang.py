@@ -35,7 +35,24 @@ tokens = [
     "STRING_LITERAL",
 ] + list(reserved.values())
 
-literals = [".", "{", "}", ":", "@", "/", "*", "-", "+", ";", ",", "(", ")", "|"]
+literals = [
+    ".",
+    "{",
+    "}",
+    ":",
+    "@",
+    "/",
+    "*",
+    "-",
+    "+",
+    ";",
+    ",",
+    "(",
+    ")",
+    "|",
+    "[",
+    "]",
+]
 
 precedence = (
     ("left", "ASSIGNOP"),
@@ -148,9 +165,30 @@ def p_preamblestatement(p):
     p[0] = p[1]
 
 
+def p_repetition(p):
+    """repetition : '[' datawordlist ']' NUM_LITERAL
+    | '[' datawordlist ']' '*'"""
+
+    if p[4] == "*":
+        p[0] = ("REPETITION", p[2], p[4])
+    else:
+        p[0] = ("REPETITION", p[2], p[4][1])
+
+
+def p_datawordlist(p):
+    """datawordlist : dataword ',' datawordlist
+    | dataword
+    """
+    if len(p) == 4:
+        p[0] = (p[1],) + p[3]
+    else:
+        p[0] = (p[1],)
+
+
 def p_bodystatement(p):
     """bodystatement : dataword ';'
     | registerassignment ';'
+    | repetition ';'
     """
     global in_preamble
     # If this is true, we have encountered our first body statement.
@@ -597,11 +635,17 @@ def main(args=None):
             else:
                 skip = 0
             s2d = StraceToDatawords(cb, syscall_definitions, strace_path, skip)
-            datawords = s2d.get_datawords()
+            automaton.events = s2d.get_datawords()
+
+            automaton.events_iter = iter(automaton.events)
 
             # Pass each dataword in the list in series into the automaton
-            for i in datawords:
-                automaton.match(i)
+            # HACK: we need events in automaton so we can hand off to subautomaton
+            try:
+                while True:
+                    automaton.match(next(automaton.events_iter))
+            except StopIteration:
+                pass
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore
@@ -610,10 +654,10 @@ def main(args=None):
             print("Automaton ended in state: " + str(automaton.current_state))
             print("With registers: " + str(automaton.registers))
 
-            for i in datawords:
+            for i in automaton.events:
                 print(s2d.get_mutated_strace(i))
 
-            return automaton, datawords, s2d
+            return automaton, automaton.events, s2d
 
         elif args.format == "jsonrpc":
 
@@ -625,11 +669,15 @@ def main(args=None):
                 automaton, cb = pickle.load(f)
 
             j2d = JSONToDatawords(cb, json_path)
-            datawords = j2d.get_datawords()
+            automaton.events = j2d.get_datawords()
+            automaton.events_iter = iter(automaton.events)
 
             # Pass each dataword in the list in series into the automaton
-            for i in datawords:
-                automaton.match(i)
+            try:
+                while True:
+                    automaton.match(next(automaton.events_iter))
+            except:
+                pass
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore
@@ -638,9 +686,9 @@ def main(args=None):
             print("Automaton ended in state: " + str(automaton.current_state))
             print("With registers: " + str(automaton.registers))
 
-            for i in datawords:
+            for i in automaton.events:
                 print(j2d.get_mutated_json(i))
-            return automaton, datawords, j2d
+            return automaton, automaton.events, j2d
 
         elif args.format == "xmlrpc":
 
@@ -652,11 +700,18 @@ def main(args=None):
                 automaton, cb = pickle.load(f)
 
             x2d = XMLToDatawords(cb, xml_path)
-            datawords = x2d.get_datawords()
+            automaton.events = x2d.get_datawords()
+
+            # HACK: second iterator tracking the list on the side
+            # for use by subautomata
+            automaton.events_iter = iter(automaton.events)
 
             # Pass each dataword in the list in series into the automaton
-            for i in datawords:
-                automaton.match(i)
+            try:
+                while True:
+                    automaton.match(next(automaton.events_iter))
+            except StopIteration:
+                pass
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore
@@ -665,10 +720,10 @@ def main(args=None):
             print("Automaton ended in state: " + str(automaton.current_state))
             print("With registers: " + str(automaton.registers))
 
-            for i in datawords:
+            for i in automaton.events:
                 print(x2d.get_mutated_xml(i))
 
-            return automaton, datawords, x2d
+            return automaton, automaton.events, x2d
 
         elif args.format == "csv":  # copy this and make it for csv
 

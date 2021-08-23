@@ -3,6 +3,7 @@ from builtins import str
 from .register_automaton import RegisterAutomaton
 from .register_automaton import State
 from .register_automaton import Transition
+from .register_automaton import SubautomatonTransition
 from .dataword import DataWord
 from .adt import ContainerBuilder
 from .cslang_error import CSlangError
@@ -24,6 +25,22 @@ def process_root(ast_root):
         elif i[0] == "DATAWORD":
             # HACK: "the rest of the stuff to build a dataword"
             handle_dataword(automaton, container_builder, i[1:])
+        elif i[0] == "REPETITION":
+            # Create a new blank automaton
+            sub_automaton = RegisterAutomaton()
+            for dw in i[1]:
+                if dw[0] != "DATAWORD":
+                    raise CSlangError(
+                        "Encountered non-dataword statement in repetition"
+                    )
+                # Create a new dataword, and apply it to our subautomaton
+                handle_dataword(sub_automaton, container_builder, dw[1:])
+            sub_automaton.states[-1].is_accepting = True
+            if i[2] == "*":
+                iterations = -1
+            else:
+                iterations = int(i[2])
+            handle_subautomaton(automaton, sub_automaton, iterations)
         else:
             raise NotImplementedError("Not implemented node: {}".format(i[0]))
 
@@ -38,6 +55,21 @@ def process_root(ast_root):
     else:
         automaton.states[-1].is_accepting = True
     return automaton, container_builder
+
+
+def handle_subautomaton(automaton, subautomaton, iterations):
+    # Give sub_automaton a reference to its parent
+    subautomaton.parent = automaton
+    automaton.subautomata.append(subautomaton)
+
+    # Create the state that we enter if we pass the repetition block
+    automaton.states.append(State("repetition_success"))
+    automaton.states[-2].transitions.append(
+        # Create transition from previous state to our new "repetition successful" state
+        SubautomatonTransition(
+            len(automaton.states) - 1, automaton.subautomata[-1], iterations
+        )
+    )
 
 
 def _find_first_non_NOT_state(automaton):

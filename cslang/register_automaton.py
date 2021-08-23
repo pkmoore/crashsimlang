@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from builtins import str
 from builtins import object
+from copy import deepcopy
+from copy import copy
 from . import adt
 
 
@@ -10,6 +12,10 @@ class RegisterAutomaton(object):
         self.states.append(State("startstate"))
         self.current_state = 0
         self.registers = {}
+        self.events = []
+        self.events_iter = None
+        self.parent = None
+        self.subautomata = []
 
     def __str__(self):
         tmp = ""
@@ -109,6 +115,81 @@ class State(object):
         return tmp
 
 
+class SubautomatonTransition(object):
+    def __init__(self, to_state, automaton, iterations=1):
+        self.to_state = to_state
+        self.automaton = automaton
+        self.iterations = iterations
+
+    def __str__(self):
+        tmp = ""
+        tmp += "Subautomaton: " + str(self.automaton)
+        tmp += "Iterations: " + str(self.iterations)
+        return tp
+
+    def match(self, incoming_dataword, registers):
+        # Load subautomaton's registers with current values from parent automaton
+        # These registers are updated throughout subautomaton iterations
+        # but only commited over the parent automaton's values if we end up in an accepting
+        # state after all iterations are complete.
+        self.automaton.registers = deepcopy(registers)
+
+        # Copy our parent's event list iterator so we can advance down the list without messing it up
+        self.automaton.events_iter = copy(self.automaton.parent.events_iter)
+
+        accepted_iterations = 0
+        i = 0
+        # Because we must match precisely, we know the exact number of
+        # events we must lookahead and examine.  This is used for populating
+        # tmpevents (the buffer of events to be examined) and to calculate
+        # how far to advance the parent's event iterator if the lookahead'd
+        # events put the subautomaton into an accepting state
+        # -2 because:
+        # first event in tmpevents has already been next()'d from the parent
+        # event iterator and passed in as incoming_dataword to maintain
+        # compatibility with a normal transition's match function
+        # first state in self.automaton is the starting state meaning
+        # an automaton always has numevents + 1 states in it.
+        num_lookahead_events = len(self.automaton.states) - 2
+
+        while self.iterations == -1 or i < self.iterations:
+            self.automaton.current_state = 0
+            # Get the next set of events to try
+            # The number of events we get equals the number of states the subautomaton has
+            # If we don't have enough events, then we automatically fail out of the subautomaton
+            tmpevents = [incoming_dataword]
+            try:
+                tmpevents += [
+                    next(self.automaton.events_iter)
+                    for _ in range(num_lookahead_events)
+                ]
+            except StopIteration:
+                break
+            for j in tmpevents:
+                self.automaton.match(j)
+            if self.automaton.is_accepting():
+                accepted_iterations += 1
+            else:
+                break
+            i += 1
+        # if we are in unbounded mode (i.e. self.iterations == -1) then
+        # we return successfully if we have any positive number of accepted
+        # iterations
+        if self.iterations == -1 and accepted_iterations > 0:
+            for i in range(accepted_iterations * num_lookahead_events):
+                print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
+            return self.to_state
+        # Otherwise if we are not in unbounded mode then we return
+        # successfully if we have the correct numnber of accepted iterations
+        # (i.e. accepted_iterations == self.iterations)
+        elif accepted_iterations == self.iterations:
+            for i in range(accepted_iterations * num_lookahead_events):
+                print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
+            return self.to_state
+        else:
+            return -1
+
+
 class Transition(object):
     def __init__(self, acceptable_names, to_state, operations=None, predicates=None):
         self.acceptable_names = acceptable_names
@@ -118,7 +199,7 @@ class Transition(object):
 
     def __str__(self):
         tmp = ""
-        tmp += "        acceptable_names: " + self.acceptable_names + "\n"
+        tmp += "        acceptable_names: " + str(self.acceptable_names) + "\n"
         tmp += "        operations: " + str() + "\n"
         tmp += "        to_state: " + str(self.to_state) + "\n"
         return tmp

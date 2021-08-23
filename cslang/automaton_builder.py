@@ -24,6 +24,8 @@ def process_root(ast_root):
         elif i[0] == "DATAWORD":
             # HACK: "the rest of the stuff to build a dataword"
             handle_dataword(automaton, container_builder, i[1:])
+        elif i[0] == "REPETITION":
+            raise NotImplementedError("We hit a repitition")
         else:
             raise NotImplementedError("Not implemented node: {}".format(i[0]))
 

@@ -35,7 +35,7 @@ tokens = [
     "STRING_LITERAL",
 ] + list(reserved.values())
 
-literals = [".", "{", "}", ":", "@", "/", "*", "-", "+", ";", ",", "(", ")", "|"]
+literals = [".", "{", "}", ":", "@", "/", "*", "-", "+", ";", ",", "(", ")", "|", '[', ']']
 
 precedence = (
     ("left", "ASSIGNOP"),
@@ -148,9 +148,18 @@ def p_preamblestatement(p):
     p[0] = p[1]
 
 
+def p_repetition(p):
+    """repetition : '[' dataword ';' ']'
+
+    """
+
+    p[0] = ('REPETITION', p[2])
+
+
 def p_bodystatement(p):
     """bodystatement : dataword ';'
     | registerassignment ';'
+    | repetition ';'
     """
     global in_preamble
     # If this is true, we have encountered our first body statement.

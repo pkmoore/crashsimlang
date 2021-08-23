@@ -1,0 +1,37 @@
+bodystatement : dataword ';'
+              | registerassignment ';'
+              | repetitionstatement ';'
+
+datawordlist : dataword ';' datawordlist
+             |  dataword
+
+repetitionstatement : '[' datawordlist ']'
+                    | '[' datawordlist ']' '*'
+                    | '[' datawordlist ']' '{' NUM_LITERAL '}'
+                    | '[' datawordlist ']' '{' num_exp '}' // Use register value
+                    to determine number of repetitions
+
+
+
+[ open({}); ];
+
+write({});
+
+[
+open({filename: !fn, filedesc: !fd});
+NOT read({filedesc: ?fd});
+close({retval: ->retval, filedesc: ?fd});
+];
+
+[
+open({filename: !fn, filedesc: !fd});
+NOT read({filedesc: ?fd});
+close({retval: ->retval, filedesc: ?fd});
+]*;
+
+[
+open({filename: !fn, filedesc: !fd});
+NOT read({filedesc: ?fd});
+close({retval: ->retval, filedesc: ?fd});
+]{5};
+

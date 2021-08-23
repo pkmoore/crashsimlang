@@ -1,0 +1,8 @@
+event statbuf {dev: String@0, stino: String@1, mode: String@2};
+event fstat {filedesc: Numeric@0, statstruct: statbuf@1};
+
+[
+fstat({statstruct: {dev: !finddev, stino: !findino}});
+];
+
+

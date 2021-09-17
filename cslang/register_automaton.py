@@ -1,15 +1,21 @@
 from __future__ import absolute_import
 from builtins import str
 from builtins import object
+from copy import deepcopy
+from copy import copy
 from . import adt
 
 
 class RegisterAutomaton(object):
+
     def __init__(self):
         self.states = []
         self.states.append(State("startstate"))
         self.current_state = 0
         self.registers = {}
+        self.events = []
+        self.events_iter = None
+        self.parent = None
 
     def __str__(self):
         tmp = ""
@@ -107,6 +113,47 @@ class State(object):
         for i in self.transitions:
             tmp += "      Transition:\n" + str(i) + "\n"
         return tmp
+
+
+class SubautomatonTransition(object):
+    def __init__(self, to_state, automaton, iterations=1)
+        self.automaton = automaton
+        self.iterations = iterations
+
+    def __str__(self):
+        tmp = ""
+        tmp += "Subautomaton: " + self.automaton
+        tmp += "Iterations: " + self.iterations
+
+
+    def match(self, incoming_datawords, registers):
+        # Load subautomaton's registers with current values from parent automaton
+        # These registers are updated throughout subautomaton iterations
+        # but only commited over the parent automaton's values if we end up in an accepting
+        # state after all iterations are complete.
+        self.automaton.registers = deepcopy(registers)
+
+        # Copy our parent's event list iterator so we can advance down the list without messing it up
+        self.automaton.event_iter = copy(parent.event_iter)
+
+        for i in interations:
+            self.automaton.current_state = 0
+
+            # Get the next set of events to try
+            # The number of events we get equals the number of states the subautomaton has
+            # If we don't have enough events, then we automatically fail out of the subautomaton
+            try:
+                tmpevents = [next(self.automaton.event_iter) for _ in range(len(self.automaton.states) - 1)]
+            except StopIteration:
+                return -1
+
+
+            for j in tmpevents:
+                automaton.match(j)
+        if self.automaton.is_accepting():
+            return self.to_state
+        else:
+            return -1
 
 
 class Transition(object):

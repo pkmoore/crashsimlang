@@ -7,6 +7,7 @@ from . import adt
 
 
 class RegisterAutomaton(object):
+
     def __init__(self):
         self.states = []
         self.states.append(State("startstate"))
@@ -15,7 +16,10 @@ class RegisterAutomaton(object):
         self.events = []
         self.events_iter = None
         self.parent = None
+<<<<<<< HEAD
         self.subautomata = []
+=======
+>>>>>>> Work in progress
 
     def __str__(self):
         tmp = ""
@@ -116,18 +120,30 @@ class State(object):
 
 
 class SubautomatonTransition(object):
+<<<<<<< HEAD
     def __init__(self, to_state, automaton, iterations=1):
         self.to_state = to_state
+=======
+    def __init__(self, to_state, automaton, iterations=1)
+>>>>>>> Work in progress
         self.automaton = automaton
         self.iterations = iterations
 
     def __str__(self):
         tmp = ""
+<<<<<<< HEAD
         tmp += "Subautomaton: " + str(self.automaton)
         tmp += "Iterations: " + str(self.iterations)
         return tp
 
     def match(self, incoming_dataword, registers):
+=======
+        tmp += "Subautomaton: " + self.automaton
+        tmp += "Iterations: " + self.iterations
+
+
+    def match(self, incoming_datawords, registers):
+>>>>>>> Work in progress
         # Load subautomaton's registers with current values from parent automaton
         # These registers are updated throughout subautomaton iterations
         # but only commited over the parent automaton's values if we end up in an accepting
@@ -135,6 +151,7 @@ class SubautomatonTransition(object):
         self.automaton.registers = deepcopy(registers)
 
         # Copy our parent's event list iterator so we can advance down the list without messing it up
+<<<<<<< HEAD
         self.automaton.events_iter = copy(self.automaton.parent.events_iter)
 
         accepted_iterations = 0
@@ -185,6 +202,25 @@ class SubautomatonTransition(object):
         elif accepted_iterations == self.iterations:
             for i in range(accepted_iterations * num_lookahead_events):
                 print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
+=======
+        self.automaton.event_iter = copy(parent.event_iter)
+
+        for i in interations:
+            self.automaton.current_state = 0
+
+            # Get the next set of events to try
+            # The number of events we get equals the number of states the subautomaton has
+            # If we don't have enough events, then we automatically fail out of the subautomaton
+            try:
+                tmpevents = [next(self.automaton.event_iter) for _ in range(len(self.automaton.states) - 1)]
+            except StopIteration:
+                return -1
+
+
+            for j in tmpevents:
+                automaton.match(j)
+        if self.automaton.is_accepting():
+>>>>>>> Work in progress
             return self.to_state
         else:
             return -1

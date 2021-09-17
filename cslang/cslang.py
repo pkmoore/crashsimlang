@@ -35,28 +35,7 @@ tokens = [
     "STRING_LITERAL",
 ] + list(reserved.values())
 
-<<<<<<< HEAD
-literals = [
-    ".",
-    "{",
-    "}",
-    ":",
-    "@",
-    "/",
-    "*",
-    "-",
-    "+",
-    ";",
-    ",",
-    "(",
-    ")",
-    "|",
-    "[",
-    "]",
-]
-=======
 literals = [".", "{", "}", ":", "@", "/", "*", "-", "+", ";", ",", "(", ")", "|", '[', ']']
->>>>>>> Repetition syntax with single dataword
 
 precedence = (
     ("left", "ASSIGNOP"),
@@ -171,6 +150,7 @@ def p_preamblestatement(p):
 
 def p_repetition(p):
 <<<<<<< HEAD
+<<<<<<< HEAD
     """repetition : '[' datawordlist ']' NUM_LITERAL
     | '[' datawordlist ']' '*'"""
 
@@ -190,11 +170,23 @@ def p_datawordlist(p):
         p[0] = (p[1],)
 =======
     """repetition : '[' dataword ';' ']'
+=======
+    """repetition : '[' datawordlist ']'
+>>>>>>> Work in progress
 
     """
 
     p[0] = ('REPETITION', p[2])
 >>>>>>> Repetition syntax with single dataword
+
+def p_datawordlist(p):
+    """datawordlist : dataword ',' datawordlist
+    | dataword
+    """
+    if len(p) == 4:
+        p[0] = (p[1],) + p[3]
+    else:
+        p[0] = (p[1],)
 
 
 def p_bodystatement(p):
@@ -653,11 +645,17 @@ def main(args=None):
 
             # Pass each dataword in the list in series into the automaton
             # HACK: we need events in automaton so we can hand off to subautomaton
+<<<<<<< HEAD
             try:
                 while True:
                     automaton.match(next(automaton.events_iter))
             except StopIteration:
                 pass
+=======
+            for i in automaton.events:
+                automaton.match(i)
+                next(automaton.events_iter)
+>>>>>>> Work in progress
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore
@@ -685,11 +683,17 @@ def main(args=None):
             automaton.events_iter = iter(automaton.events)
 
             # Pass each dataword in the list in series into the automaton
+<<<<<<< HEAD
             try:
                 while True:
                     automaton.match(next(automaton.events_iter))
             except:
                 pass
+=======
+            for i in automaton.events:
+                automaton.match(i)
+                next(automaton.events_iter)
+>>>>>>> Work in progress
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore
@@ -719,11 +723,17 @@ def main(args=None):
             automaton.events_iter = iter(automaton.events)
 
             # Pass each dataword in the list in series into the automaton
+<<<<<<< HEAD
             try:
                 while True:
                     automaton.match(next(automaton.events_iter))
             except StopIteration:
                 pass
+=======
+            for i in automaton.events:
+                automaton.match(i)
+                next(automaton.events_iter)
+>>>>>>> Work in progress
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore

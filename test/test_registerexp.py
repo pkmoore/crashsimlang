@@ -2,8 +2,8 @@ from builtins import str
 import os
 import unittest
 from argparse import Namespace
-from cslang.cslang import main as cslang_main
-from cslang.cslang_error import CSlangError
+from port.port import main as port_main
+from port.port_error import PORTError
 
 
 def get_test_data_path(filename):
@@ -13,19 +13,17 @@ def get_test_data_path(filename):
 
 class TestRegisterExpressions(unittest.TestCase):
     def test_assign(self):
-        cslang_main(
-            Namespace(
-                mode="build", cslang_path=get_test_data_path("registerassign.cslang")
-            )
+        port_main(
+            Namespace(mode="build", port_path=get_test_data_path("registerassign.port"))
         )
 
-        automaton, datawords_after, _ = cslang_main(
+        automaton, datawords_after, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registerassign.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("registerassign.auto"),
             )
@@ -36,20 +34,18 @@ class TestRegisterExpressions(unittest.TestCase):
         assert automaton.registers["assignids"] == "worked"
 
     def test_concat(self):
-        test_file = get_test_data_path("registerconcat.cslang")
-        cslang_main(
-            Namespace(
-                mode="build", cslang_path=get_test_data_path("registerconcat.cslang")
-            )
+        test_file = get_test_data_path("registerconcat.port")
+        port_main(
+            Namespace(mode="build", port_path=get_test_data_path("registerconcat.port"))
         )
 
-        automaton, datawords_after, _ = cslang_main(
+        automaton, datawords_after, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registerconcat.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("registerconcat.auto"),
             )
@@ -60,30 +56,28 @@ class TestRegisterExpressions(unittest.TestCase):
         assert automaton.registers["regreg"] == "helhel"
 
     def test_badadd(self):
-        with self.assertRaises(CSlangError) as cm:
-            cslang_main(
+        with self.assertRaises(PORTError) as cm:
+            port_main(
                 Namespace(
                     mode="build",
-                    cslang_path=get_test_data_path("register_badadd.cslang"),
+                    port_path=get_test_data_path("register_badadd.port"),
                 )
             )
 
         assert "Type mismatch between registers" in str(cm.exception)
 
     def test_add(self):
-        cslang_main(
-            Namespace(
-                mode="build", cslang_path=get_test_data_path("registeradd.cslang")
-            )
+        port_main(
+            Namespace(mode="build", port_path=get_test_data_path("registeradd.port"))
         )
 
-        automaton, datawords_after, _ = cslang_main(
+        automaton, datawords_after, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registeradd.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("registeradd.auto"),
             )
@@ -104,19 +98,17 @@ class TestRegisterExpressions(unittest.TestCase):
         assert automaton.registers["nregreg"] == -3
 
     def test_subtract(self):
-        cslang_main(
-            Namespace(
-                mode="build", cslang_path=get_test_data_path("registersub.cslang")
-            )
+        port_main(
+            Namespace(mode="build", port_path=get_test_data_path("registersub.port"))
         )
 
-        automaton, datawords_after, _ = cslang_main(
+        automaton, datawords_after, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registersub.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("registersub.auto"),
             )
@@ -137,19 +129,17 @@ class TestRegisterExpressions(unittest.TestCase):
         assert automaton.registers["nregreg"] == 0
 
     def test_multiply(self):
-        cslang_main(
-            Namespace(
-                mode="build", cslang_path=get_test_data_path("registermul.cslang")
-            )
+        port_main(
+            Namespace(mode="build", port_path=get_test_data_path("registermul.port"))
         )
 
-        automaton, datawords_after, _ = cslang_main(
+        automaton, datawords_after, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registermul.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("registermul.auto"),
             )
@@ -170,20 +160,18 @@ class TestRegisterExpressions(unittest.TestCase):
         assert automaton.registers["nregreg"] == 1
 
     def test_divide(self):
-        test_file = get_test_data_path("registerdiv.cslang")
-        cslang_main(
-            Namespace(
-                mode="build", cslang_path=get_test_data_path("registerdiv.cslang")
-            )
+        test_file = get_test_data_path("registerdiv.port")
+        port_main(
+            Namespace(mode="build", port_path=get_test_data_path("registerdiv.port"))
         )
 
-        automaton, datawords_after, _ = cslang_main(
+        automaton, datawords_after, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registerdiv.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("registerdiv.auto"),
             )

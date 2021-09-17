@@ -1,7 +1,7 @@
 from builtins import object
 import os
 from argparse import Namespace
-from cslang.cslang import main as cslang_main
+from port.port import main as port_main
 
 
 def get_test_data_path(filename):
@@ -11,13 +11,11 @@ def get_test_data_path(filename):
 
 class TestOutputs(object):
     def test_outputs(self):
-        syscall_definitions = get_test_data_path("../cslang/syscall_definitions.pickle")
+        syscall_definitions = get_test_data_path("../port/syscall_definitions.pickle")
         automaton_path = get_test_data_path("outputs.auto")
-        cslang_main(
-            Namespace(mode="build", cslang_path=get_test_data_path("outputs.cslang"))
-        )
+        port_main(Namespace(mode="build", port_path=get_test_data_path("outputs.port")))
 
-        automaton, datawords_after, s2d = cslang_main(
+        automaton, datawords_after, s2d = port_main(
             Namespace(
                 mode="run",
                 format="strace",

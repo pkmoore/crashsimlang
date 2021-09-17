@@ -2,8 +2,8 @@ from builtins import str
 import os
 import unittest
 from argparse import Namespace
-from cslang.cslang import main as cslang_main
-from cslang.cslang_error import CSlangError
+from port.port import main as port_main
+from port.port_error import PORTError
 
 
 def get_test_data_path(filename):
@@ -13,18 +13,18 @@ def get_test_data_path(filename):
 
 class TestDefine(unittest.TestCase):
     def test_define(self):
-        test_file = get_test_data_path("define.cslang")
-        automaton, containerbuilder = cslang_main(
-            Namespace(mode="build", cslang_path=get_test_data_path("define.cslang"))
+        test_file = get_test_data_path("define.port")
+        automaton, containerbuilder = port_main(
+            Namespace(mode="build", port_path=get_test_data_path("define.port"))
         )
 
-        automaton, datawords, _ = cslang_main(
+        automaton, datawords, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("define.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("define.auto"),
             )
@@ -44,21 +44,19 @@ class TestDefine(unittest.TestCase):
         assert "402" in container["members"][1]["members"][1]["members"][0]
 
     def test_definedup(self):
-        with self.assertRaises(CSlangError) as cm:
-            cslang_main(
-                Namespace(
-                    mode="build", cslang_path=get_test_data_path("define_dup.cslang")
-                )
+        with self.assertRaises(PORTError) as cm:
+            port_main(
+                Namespace(mode="build", port_path=get_test_data_path("define_dup.port"))
             )
 
         assert "Illegal type redefinition" in str(cm.exception)
 
     def test_definenonexistant(self):
-        with self.assertRaises(CSlangError) as cm:
-            cslang_main(
+        with self.assertRaises(PORTError) as cm:
+            port_main(
                 Namespace(
                     mode="build",
-                    cslang_path=get_test_data_path("define_nonexistant.cslang"),
+                    port_path=get_test_data_path("define_nonexistant.port"),
                 )
             )
 

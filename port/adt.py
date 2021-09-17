@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import range
 from builtins import object
-from .cslang_error import CSlangError
+from .port_error import PORTError
 import pprint
 
 
@@ -32,7 +32,7 @@ def write_nested_member_for_path(container, path, value):
     elif current_argument["type"] == "String":
         current_argument["members"][0] = str(value)
     else:
-        raise CSlangError(
+        raise PORTError(
             "Bad type found ({}) when writing value {}".format(
                 current_argument["type"], value
             )
@@ -43,7 +43,7 @@ def _get_member_for_name(current_argument, name):
     for i in current_argument:
         if i["arg_name"] == name:
             return i
-    raise CSlangError("Couldn't find member with name {}".format(name))
+    raise PORTError("Couldn't find member with name {}".format(name))
 
 
 class ContainerBuilder(object):
@@ -66,7 +66,7 @@ class ContainerBuilder(object):
 
     def define_variant(self, variant_name, variant_definition):
         if variant_name in self.variants:
-            raise CSlangError(
+            raise PORTError(
                 "Illegal variant redefinition for variant: {}".format(variant_name)
             )
         self.variants[variant_name] = []
@@ -76,7 +76,7 @@ class ContainerBuilder(object):
     def define_type(self, container_type, types):
         # It is an error for us to already have a builder for the type we're defining
         if container_type in self.builders:
-            raise CSlangError(
+            raise PORTError(
                 "Illegal type redefinition for type: {}".format(container_type)
             )
 
@@ -85,9 +85,7 @@ class ContainerBuilder(object):
         # It is an error for types list to contain a type that has not been defined
         for t in member_types:
             if t not in self.builders:
-                raise CSlangError(
-                    "Type definition contains undefined type: {}".format(t)
-                )
+                raise PORTError("Type definition contains undefined type: {}".format(t))
 
         # Newly created types are considered top_level until used as a member type
         self.top_level[container_type] = True

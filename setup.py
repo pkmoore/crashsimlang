@@ -3,19 +3,19 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name = "cslang",
+    name = "port",                
     version = "0.0.1",
     author = "Preston Moore",
     author_email = "pkm266@nyu.edu",
-    description = ("Compile and run cslang automata"),
+    description = ("Compile and run port automata"),
     url = "https://github.com/pkmoore/crashsimlang",
     install_requires = ["setuptools",
                         "ply",
                         "dill",
                         "lxml",
                         "posix-omni-parser @ git+https://github.com/pkmoore/posix-omni-parser"],
-    packages=['cslang'],
+    packages=['port'],
     entry_points = {
-      "console_scripts": ['cslang = cslang.cslang:main']
+      "console_scripts": ['port = port.port:main']                     
     }
 )

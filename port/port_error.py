@@ -1,0 +1,2 @@
+class PORTError(Exception):
+    pass

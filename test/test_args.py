@@ -1,8 +1,8 @@
 import os
 import unittest
 from argparse import Namespace
-from cslang.cslang import main as cslang_main
-from cslang.cslang_error import CSlangError
+from port.port import main as port_main
+from port.port_error import PORTError
 
 
 def get_test_data_path(filename):
@@ -12,11 +12,11 @@ def get_test_data_path(filename):
 
 class TestArgs(unittest.TestCase):
     def test_exception_on_both_c_and_s(self):
-        with self.assertRaises(CSlangError) as cm:
-            ast = cslang_main(
+        with self.assertRaises(PORTError) as cm:
+            ast = port_main(
                 Namespace(
                     mode="parse",
-                    cslang_file="test/bad.cslang",
+                    port_file="test/bad.port",
                     check=True,
                     string="""
 event read {filedesc: Numeric@0};
@@ -27,17 +27,15 @@ NOT read({}) -> read({filedesc: ->bad});
             )
 
     def test_skip(self):
-        cslang_main(
-            Namespace(mode="build", cslang_path=get_test_data_path("open.cslang"))
-        )
-        automaton, datawords_after, _ = cslang_main(
+        port_main(Namespace(mode="build", port_path=get_test_data_path("open.port")))
+        automaton, datawords_after, _ = port_main(
             Namespace(
                 mode="run",
                 format="strace",
                 skip=2,
                 strace_path=get_test_data_path("openclose.strace"),
                 syscall_definitions=get_test_data_path(
-                    "../cslang/syscall_definitions.pickle"
+                    "../port/syscall_definitions.pickle"
                 ),
                 automaton_path=get_test_data_path("open.auto"),
             )

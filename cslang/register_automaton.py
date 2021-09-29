@@ -127,7 +127,7 @@ class SubautomatonTransition(object):
         tmp += "Iterations: " + str(self.iterations)
         return tp
 
-    def match(self, incoming_datawords, registers):
+    def match(self, incoming_dataword, registers):
         # Load subautomaton's registers with current values from parent automaton
         # These registers are updated throughout subautomaton iterations
         # but only commited over the parent automaton's values if we end up in an accepting
@@ -138,27 +138,40 @@ class SubautomatonTransition(object):
         self.automaton.events_iter = copy(self.automaton.parent.events_iter)
 
         accepted_iterations = 0
-        for i in range(self.iterations):
+        i = 0
+        while self.iterations == -1 or i < self.iterations:
             self.automaton.current_state = 0
-
             # Get the next set of events to try
             # The number of events we get equals the number of states the subautomaton has
             # If we don't have enough events, then we automatically fail out of the subautomaton
+            tmpevents = [incoming_dataword]
             try:
-                tmpevents = [
+                tmpevents += [
                     next(self.automaton.events_iter)
-                    for _ in range(len(self.automaton.states) - 1)
+                    for _ in range(len(self.automaton.states) - 2)
                 ]
             except StopIteration:
-                return -1
-
+                break
             for j in tmpevents:
                 self.automaton.match(j)
             if self.automaton.is_accepting():
                 accepted_iterations += 1
             else:
                 break
-        if accepted_iterations == self.iterations:
+            i += 1
+        # if we are in unbounded mode (i.e. self.iterations == -1) then
+        # we return successfully if we have any positive number of accepted
+        # iterations
+        if self.iterations == -1 and accepted_iterations > 0:
+            for i in range(accepted_iterations * (len(self.automaton.states) - 2)):
+                print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
+            return self.to_state
+        # Otherwise if we are not in unbounded mode then we return
+        # successfully if we have the correct numnber of accepted iterations
+        # (i.e. accepted_iterations == self.iterations)
+        elif accepted_iterations == self.iterations:
+            for i in range(accepted_iterations * (len(self.automaton.states) - 2)):
+                print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
             return self.to_state
         else:
             return -1

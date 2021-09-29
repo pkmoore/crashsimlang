@@ -167,9 +167,12 @@ def p_preamblestatement(p):
 
 def p_repetition(p):
     """repetition : '[' datawordlist ']' NUM_LITERAL
-                  | '[' datawordlist ']' '*'"""
+    | '[' datawordlist ']' '*'"""
 
-    p[0] = ("REPETITION", p[2], p[4][1])
+    if p[4] == "*":
+        p[0] = ("REPETITION", p[2], p[4])
+    else:
+        p[0] = ("REPETITION", p[2], p[4][1])
 
 
 def p_datawordlist(p):
@@ -638,9 +641,11 @@ def main(args=None):
 
             # Pass each dataword in the list in series into the automaton
             # HACK: we need events in automaton so we can hand off to subautomaton
-            for i in automaton.events:
-                automaton.match(i)
-                next(automaton.events_iter)
+            try:
+                while True:
+                    automaton.match(next(automaton.events_iter))
+            except StopIteration:
+                pass
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore
@@ -668,9 +673,11 @@ def main(args=None):
             automaton.events_iter = iter(automaton.events)
 
             # Pass each dataword in the list in series into the automaton
-            for i in automaton.events:
-                automaton.match(i)
-                next(automaton.events_iter)
+            try:
+                while True:
+                    automaton.match(next(automaton.events_iter))
+            except:
+                pass
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore
@@ -700,9 +707,11 @@ def main(args=None):
             automaton.events_iter = iter(automaton.events)
 
             # Pass each dataword in the list in series into the automaton
-            for i in automaton.events:
-                automaton.match(i)
-                next(automaton.events_iter)
+            try:
+                while True:
+                    automaton.match(next(automaton.events_iter))
+            except StopIteration:
+                pass
 
             # At the end of everything we have a transformed set of datawords.
             # We either use them if we ended in an accepting state or drop ignore

@@ -36,7 +36,11 @@ def process_root(ast_root):
                 # Create a new dataword, and apply it to our subautomaton
                 handle_dataword(sub_automaton, container_builder, dw[1:])
             sub_automaton.states[-1].is_accepting = True
-            handle_subautomaton(automaton, sub_automaton)
+            if i[2] == "*":
+                iterations = -1
+            else:
+                iterations = int(i[2])
+            handle_subautomaton(automaton, sub_automaton, iterations)
         else:
             raise NotImplementedError("Not implemented node: {}".format(i[0]))
 
@@ -53,7 +57,7 @@ def process_root(ast_root):
     return automaton, container_builder
 
 
-def handle_subautomaton(automaton, subautomaton):
+def handle_subautomaton(automaton, subautomaton, iterations):
     # Give sub_automaton a reference to its parent
     subautomaton.parent = automaton
     automaton.subautomata.append(subautomaton)
@@ -62,8 +66,9 @@ def handle_subautomaton(automaton, subautomaton):
     automaton.states.append(State("repetition_success"))
     automaton.states[-2].transitions.append(
         # Create transition from previous state to our new "repetition successful" state
-        # HACK: last param is iterations hard coded to 1
-        SubautomatonTransition(len(automaton.states) - 1, automaton.subautomata[-1], 1)
+        SubautomatonTransition(len(automaton.states) - 1,
+            automaton.subautomata[-1],
+            iterations)
     )
 
 

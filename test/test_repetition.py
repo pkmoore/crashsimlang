@@ -14,7 +14,21 @@ def get_test_data_path(filename):
 class TestRepetition(unittest.TestCase):
     def test_single(self):
         test_file = get_test_data_path("repetition.cslang")
-        with self.assertRaises(NotImplementedError):
-            automaton, containerbuilder = cslang_main(
-                Namespace(mode="build", cslang_path=get_test_data_path("repetition.cslang"))
+        automaton, containerbuilder = cslang_main(
+            Namespace(mode="build", cslang_path=get_test_data_path("repetition.cslang"))
+        )
+        assert len(automaton.states) == 2
+        assert len(automaton.subautomata) == 1
+        automaton, datawords, _ = cslang_main(
+            Namespace(
+                mode="run",
+                format="strace",
+                strace_path=get_test_data_path("repetition.strace"),
+                syscall_definitions=get_test_data_path(
+                    "../cslang/syscall_definitions.pickle"
+                ),
+                automaton_path=get_test_data_path("repetition.auto"),
             )
+        )
+
+        assert automaton.current_state == 1

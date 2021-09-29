@@ -35,7 +35,24 @@ tokens = [
     "STRING_LITERAL",
 ] + list(reserved.values())
 
-literals = [".", "{", "}", ":", "@", "/", "*", "-", "+", ";", ",", "(", ")", "|", '[', ']']
+literals = [
+    ".",
+    "{",
+    "}",
+    ":",
+    "@",
+    "/",
+    "*",
+    "-",
+    "+",
+    ";",
+    ",",
+    "(",
+    ")",
+    "|",
+    "[",
+    "]",
+]
 
 precedence = (
     ("left", "ASSIGNOP"),
@@ -149,11 +166,10 @@ def p_preamblestatement(p):
 
 
 def p_repetition(p):
-    """repetition : '[' datawordlist ']'
+    """repetition : '[' datawordlist ']'"""
 
-    """
+    p[0] = ("REPETITION", p[2])
 
-    p[0] = ('REPETITION', p[2])
 
 def p_datawordlist(p):
     """datawordlist : dataword ',' datawordlist
@@ -632,10 +648,10 @@ def main(args=None):
             print("Automaton ended in state: " + str(automaton.current_state))
             print("With registers: " + str(automaton.registers))
 
-            for i in datawords:
+            for i in automaton.events:
                 print(s2d.get_mutated_strace(i))
 
-            return automaton, datawords, s2d
+            return automaton, automaton.events, s2d
 
         elif args.format == "jsonrpc":
 
@@ -662,9 +678,9 @@ def main(args=None):
             print("Automaton ended in state: " + str(automaton.current_state))
             print("With registers: " + str(automaton.registers))
 
-            for i in datawords:
+            for i in automaton.events:
                 print(j2d.get_mutated_json(i))
-            return automaton, datawords, j2d
+            return automaton, automaton.events, j2d
 
         elif args.format == "xmlrpc":
 
@@ -694,10 +710,10 @@ def main(args=None):
             print("Automaton ended in state: " + str(automaton.current_state))
             print("With registers: " + str(automaton.registers))
 
-            for i in datawords:
+            for i in automaton.events:
                 print(x2d.get_mutated_xml(i))
 
-            return automaton, datawords, x2d
+            return automaton, automaton.events, x2d
 
         elif args.format == "csv":  # copy this and make it for csv
 

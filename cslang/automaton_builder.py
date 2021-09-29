@@ -30,9 +30,12 @@ def process_root(ast_root):
             sub_automaton = RegisterAutomaton()
             for dw in i[1]:
                 if dw[0] != "DATAWORD":
-                    raise CSlangError("Encountered non-dataword statement in repetition")
+                    raise CSlangError(
+                        "Encountered non-dataword statement in repetition"
+                    )
                 # Create a new dataword, and apply it to our subautomaton
                 handle_dataword(sub_automaton, container_builder, dw[1:])
+            sub_automaton.states[-1].is_accepting = True
             handle_subautomaton(automaton, sub_automaton)
         else:
             raise NotImplementedError("Not implemented node: {}".format(i[0]))
@@ -52,24 +55,20 @@ def process_root(ast_root):
 
 def handle_subautomaton(automaton, subautomaton):
     # Give sub_automaton a reference to its parent
-    sub_automaton.parent = automaton
+    subautomaton.parent = automaton
+    automaton.subautomata.append(subautomaton)
 
     # Create the state that we enter if we pass the repetition block
     automaton.states.append(State("repetition_success"))
     automaton.states[-2].transitions.append(
-<<<<<<< HEAD
-        # Create transition from previous state to our new "repetition successful" state
-        SubautomatonTransition(
-            len(automaton.states) - 1, automaton.subautomata[-1], iterations
-        )
-    )
-=======
+
             # Create transition from previous state to our new "repetition successful" state
             # HACK: last param is iterations hard coded to 1
             SubautomatonTransition(len(automaton.states) - 1,
                                    subautomaton,
                                    1)
->>>>>>> Work in progress
+    )
+
 
 
 def _find_first_non_NOT_state(automaton):
@@ -237,7 +236,3 @@ def handle_dataword(automaton, container_builder, params):
                 predicates=predicates,
             )
         )
-
-
-def handle_sub_automaton(automaton, sub_automaton):
-

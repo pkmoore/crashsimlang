@@ -17,8 +17,8 @@ class TestRepetition(unittest.TestCase):
         automaton, containerbuilder = cslang_main(
             Namespace(mode="build", cslang_path=get_test_data_path("repetition.cslang"))
         )
-        assert len(automaton.states) == 3
-        assert len(automaton.subautomata) == 2
+        assert len(automaton.states) == 2
+        assert len(automaton.subautomata) == 1
         automaton, datawords, _ = cslang_main(
             Namespace(
                 mode="run",
@@ -31,5 +31,4 @@ class TestRepetition(unittest.TestCase):
             )
         )
 
-        assert automaton.current_state == 2
-        assert automaton.is_accepting()
+        assert automaton.current_state == 1

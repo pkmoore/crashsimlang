@@ -7,7 +7,6 @@ from . import adt
 
 
 class RegisterAutomaton(object):
-
     def __init__(self):
         self.states = []
         self.states.append(State("startstate"))
@@ -17,9 +16,13 @@ class RegisterAutomaton(object):
         self.events_iter = None
         self.parent = None
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.subautomata = []
 =======
 >>>>>>> Work in progress
+=======
+        self.subautomata = []
+>>>>>>> Bounded repetition works
 
     def __str__(self):
         tmp = ""
@@ -121,16 +124,22 @@ class State(object):
 
 class SubautomatonTransition(object):
 <<<<<<< HEAD
+<<<<<<< HEAD
     def __init__(self, to_state, automaton, iterations=1):
         self.to_state = to_state
 =======
     def __init__(self, to_state, automaton, iterations=1)
 >>>>>>> Work in progress
+=======
+    def __init__(self, to_state, automaton, iterations=1):
+        self.to_state = to_state
+>>>>>>> Bounded repetition works
         self.automaton = automaton
         self.iterations = iterations
 
     def __str__(self):
         tmp = ""
+<<<<<<< HEAD
 <<<<<<< HEAD
         tmp += "Subautomaton: " + str(self.automaton)
         tmp += "Iterations: " + str(self.iterations)
@@ -141,6 +150,11 @@ class SubautomatonTransition(object):
         tmp += "Subautomaton: " + self.automaton
         tmp += "Iterations: " + self.iterations
 
+=======
+        tmp += "Subautomaton: " + str(self.automaton)
+        tmp += "Iterations: " + str(self.iterations)
+        return tp
+>>>>>>> Bounded repetition works
 
     def match(self, incoming_datawords, registers):
 >>>>>>> Work in progress
@@ -151,6 +165,7 @@ class SubautomatonTransition(object):
         self.automaton.registers = deepcopy(registers)
 
         # Copy our parent's event list iterator so we can advance down the list without messing it up
+<<<<<<< HEAD
 <<<<<<< HEAD
         self.automaton.events_iter = copy(self.automaton.parent.events_iter)
 
@@ -204,21 +219,26 @@ class SubautomatonTransition(object):
                 print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
 =======
         self.automaton.event_iter = copy(parent.event_iter)
+=======
+        self.automaton.events_iter = copy(self.automaton.parent.events_iter)
+>>>>>>> Bounded repetition works
 
-        for i in interations:
+        for i in range(self.iterations):
             self.automaton.current_state = 0
 
             # Get the next set of events to try
             # The number of events we get equals the number of states the subautomaton has
             # If we don't have enough events, then we automatically fail out of the subautomaton
             try:
-                tmpevents = [next(self.automaton.event_iter) for _ in range(len(self.automaton.states) - 1)]
+                tmpevents = [
+                    next(self.automaton.events_iter)
+                    for _ in range(len(self.automaton.states) - 1)
+                ]
             except StopIteration:
                 return -1
 
-
             for j in tmpevents:
-                automaton.match(j)
+                self.automaton.match(j)
         if self.automaton.is_accepting():
 >>>>>>> Work in progress
             return self.to_state

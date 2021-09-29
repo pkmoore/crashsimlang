@@ -128,8 +128,7 @@ class SubautomatonTransition(object):
         tmp += "Iterations: " + str(self.iterations)
         return tp
 
-
-    def match(self, incoming_datawords, registers):
+    def match(self, incoming_dataword, registers):
         # Load subautomaton's registers with current values from parent automaton
         # These registers are updated throughout subautomaton iterations
         # but only commited over the parent automaton's values if we end up in an accepting
@@ -141,19 +140,6 @@ class SubautomatonTransition(object):
 
         accepted_iterations = 0
         i = 0
-        # Because we must match precisely, we know the exact number of
-        # events we must lookahead and examine.  This is used for populating
-        # tmpevents (the buffer of events to be examined) and to calculate
-        # how far to advance the parent's event iterator if the lookahead'd
-        # events put the subautomaton into an accepting state
-        # -2 because:
-        # first event in tmpevents has already been next()'d from the parent
-        # event iterator and passed in as incoming_dataword to maintain
-        # compatibility with a normal transition's match function
-        # first state in self.automaton is the starting state meaning
-        # an automaton always has numevents + 1 states in it.
-        num_lookahead_events = len(self.automaton.states) - 2
-
         while self.iterations == -1 or i < self.iterations:
             self.automaton.current_state = 0
             # Get the next set of events to try
@@ -163,7 +149,7 @@ class SubautomatonTransition(object):
             try:
                 tmpevents += [
                     next(self.automaton.events_iter)
-                    for _ in range(num_lookahead_events)
+                    for _ in range(len(self.automaton.states) - 2)
                 ]
             except StopIteration:
                 break
@@ -178,37 +164,15 @@ class SubautomatonTransition(object):
         # we return successfully if we have any positive number of accepted
         # iterations
         if self.iterations == -1 and accepted_iterations > 0:
-            for i in range(accepted_iterations * num_lookahead_events):
+            for i in range(accepted_iterations * (len(self.automaton.states) - 2)):
                 print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
             return self.to_state
         # Otherwise if we are not in unbounded mode then we return
         # successfully if we have the correct numnber of accepted iterations
         # (i.e. accepted_iterations == self.iterations)
         elif accepted_iterations == self.iterations:
-            for i in range(accepted_iterations * num_lookahead_events):
+            for i in range(accepted_iterations * (len(self.automaton.states) - 2)):
                 print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
-
-        accepted_iterations = 0
-        for i in range(self.iterations):
-            self.automaton.current_state = 0
-
-            # Get the next set of events to try
-            # The number of events we get equals the number of states the subautomaton has
-            # If we don't have enough events, then we automatically fail out of the subautomaton
-            try:
-                tmpevents = [
-                    next(self.automaton.events_iter)
-                    for _ in range(len(self.automaton.states) - 1)
-                ]
-            except StopIteration:
-                return -1
-            for j in tmpevents:
-                self.automaton.match(j)
-            if self.automaton.is_accepting():
-                accepted_iterations += 1
-            else:
-                break
-        if accepted_iterations == self.iterations:
             return self.to_state
         else:
             return -1

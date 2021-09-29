@@ -166,9 +166,10 @@ def p_preamblestatement(p):
 
 
 def p_repetition(p):
-    """repetition : '[' datawordlist ']'"""
+    """repetition : '[' datawordlist ']' NUM_LITERAL
+                  | '[' datawordlist ']' '*'"""
 
-    p[0] = ("REPETITION", p[2])
+    p[0] = ("REPETITION", p[2], p[4][1])
 
 
 def p_datawordlist(p):

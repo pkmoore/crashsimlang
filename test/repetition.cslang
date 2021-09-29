@@ -6,7 +6,7 @@ event open {filename: String@0};
 fstat({statstruct: {dev: !finddev, stino: !findino}}),
 fstat({statstruct: {dev: !finddev, stino: !findino}}),
 fstat({statstruct: {dev: !finddev, stino: !findino}})
-];
+] 1;
 
 
 [

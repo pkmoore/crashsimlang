@@ -166,9 +166,6 @@ def p_preamblestatement(p):
 
 
 def p_repetition(p):
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     """repetition : '[' datawordlist ']' NUM_LITERAL
     | '[' datawordlist ']' '*'"""
 
@@ -177,31 +174,6 @@ def p_repetition(p):
     else:
         p[0] = ("REPETITION", p[2], p[4][1])
 
-
-def p_datawordlist(p):
-    """datawordlist : dataword ',' datawordlist
-    | dataword
-    """
-    if len(p) == 4:
-        p[0] = (p[1],) + p[3]
-    else:
-        p[0] = (p[1],)
-=======
-    """repetition : '[' dataword ';' ']'
-=======
-    """repetition : '[' datawordlist ']'
->>>>>>> Work in progress
-=======
-    """repetition : '[' datawordlist ']'"""
->>>>>>> Bounded repetition works
-
-    p[0] = ("REPETITION", p[2])
-
-<<<<<<< HEAD
-    p[0] = ('REPETITION', p[2])
->>>>>>> Repetition syntax with single dataword
-=======
->>>>>>> Bounded repetition works
 
 def p_datawordlist(p):
     """datawordlist : dataword ',' datawordlist

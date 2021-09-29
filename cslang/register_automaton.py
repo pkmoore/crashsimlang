@@ -15,14 +15,8 @@ class RegisterAutomaton(object):
         self.events = []
         self.events_iter = None
         self.parent = None
-<<<<<<< HEAD
-<<<<<<< HEAD
         self.subautomata = []
-=======
->>>>>>> Work in progress
-=======
-        self.subautomata = []
->>>>>>> Bounded repetition works
+
 
     def __str__(self):
         tmp = ""
@@ -123,41 +117,19 @@ class State(object):
 
 
 class SubautomatonTransition(object):
-<<<<<<< HEAD
-<<<<<<< HEAD
     def __init__(self, to_state, automaton, iterations=1):
         self.to_state = to_state
-=======
-    def __init__(self, to_state, automaton, iterations=1)
->>>>>>> Work in progress
-=======
-    def __init__(self, to_state, automaton, iterations=1):
-        self.to_state = to_state
->>>>>>> Bounded repetition works
         self.automaton = automaton
         self.iterations = iterations
 
     def __str__(self):
         tmp = ""
-<<<<<<< HEAD
-<<<<<<< HEAD
         tmp += "Subautomaton: " + str(self.automaton)
         tmp += "Iterations: " + str(self.iterations)
         return tp
 
-    def match(self, incoming_dataword, registers):
-=======
-        tmp += "Subautomaton: " + self.automaton
-        tmp += "Iterations: " + self.iterations
-
-=======
-        tmp += "Subautomaton: " + str(self.automaton)
-        tmp += "Iterations: " + str(self.iterations)
-        return tp
->>>>>>> Bounded repetition works
 
     def match(self, incoming_datawords, registers):
->>>>>>> Work in progress
         # Load subautomaton's registers with current values from parent automaton
         # These registers are updated throughout subautomaton iterations
         # but only commited over the parent automaton's values if we end up in an accepting
@@ -165,8 +137,6 @@ class SubautomatonTransition(object):
         self.automaton.registers = deepcopy(registers)
 
         # Copy our parent's event list iterator so we can advance down the list without messing it up
-<<<<<<< HEAD
-<<<<<<< HEAD
         self.automaton.events_iter = copy(self.automaton.parent.events_iter)
 
         accepted_iterations = 0
@@ -217,12 +187,8 @@ class SubautomatonTransition(object):
         elif accepted_iterations == self.iterations:
             for i in range(accepted_iterations * num_lookahead_events):
                 print("SKIP: ", next(self.automaton.parent.events_iter).get_name())
-=======
-        self.automaton.event_iter = copy(parent.event_iter)
-=======
-        self.automaton.events_iter = copy(self.automaton.parent.events_iter)
->>>>>>> Bounded repetition works
 
+        accepted_iterations = 0
         for i in range(self.iterations):
             self.automaton.current_state = 0
 
@@ -236,11 +202,13 @@ class SubautomatonTransition(object):
                 ]
             except StopIteration:
                 return -1
-
             for j in tmpevents:
                 self.automaton.match(j)
-        if self.automaton.is_accepting():
->>>>>>> Work in progress
+            if self.automaton.is_accepting():
+                accepted_iterations += 1
+            else:
+                break
+        if accepted_iterations == self.iterations:
             return self.to_state
         else:
             return -1

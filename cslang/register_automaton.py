@@ -137,6 +137,7 @@ class SubautomatonTransition(object):
         # Copy our parent's event list iterator so we can advance down the list without messing it up
         self.automaton.events_iter = copy(self.automaton.parent.events_iter)
 
+        accepted_iterations = 0
         for i in range(self.iterations):
             self.automaton.current_state = 0
 
@@ -153,7 +154,11 @@ class SubautomatonTransition(object):
 
             for j in tmpevents:
                 self.automaton.match(j)
-        if self.automaton.is_accepting():
+            if self.automaton.is_accepting():
+                accepted_iterations += 1
+            else:
+                break
+        if accepted_iterations == self.iterations:
             return self.to_state
         else:
             return -1

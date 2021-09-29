@@ -66,9 +66,9 @@ def handle_subautomaton(automaton, subautomaton, iterations):
     automaton.states.append(State("repetition_success"))
     automaton.states[-2].transitions.append(
         # Create transition from previous state to our new "repetition successful" state
-        SubautomatonTransition(len(automaton.states) - 1,
-            automaton.subautomata[-1],
-            iterations)
+        SubautomatonTransition(
+            len(automaton.states) - 1, automaton.subautomata[-1], iterations
+        )
     )
 
 

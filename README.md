@@ -1,4 +1,4 @@
-# CSlang Compiler and Runner
+# PORT Compiler and Runner
 
 # Installation
 ```
@@ -7,7 +7,7 @@ cd crashsimlang
 pip install setuptools
 pip install .
 ```
-Installing in this fashion makes the command "cslang" available globally.
+Installing in this fashion makes the command "port" available globally.
 It also provides a "parse\_syscall\_definitions" command for generating a
 syscall\_definitions.pickle file needed for working with strace.
 
@@ -19,35 +19,35 @@ pip install setuptools tox
 tox
 ```
 
-# Compiling CSlang files
+# Compiling PORT files
 ```
-cslang build -c <path to cslang file>
+port build -c <path to port file>
 ```
-This command builds an automaton from the specified cslang file.
+This command builds an automaton from the specified port file.
 
 
-# Running CSlang Automata
+# Running PORT Automata
 ```
-cslang run <strace OR jsonrpc> <format specific options>
+port run <strace OR jsonrpc> <format specific options>
 
 ```
 ## Run an automaton against an strace file
 
 ```
-cslang run strace -a <path to automaton> -s <path to strace file> -d <path
+port run strace -a <path to automaton> -s <path to strace file> -d <path
 to syscall_definitions.pickle file>
 ```
 
 ## Run an automaton against a json-rpc file
 ```
-cslang run jsonrpc -a <path to automaton> -j <path to json file>
+port run jsonrpc -a <path to automaton> -j <path to json file>
 ```
 
 
 Note:  For now, it is an error to run an automaton against a format it was
 not built for.
 
-# Writing CSlang Programs
+# Writing PORT Programs
 
 ## The Simplest Case
 

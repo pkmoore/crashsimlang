@@ -25,7 +25,7 @@ class JSONToDatawords(object):
             datawords.append(self.handle_event(i))
         return datawords
 
-    def get_mutated_json(self, dw):
+    def get_mutated_event(self, dw):
         out = {}
         out["jsonrpc"] = "2.0"
         out["method"] = dw.container["type"]

@@ -25,7 +25,7 @@ class CSVToDatawords(object):
                 datawords.append(self.handle_event(row))
         return datawords
 
-    def get_mutated_csv(self, dw):  # output this to a csv file with csv reader
+    def get_mutated_event(self, dw):  # output this to a csv file with csv reader
         out = []
         # copy down the original event
         for i in dw.original_event:

@@ -28,4 +28,4 @@ class TestPredicates(object):
         )
         assert automaton.current_state == 4
         assert not automaton.is_accepting()
-        assert "foo, bar" in s2d.get_mutated_strace(datawords_after[2])
+        assert "foo, bar" in s2d.get_mutated_event(datawords_after[2])

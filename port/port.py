@@ -622,138 +622,61 @@ def main(args=None):
         return automaton, containerbuilder
 
     elif args.mode == "run":
+
+        automaton_path = args.automaton_path
+
+        # Load in the automaton
+        with open(automaton_path, "rb") as f:
+            automaton, cb = pickle.load(f)
+
         if args.format == "strace":
 
             strace_path = args.strace_path
-            automaton_path = args.automaton_path
             syscall_definitions = args.syscall_definitions
-
-            # Load in the automaton
-            with open(automaton_path, "rb") as f:
-                automaton, cb = pickle.load(f)
 
             if hasattr(args, "skip") and args.skip is not None:
                 skip = args.skip
             else:
                 skip = 0
-            s2d = StraceToDatawords(cb, syscall_definitions, strace_path, skip)
-            automaton.events = s2d.get_datawords()
-
-            automaton.events_iter = iter(automaton.events)
-
-            # Pass each dataword in the list in series into the automaton
-            # HACK: we need events in automaton so we can hand off to subautomaton
-            try:
-                while True:
-                    automaton.match(next(automaton.events_iter))
-            except StopIteration:
-                pass
-
-            # At the end of everything we have a transformed set of datawords.
-            # We either use them if we ended in an accepting state or drop ignore
-            # them if we haven't ended in an accepting state
-            # Some print goes here
-            print("Automaton ended in state: " + str(automaton.current_state))
-            print("With registers: " + str(automaton.registers))
-
-            for i in automaton.events:
-                print(s2d.get_mutated_strace(i))
-
-            return automaton, automaton.events, s2d
+            datawords = StraceToDatawords(cb, syscall_definitions, strace_path, skip)
 
         elif args.format == "jsonrpc":
 
             json_path = args.json_path
-            automaton_path = args.automaton_path
-
-            # Load in the automaton
-            with open(automaton_path, "rb") as f:
-                automaton, cb = pickle.load(f)
-
-            j2d = JSONToDatawords(cb, json_path)
-            automaton.events = j2d.get_datawords()
-            automaton.events_iter = iter(automaton.events)
-
-            # Pass each dataword in the list in series into the automaton
-            try:
-                while True:
-                    automaton.match(next(automaton.events_iter))
-            except:
-                pass
-
-            # At the end of everything we have a transformed set of datawords.
-            # We either use them if we ended in an accepting state or drop ignore
-            # them if we haven't ended in an accepting state
-            # Some print goes here
-            print("Automaton ended in state: " + str(automaton.current_state))
-            print("With registers: " + str(automaton.registers))
-
-            for i in automaton.events:
-                print(j2d.get_mutated_json(i))
-            return automaton, automaton.events, j2d
+            datawords = JSONToDatawords(cb, json_path)
 
         elif args.format == "xmlrpc":
 
             xml_path = args.xml_path
-            automaton_path = args.automaton_path
+            datawords = XMLToDatawords(cb, xml_path)
 
-            # Load in the automaton
-            with open(automaton_path, "rb") as f:
-                automaton, cb = pickle.load(f)
-
-            x2d = XMLToDatawords(cb, xml_path)
-            automaton.events = x2d.get_datawords()
-
-            # HACK: second iterator tracking the list on the side
-            # for use by subautomata
-            automaton.events_iter = iter(automaton.events)
-
-            # Pass each dataword in the list in series into the automaton
-            try:
-                while True:
-                    automaton.match(next(automaton.events_iter))
-            except StopIteration:
-                pass
-
-            # At the end of everything we have a transformed set of datawords.
-            # We either use them if we ended in an accepting state or drop ignore
-            # them if we haven't ended in an accepting state
-            # Some print goes here
-            print("Automaton ended in state: " + str(automaton.current_state))
-            print("With registers: " + str(automaton.registers))
-
-            for i in automaton.events:
-                print(x2d.get_mutated_xml(i))
-
-            return automaton, automaton.events, x2d
-
-        elif args.format == "csv":  # copy this and make it for csv
+        elif args.format == "csv":
 
             csv_path = args.csv_path
-            automaton_path = args.automaton_path
+            datawords = CSVToDatawords(cb, csv_path)
 
-            # Load in the automaton
-            with open(automaton_path, "rb") as f:
-                automaton, cb = pickle.load(f)
+        automaton.events = datawords.get_datawords()
+        automaton.events_iter = iter(automaton.events)
 
-            c2d = CSVToDatawords(cb, csv_path)  # change to csv
-            datawords = c2d.get_datawords()
+        # Pass each dataword in the list in series into the automaton
+        # HACK: we need events in automaton so we can hand off to subautomaton
+        try:
+            while True:
+                automaton.match(next(automaton.events_iter))
+        except StopIteration:
+            pass
 
-            # Pass each dataword in the list in series into the automaton
-            for i in datawords:
-                automaton.match(i)
+        # At the end of everything we have a transformed set of datawords.
+        # We either use them if we ended in an accepting state or drop ignore
+        # them if we haven't ended in an accepting state
+        # Some print goes here
+        print("Automaton ended in state: " + str(automaton.current_state))
+        print("With registers: " + str(automaton.registers))
 
-            # At the end of everything we have a transformed set of datawords.
-            # We either use them if we ended in an accepting state or drop ignore
-            # them if we haven't ended in an accepting state
-            # Some print goes here
-            print("Automaton ended in state: " + str(automaton.current_state))
-            print("With registers: " + str(automaton.registers))
+        for i in automaton.events:
+            print(datawords.get_mutated_event(i))
 
-            for i in datawords:
-                print(c2d.get_mutated_csv(i))
-
-            return automaton, datawords, c2d
+        return automaton, automaton.events, datawords
 
 
 in_preamble = None

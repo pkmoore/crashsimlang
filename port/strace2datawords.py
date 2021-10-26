@@ -63,7 +63,7 @@ class StraceToDatawords(object):
             else:
                 return funcs[out_type](argslist[int(arg_pos)])
 
-    def get_mutated_strace(self, dw):
+    def get_mutated_event(self, dw):
         tmp = ""
         tmp += dw.original_event.pid
         tmp += "  "

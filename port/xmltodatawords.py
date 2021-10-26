@@ -27,7 +27,7 @@ class XMLToDatawords(object):
             datawords.append(self.handle_event(child))
         return datawords
 
-    def get_mutated_xml(self, dw):
+    def get_mutated_event(self, dw):
         root = etree.Element("methodCall")
         mn = etree.Element("methodName")
         mn.text = dw.type

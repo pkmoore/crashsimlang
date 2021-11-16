@@ -11,7 +11,7 @@ def get_test_data_path(filename):
 
 class TestPredicates(object):
     def test_checkfdtrue(self):
-        syscall_definitions = get_test_data_path("../port/syscall_definitions.pickle")
+        syscall_definitions = get_test_data_path("syscall_definitions.pickle")
         automaton_path = get_test_data_path("predicates.auto")
         port_main(
             Namespace(mode="build", port_path=get_test_data_path("predicates.port"))

@@ -11,7 +11,7 @@ def get_test_data_path(filename):
 
 class TestOutputs(object):
     def test_outputs(self):
-        syscall_definitions = get_test_data_path("../port/syscall_definitions.pickle")
+        syscall_definitions = get_test_data_path("syscall_definitions.pickle")
         automaton_path = get_test_data_path("outputs.auto")
         port_main(Namespace(mode="build", port_path=get_test_data_path("outputs.port")))
 

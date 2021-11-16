@@ -22,9 +22,7 @@ class TestRegisterExpressions(unittest.TestCase):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registerassign.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("registerassign.auto"),
             )
         )
@@ -44,9 +42,7 @@ class TestRegisterExpressions(unittest.TestCase):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registerconcat.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("registerconcat.auto"),
             )
         )
@@ -76,9 +72,7 @@ class TestRegisterExpressions(unittest.TestCase):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registeradd.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("registeradd.auto"),
             )
         )
@@ -107,9 +101,7 @@ class TestRegisterExpressions(unittest.TestCase):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registersub.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("registersub.auto"),
             )
         )
@@ -138,9 +130,7 @@ class TestRegisterExpressions(unittest.TestCase):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registermul.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("registermul.auto"),
             )
         )
@@ -170,9 +160,7 @@ class TestRegisterExpressions(unittest.TestCase):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("registerdiv.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("registerdiv.auto"),
             )
         )

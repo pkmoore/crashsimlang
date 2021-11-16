@@ -20,9 +20,7 @@ class TestIntegration(object):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("openclose.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("openclose.auto"),
                 containerbuilder_path=get_test_data_path("openclose.cb"),
             )
@@ -48,9 +46,7 @@ class TestIntegration(object):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("uninterestingdataword.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("uninterestingdataword.auto"),
                 containerbuilder_path=get_test_data_path("uninterestingdataword.cb"),
             )
@@ -67,9 +63,7 @@ class TestIntegration(object):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("emptydataword.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("emptydataword.auto"),
                 containerbuilder_path=get_test_data_path("emptydataword.cb"),
             )

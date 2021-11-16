@@ -53,7 +53,7 @@ event bothread {read filedesc: Numeric@0} | {otherread filedesc: Numeric@0};
         assert ast[0][2][1][1][0][1] == "0"
         assert ast[0][2][1][1][0][2] == "filedesc"
 
-    syscall_definitions = get_test_data_path("../port/syscall_definitions.pickle")
+    syscall_definitions = get_test_data_path("syscall_definitions.pickle")
 
     def test_simple_variant(self):
         automaton_path = get_test_data_path("variantread.auto")

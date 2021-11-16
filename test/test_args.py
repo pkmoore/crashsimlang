@@ -34,9 +34,7 @@ NOT read({}) -> read({filedesc: ->bad});
                 format="strace",
                 skip=2,
                 strace_path=get_test_data_path("openclose.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("open.auto"),
             )
         )

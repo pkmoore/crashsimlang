@@ -23,9 +23,7 @@ class TestDefine(unittest.TestCase):
                 mode="run",
                 format="strace",
                 strace_path=get_test_data_path("define.strace"),
-                syscall_definitions=get_test_data_path(
-                    "../port/syscall_definitions.pickle"
-                ),
+                syscall_definitions=get_test_data_path("syscall_definitions.pickle"),
                 automaton_path=get_test_data_path("define.auto"),
             )
         )

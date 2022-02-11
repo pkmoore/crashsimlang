@@ -1,4 +1,5 @@
-cslang.egg-info/
+port.egg-info/PKGINFO-
+port.egg-info/*
 dist/*
 build/*
 .coverage

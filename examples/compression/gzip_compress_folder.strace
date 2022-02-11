@@ -1,0 +1,47 @@
+14034 openat(AT_FDCWD, ".", O_RDONLY|O_DIRECTORY) = 3
+14034 openat(3, "test_folder", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW) = 4
+14034 fstat(4, {st_dev=makedev(0x8, 0x5), st_ino=938244, st_mode=S_IFDIR|0775, st_nlink=5, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1639438841 /* 2021-12-13T18:40:41.181859878-0500 */, st_atime_nsec=181859878, st_mtime=1639441799 /* 2021-12-13T19:29:59.113417046-0500 */, st_mtime_nsec=113417046, st_ctime=1639441799 /* 2021-12-13T19:29:59.113417046-0500 */, st_ctime_nsec=113417046}) = 0
+14034 fstat(4, {st_dev=makedev(0x8, 0x5), st_ino=938244, st_mode=S_IFDIR|0775, st_nlink=5, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1639438841 /* 2021-12-13T18:40:41.181859878-0500 */, st_atime_nsec=181859878, st_mtime=1639441799 /* 2021-12-13T19:29:59.113417046-0500 */, st_mtime_nsec=113417046, st_ctime=1639441799 /* 2021-12-13T19:29:59.113417046-0500 */, st_ctime_nsec=113417046}) = 0
+14034 fcntl(4, F_GETFL)                 = 0x28800 (flags O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_NOFOLLOW)
+14034 fcntl(4, F_SETFD, FD_CLOEXEC)     = 0
+14034 brk(NULL)                         = 0x55bac4d91000
+14034 brk(0x55bac4db2000)               = 0x55bac4db2000
+14034 getdents64(4, [{d_ino=938244, d_off=2612922630586596707, d_reclen=24, d_type=DT_DIR, d_name="."}, {d_ino=938246, d_off=3106429000333868110, d_reclen=32, d_type=DT_DIR, d_name="extra"}, {d_ino=1183228, d_off=4784967672965394558, d_reclen=32, d_type=DT_DIR, d_name="normal"}, {d_ino=809155, d_off=5936902790011334445, d_reclen=24, d_type=DT_DIR, d_name=".."}, {d_ino=937714, d_off=6049117294158348564, d_reclen=40, d_type=DT_REG, d_name=".gitattributes"}, {d_ino=935995, d_off=7410753823955224211, d_reclen=40, d_type=DT_REG, d_name=".gitattributes.gz"}, {d_ino=938250, d_off=9223372036854775807, d_reclen=24, d_type=DT_DIR, d_name=".git"}], 32768) = 216
+14034 getdents64(4, [], 32768)          = 0
+14034 close(4)                          = 0
+14034 close(3)                          = 0
+14034 openat(AT_FDCWD, "test_folder/", O_RDONLY|O_DIRECTORY) = 3
+14034 openat(3, "extra", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW) = 4
+14034 fstat(4, {st_dev=makedev(0x8, 0x5), st_ino=938246, st_mode=S_IFDIR|0775, st_nlink=2, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_atime_nsec=101420388, st_mtime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_mtime_nsec=101420388, st_ctime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_ctime_nsec=101420388}) = 0
+14034 fstat(4, {st_dev=makedev(0x8, 0x5), st_ino=938246, st_mode=S_IFDIR|0775, st_nlink=2, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_atime_nsec=101420388, st_mtime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_mtime_nsec=101420388, st_ctime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_ctime_nsec=101420388}) = 0
+14034 fcntl(4, F_GETFL)                 = 0x28800 (flags O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_NOFOLLOW)
+14034 fcntl(4, F_SETFD, FD_CLOEXEC)     = 0
+14034 getdents64(4, [{d_ino=938246, d_off=3328505398858507181, d_reclen=24, d_type=DT_DIR, d_name="."}, {d_ino=918114, d_off=4395974110639531377, d_reclen=32, d_type=DT_REG, d_name="fifo.py.gz"}, {d_ino=937299, d_off=4784967672965394558, d_reclen=32, d_type=DT_REG, d_name="fifo.py"}, {d_ino=938244, d_off=6042301052942664761, d_reclen=24, d_type=DT_DIR, d_name=".."}, {d_ino=935994, d_off=7102740410845682398, d_reclen=56, d_type=DT_REG, d_name="assignment_4_extra_credit.pdf.gz"}, {d_ino=937705, d_off=7786533407136443961, d_reclen=32, d_type=DT_REG, d_name="pim.py"}, {d_ino=937710, d_off=8617113464086606894, d_reclen=56, d_type=DT_REG, d_name="assignment_4_extra_credit.pdf"}, {d_ino=935993, d_off=9223372036854775807, d_reclen=32, d_type=DT_REG, d_name="pim.py.gz"}], 32768) = 288
+14034 getdents64(4, [], 32768)          = 0
+14034 close(4)                          = 0
+14034 close(3)                          = 0
+14034 openat(AT_FDCWD, "test_folder/extra/", O_RDONLY|O_DIRECTORY) = 3
+14034 openat(3, "fifo.py.gz", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW) = 4
+14034 fstat(4, {st_dev=makedev(0x8, 0x5), st_ino=918114, st_mode=S_IFREG|0664, st_nlink=1, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=8, st_size=1392, st_atime=1637645487 /* 2021-11-23T00:31:27-0500 */, st_atime_nsec=0, st_mtime=1637635244 /* 2021-11-22T21:40:44-0500 */, st_mtime_nsec=0, st_ctime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_ctime_nsec=101420388}) = 0
+14034 close(4)                          = 0
+14034 openat(3, "fifo.py", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW) = 4
+14034 fstat(4, {st_dev=makedev(0x8, 0x5), st_ino=937299, st_mode=S_IFREG|0664, st_nlink=1, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=16, st_size=4197, st_atime=1639441799 /* 2021-12-13T19:29:59.101420388-0500 */, st_atime_nsec=101420388, st_mtime=1637635244 /* 2021-11-22T21:40:44-0500 */, st_mtime_nsec=0, st_ctime=1637646812 /* 2021-11-23T00:53:32.985878298-0500 */, st_ctime_nsec=985878298}) = 0
+14034 rt_sigprocmask(SIG_BLOCK, [HUP INT PIPE TERM XCPU XFSZ], [], 8) = 0
+14034 openat(3, "fifo.py.gz", O_WRONLY|O_CREAT|O_EXCL, 0600) = -1 EEXIST (File exists)
+14034 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+14034 write(2, "gzip: test_folder/extra/fifo.py.gz already exists;", 50) = 50
+14034 ioctl(0, TCGETS, {c_iflags=0x4500, c_oflags=0x5, c_cflags=0xbf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\x00\x12\x0f\x17\x16\x00\x00\x00"}) = 0
+14034 write(2, " do you wish to overwrite (y or n)? ", 36) = 36
+14034 fstat(0, {st_dev=makedev(0, 0x17), st_ino=3, st_mode=S_IFCHR|0620, st_nlink=1, st_uid=1000, st_gid=5, st_blksize=1024, st_blocks=0, st_rdev=makedev(0x88, 0), st_atime=1639441827 /* 2021-12-13T19:30:27.178675078-0500 */, st_atime_nsec=178675078, st_mtime=1639441827 /* 2021-12-13T19:30:27.178675078-0500 */, st_mtime_nsec=178675078, st_ctime=1639439585 /* 2021-12-13T18:53:05.178675078-0500 */, st_ctime_nsec=178675078}) = 0
+14034 read(0, 0x55bac4d912c0, 1024)     = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
+14034 --- SIGTERM {si_signo=SIGTERM, si_code=SI_USER, si_pid=4461, si_uid=1000} ---
+14034 --- SIGCONT {si_signo=SIGCONT, si_code=SI_USER, si_pid=4461, si_uid=1000} ---
+14034 rt_sigaction(SIGTERM, {sa_handler=SIG_DFL, sa_mask=[TERM], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f1f0fc0f210}, {sa_handler=0x55bac304a4b0, sa_mask=[HUP INT PIPE TERM XCPU XFSZ], sa_flags=SA_RESTORER, sa_restorer=0x7f1f0fc0f210}, 8) = 0
+14034 rt_sigprocmask(SIG_BLOCK, ~[RTMIN RT_1], [HUP INT PIPE TERM XCPU XFSZ], 8) = 0
+14034 getpid()                          = 14034
+14034 gettid()                          = 14034
+14034 tgkill(14034, 14034, SIGTERM)     = 0
+14034 rt_sigprocmask(SIG_SETMASK, [HUP INT PIPE TERM XCPU XFSZ], NULL, 8) = 0
+14034 rt_sigreturn({mask=[]})           = -1 EINTR (Interrupted system call)
+14034 --- SIGTERM {si_signo=SIGTERM, si_code=SI_TKILL, si_pid=14034, si_uid=1000} ---
+14034 +++ killed by SIGTERM +++

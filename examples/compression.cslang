@@ -1,0 +1,8 @@
+event open { open fd: Numeric@ret } | { openat fd: Numeric@ret};
+event read { fd: Numeric@0 };
+event write { fd: Numeric@0 };
+event close { fd: Numeric@0 };
+
+open({fd: !storefd});
+read({fd: ?storefd});
+close({fd: ?storefd});

@@ -1,5 +1,0 @@
-setuptools
-ply
-dill
-lxml
-posix-omni-parser@ git+https://github.com/pkmoore/posix-omni-parser

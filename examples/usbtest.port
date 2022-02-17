@@ -1,0 +1,25 @@
+event usbhid { src: String@0,
+               dst: String@1,
+               data: String@13,
+               transfertype: String@10};
+
+s1 <- "00:00:1e:00:00:00:00:00";
+s2 <- "00:00:1f:00:00:00:00:00";
+s3 <- "00:00:20:00:00:00:00:00";
+s4 <- "00:00:21:00:00:00:00:00";
+s5 <- "00:00:22:00:00:00:00:00";
+tt <- "blahblahblah";
+
+src <- "2.1.1";
+dst <- "host";
+
+usbhid({src: ?src, dst: ?dst, data: ?s1})
+-> usbhid({src: ->tt});
+usbhid({src: ?src, dst: ?dst, data: ?s2})
+-> usbhid({src: ->tt});
+usbhid({src: ?src, dst: ?dst, data: ?s3})
+-> usbhid({src: ->tt});
+usbhid({src: ?src, dst: ?dst, data: ?s4})
+-> usbhid({src: ->tt});
+usbhid({src: ?src, dst: ?dst, data: ?s5})
+-> usbhid({src: ->tt});

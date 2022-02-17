@@ -18,6 +18,11 @@ class DataWord(object):
             # JSON objects have a "procedure" key
             elif "procedure" in list(self.original_event.keys()):
                 self.type = self.original_event["procedure"]
+            elif self.original_event['_source']:
+              proto = event['_source']['layers']['frame']['frame.protocols']
+              if proto.startswith("usb:"):
+                proto = proto.split(":", 1)[1]
+              self.type = proto
             # XMLRPC object have a methodName
             elif self.original_event[0].tag == "methodName":
                 self.type = self.original_event[0].text

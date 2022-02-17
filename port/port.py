@@ -10,6 +10,7 @@ from .strace2datawords import StraceToDatawords
 from .jsontodatawords import JSONToDatawords
 from .xmltodatawords import XMLToDatawords
 from .csvtodatawords import CSVToDatawords
+from .usbjsontodatawords import USBJSONToDatawords
 from posix_omni_parser import Trace
 from .adt import ContainerBuilder
 from . import automaton_builder
@@ -571,6 +572,22 @@ def main(args=None):
         help="Location of csv recording to execute against",
     )
 
+    usbjson_run_argparser = run_subparsers.add_parser("usbjson")
+    usbjson_run_argparser.add_argument(
+        "-a",
+        "--automaton-path",
+        required=True,
+        type=str,
+        help="Location of PORT automaton to be used in processing the specified strace file.",
+        )
+    usbjson_run_argparser.add_argument(
+        "-u",
+        "--usbjson-path",
+        required=True,
+        type=str,
+        help="Location of usbjson recording to execute against",
+        )
+
     if not args:
         args = parser.parse_args()
 
@@ -655,6 +672,10 @@ def main(args=None):
             csv_path = args.csv_path
             datawords = CSVToDatawords(cb, csv_path)
 
+        elif args.format == "usbjson":
+            usbjson_path = args.usbjson_path
+            datawords = USBJSONToDatawords(cb, usbjson_path)
+
         automaton.events = datawords.get_datawords()
         automaton.events_iter = iter(automaton.events)
 
@@ -673,8 +694,8 @@ def main(args=None):
         print("Automaton ended in state: " + str(automaton.current_state))
         print("With registers: " + str(automaton.registers))
 
-        for i in automaton.events:
-            print(datawords.get_mutated_event(i))
+        #for i in automaton.events:
+        #    print(datawords.get_mutated_event(i))
 
         return automaton, automaton.events, datawords
 
@@ -684,4 +705,4 @@ lexer = None
 parser = None
 
 if __name__ == "__main__":
-    main()
+  main()

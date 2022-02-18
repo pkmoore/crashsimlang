@@ -40,7 +40,6 @@ def check_no_ret_in_none_top_level_event(ast):
 
     # get the top level event list
     top_level = check_top_level_event(ast)
-    print(top_level)
 
     for node in ast:
         if node[0] == "TYPEDEF":

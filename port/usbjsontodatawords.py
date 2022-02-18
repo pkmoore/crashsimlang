@@ -7,6 +7,7 @@ import os
 from collections import OrderedDict
 from . import adt
 import json
+import copy
 
 from .dataword import DataWord
 from .dataword import UninterestingDataWord
@@ -26,10 +27,24 @@ class USBJSONToDatawords(object):
         return datawords
 
     def get_mutated_event(self, dw):
-        # out = {}
-        # out["jsonrpc"] = "2.0"
-        # out["method"] = dw.container["type"]
-        # out["id"] = dw.original_event["id"]
+        out = copy.deepcopy(dw.original_event)
+        out['_source']['layers']['usb']["usb.src"] = self._get_arg_by_name("src", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.dst"] = self._get_arg_by_name("dst", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.usbpcap_header_len"] = self._get_arg_by_name("usbpcap_header_len", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.irp_id"] = self._get_arg_by_name("irp_id", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.usbd_status"] = self._get_arg_by_name("usbd_status", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.function"] = self._get_arg_by_name("function", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.irp_info"] = self._get_arg_by_name("irp_info", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.bus_id"] = self._get_arg_by_name("bus_id", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.device_address"] = self._get_arg_by_name("device_address", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.endpoint_address"] = self._get_arg_by_name("endpoint_address", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.transfer_type"] = self._get_arg_by_name("transfer_type", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.data_len"] = self._get_arg_by_name("data_len", dw.captured_arguments)
+        out['_source']['layers']['usb']["usb.bInterfaceClass"] = self._get_arg_by_name("bInterfaceClass", dw.captured_arguments)
+        maybe_data = self._get_arg_by_name("data", dw.captured_arguments)
+        if maybe_data:
+          out['_source']['layers']["usbhid.data"] = maybe_data
+        print(self._get_arg_by_name("data", dw.captured_arguments))
         # out["params"] = dw.original_event["params"]
         # if dw.captured_arguments:
         #     for i in dw.captured_arguments:
@@ -37,6 +52,7 @@ class USBJSONToDatawords(object):
 
         # return json.dumps(out)
         raise NotImplementedError
+
 
     def handle_event(self, event):
         proto = event['_source']['layers']['frame']['frame.protocols']
@@ -67,9 +83,6 @@ class USBJSONToDatawords(object):
         ) or not self.containerbuilder.top_level.get(proto):
             return UninterestingDataWord(event)
         else:
-            # JSON flavored operation here to get the return value from result
-            # message
-            # argslist.append(event.ret[0])
             container = self.containerbuilder.instantiate_type(proto)
             container = self._capture_args(container, argslist)
             return DataWord(event, container)
@@ -91,3 +104,12 @@ class USBJSONToDatawords(object):
         #  return funcs[out_type](argslist[-1])
         # else:
         return funcs[out_type](argslist[int(arg_pos)])
+
+    def _get_arg_by_name(self, name, members):
+      candidates = tuple(x for x in members if x["arg_name"] == name)
+      assert len(candidates) <= 1, f"Multiple arguments for name {name}: {candidates}"
+      if len(candidates) == 0:
+        return None
+      value = candidates[0]["members"]
+      assert len(value) == 1, f"Multiple values for name {name}"
+      return candidates[0]["members"][0]

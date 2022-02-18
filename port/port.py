@@ -694,8 +694,8 @@ def main(args=None):
         print("Automaton ended in state: " + str(automaton.current_state))
         print("With registers: " + str(automaton.registers))
 
-        #for i in automaton.events:
-        #    print(datawords.get_mutated_event(i))
+        for i in automaton.events:
+            print(datawords.get_mutated_event(i))
 
         return automaton, automaton.events, datawords
 

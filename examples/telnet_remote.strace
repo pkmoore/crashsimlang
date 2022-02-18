@@ -1,0 +1,23 @@
+5557  fstat(1, {st_dev=makedev(0, 0x17), st_ino=3, st_mode=S_IFCHR|0620, st_nlink=1, st_uid=1000, st_gid=5, st_blksize=1024, st_blocks=0, st_rdev=makedev(0x88, 0), st_atime=1632436880 /* 2021-09-24T06:41:20.244674933+0800 */, st_atime_nsec=244674933, st_mtime=1632436880 /* 2021-09-24T06:41:20.244674933+0800 */, st_mtime_nsec=244674933, st_ctime=1632433933 /* 2021-09-24T05:52:13.244674933+0800 */, st_ctime_nsec=244674933}) = 0
+5557  write(1, "Trying 23.61.243.35...\n", 23) = 23
+5557  close(-1)                         = -1 EBADF (Bad file descriptor)
+5557  socket(AF_INET, SOCK_STREAM, IPPROTO_IP) = 3
+5557  setsockopt(3, SOL_IP, IP_TOS, [16], 4) = 0
+5557  connect(3, {sa_family=AF_INET, sin_port=htons(80), sin_addr=inet_addr("23.61.243.35")}, 16) = 0
+5557  openat(AT_FDCWD, "/etc/telnetrc", O_RDONLY) = -1 ENOENT (No such file or directory)
+5557  openat(AT_FDCWD, "/root/.telnetrc", O_RDONLY) = -1 ENOENT (No such file or directory)
+5557  write(1, "Connected to e3396.dscx.akamaiedge.net.\n", 40) = 40
+5557  write(1, "Escape character is '^]'.\n", 26) = 26
+5557  rt_sigprocmask(SIG_BLOCK, NULL, [], 8) = 0
+5557  rt_sigaction(SIGINT, {sa_handler=0x5603cf791ab0, sa_mask=[INT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7effc5cfc210}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+5557  rt_sigaction(SIGQUIT, {sa_handler=0x5603cf791a60, sa_mask=[QUIT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7effc5cfc210}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+5557  rt_sigaction(SIGWINCH, {sa_handler=0x5603cf791a40, sa_mask=[WINCH], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7effc5cfc210}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+5557  rt_sigaction(SIGTSTP, {sa_handler=0x5603cf7960e0, sa_mask=[TSTP], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7effc5cfc210}, {sa_handler=0x5603cf7960e0, sa_mask=[TSTP], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7effc5cfc210}, 8) = 0
+5557  ioctl(0, TCGETS, {c_iflags=0x6d02, c_oflags=0x5, c_cflags=0x4bf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\xff\x12\x0f\x17\x16\xff\x00\x00"}) = 0
+5557  ioctl(0, SNDCTL_TMR_STOP or TCSETSW, {c_iflags=0x6102, c_oflags=0x5, c_cflags=0x4bf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\xff\x12\x0f\x17\x16\xff\x00\x00"}) = 0
+5557  ioctl(0, TCGETS, {c_iflags=0x6102, c_oflags=0x5, c_cflags=0x4bf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\xff\x12\x0f\x17\x16\xff\x00\x00"}) = 0
+5557  ioctl(0, FIONBIO, [1])            = 0
+5557  ioctl(1, FIONBIO, [1])            = 0
+5557  ioctl(3, FIONBIO, [1])            = 0
+5557  setsockopt(3, SOL_SOCKET, SO_OOBINLINE, [1], 4) = 0
+5557  select(4, [0 3], [], [3], {tv_sec=0, tv_usec=0}) = 0 (Timeout)

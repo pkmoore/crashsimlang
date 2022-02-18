@@ -1,0 +1,11 @@
+event socket {fd: Numeric@ret};
+event connect {fd: Numeric@0};
+event anysend {sendto fd: Numeric@0} | { write fd: Numeric@0} | { send fd: Numeric@0};
+event anyrecv {recvfrom fd: Numeric@0} | { read fd: Numeric@0} | { recv fd: Numeric@0};
+event close {fd: Numeric@0};
+
+socket({fd: !storefd});
+anysend({fd: ?storefd});
+anyrecv({fd: ?storefd});
+close({fd: ?storefd});
+

@@ -1,0 +1,71 @@
+11453 mprotect(0x7ff8e1e41000, 4096, PROT_READ) = 0
+11453 munmap(0x7ff8e1e03000, 67367)     = 0
+11453 set_tid_address(0x7ff8e184aa10)   = 11453
+11453 set_robust_list(0x7ff8e184aa20, 24) = 0
+11453 rt_sigaction(SIGRTMIN, {sa_handler=0x7ff8e185abf0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7ff8e18683c0}, NULL, 8) = 0
+11453 rt_sigaction(SIGRT_1, {sa_handler=0x7ff8e185ac90, sa_mask=[], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7ff8e18683c0}, NULL, 8) = 0
+11453 rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+11453 prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+11453 socketpair(AF_UNIX, SOCK_DGRAM, 0, [3, 4]) = 0
+11453 brk(NULL)                         = 0x55583beca000
+11453 brk(0x55583beeb000)               = 0x55583beeb000
+11453 getpid()                          = 11453
+11453 uname({sysname="Linux", nodename="alma-VirtualBox", release="5.11.0-34-generic", version="#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021", machine="x86_64", domainname="(none)"}) = 0
+11453 rt_sigaction(SIGHUP, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGINT, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGQUIT, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGILL, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGABRT, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGBUS, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGFPE, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGSEGV, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGTERM, {sa_handler=0x55583a8d3e80, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7ff8e18db210}, NULL, 8) = 0
+11453 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7ff8e18db210}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+11453 ioctl(0, TCGETS, {c_iflags=0x6d02, c_oflags=0x5, c_cflags=0x4bf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\xff\x12\x0f\x17\x16\xff\x00\x00"}) = 0
+11453 ioctl(0, TCGETS, {c_iflags=0x6d02, c_oflags=0x5, c_cflags=0x4bf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\xff\x12\x0f\x17\x16\xff\x00\x00"}) = 0
+11453 ioctl(1, TCGETS, {c_iflags=0x6d02, c_oflags=0x5, c_cflags=0x4bf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\xff\x12\x0f\x17\x16\xff\x00\x00"}) = 0
+11453 ioctl(1, TCGETS, {c_iflags=0x6d02, c_oflags=0x5, c_cflags=0x4bf, c_lflags=0x8a3b, c_line=0, c_cc="\x03\x1c\x7f\x15\x04\x00\x01\x00\x11\x13\x1a\xff\x12\x0f\x17\x16\xff\x00\x00"}) = 0
+11453 socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) = 5
+11453 recvfrom(3, 0x7ffcf82a8b20, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 fcntl(5, F_SETFD, FD_CLOEXEC)     = 0
+11453 recvfrom(3, 0x7ffcf82a8b20, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 bind(5, {sa_family=AF_INET, sin_port=htons(4001), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
+11453 getsockname(5, {sa_family=AF_INET, sin_port=htons(4001), sin_addr=inet_addr("0.0.0.0")}, [16]) = 0
+11453 listen(5, 5)                      = 0
+11453 recvfrom(3, 0x7ffcf82a8980, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a8750, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 select(6, [3 5], NULL, NULL, NULL) = 1 (in [5])
+11453 recvfrom(3, 0x7ffcf82a8750, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 accept(5, {sa_family=AF_INET, sin_port=htons(47898), sin_addr=inet_addr("127.0.0.1")}, [16]) = 6
+11453 recvfrom(3, 0x7ffcf82a8980, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a8b20, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 fcntl(6, F_SETFD, FD_CLOEXEC)     = 0
+11453 recvfrom(3, 0x7ffcf82a8b20, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 getpeername(6, {sa_family=AF_INET, sin_port=htons(47898), sin_addr=inet_addr("127.0.0.1")}, [112->16]) = 0
+11453 getsockname(6, {sa_family=AF_INET, sin_port=htons(4001), sin_addr=inet_addr("127.0.0.1")}, [112->16]) = 0
+11453 close(5)                          = 0
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 select(7, [0 6], [1 6], [], NULL) = 3 (in [0], out [1 6])
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a8b00, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 read(0, "\n", 8192)               = 1
+11453 recvfrom(3, 0x7ffcf82a8b00, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a8ff0, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 write(6, "\r\n", 2)               = 2
+11453 recvfrom(3, 0x7ffcf82a8ff0, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 select(7, [0 6], [6], [], NULL)   = 1 (out [6])
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 select(7, [0 6], [], [], NULL)    = 1 (in [6])
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a8b00, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 read(6, "hello-there\n", 8192)    = 12
+11453 recvfrom(3, 0x7ffcf82a8b00, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a8ff0, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 write(1, "hello-there\n", 12)     = 12
+11453 recvfrom(3, 0x7ffcf82a8ff0, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 select(7, [0 6], [1], [], NULL)   = 1 (out [1])
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+11453 recvfrom(3, 0x7ffcf82a9080, 519, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)

@@ -27,56 +27,78 @@ class USBJSONToDatawords(object):
         return datawords
 
     def get_mutated_event(self, dw):
+        # For uninteresting datawords, we return the original event,
+        # unmodified event
+        if not dw.is_interesting():
+            return dw.original_event
         out = copy.deepcopy(dw.original_event)
-        out['_source']['layers']['usb']["usb.src"] = self._get_arg_by_name("src", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.dst"] = self._get_arg_by_name("dst", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.usbpcap_header_len"] = self._get_arg_by_name("usbpcap_header_len", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.irp_id"] = self._get_arg_by_name("irp_id", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.usbd_status"] = self._get_arg_by_name("usbd_status", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.function"] = self._get_arg_by_name("function", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.irp_info"] = self._get_arg_by_name("irp_info", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.bus_id"] = self._get_arg_by_name("bus_id", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.device_address"] = self._get_arg_by_name("device_address", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.endpoint_address"] = self._get_arg_by_name("endpoint_address", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.transfer_type"] = self._get_arg_by_name("transfer_type", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.data_len"] = self._get_arg_by_name("data_len", dw.captured_arguments)
-        out['_source']['layers']['usb']["usb.bInterfaceClass"] = self._get_arg_by_name("bInterfaceClass", dw.captured_arguments)
+        maybe_data = self._get_arg_by_name("src", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.src"] = maybe_data
+        maybe_data = self._get_arg_by_name("dst", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.dst"] = maybe_data
+        maybe_data = self._get_arg_by_name("usbpcap_header_len", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.usbpcap_header_len"] = maybe_data
+        maybe_data = self._get_arg_by_name("irp_id", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.irp_id"] = maybe_data
+        maybe_data = self._get_arg_by_name("usbd_status", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.usbd_status"] = maybe_data
+        maybe_data = self._get_arg_by_name("function", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.function"] = maybe_data
+        maybe_data = self._get_arg_by_name("irp_info", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.irp_info"] = maybe_data
+        maybe_data = self._get_arg_by_name("bus_id", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.bus_id"] = maybe_data
+        maybe_data = self._get_arg_by_name("device_address", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.device_address"] = maybe_data
+        maybe_data = self._get_arg_by_name("endpoint_address", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.endpoint_address"] = maybe_data
+        maybe_data = self._get_arg_by_name("transfer_type", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.transfer_type"] = maybe_data
+        maybe_data = self._get_arg_by_name("data_len", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.data_len"] = maybe_data
+        maybe_data = self._get_arg_by_name("bInterfaceClass", dw.captured_arguments)
+        if maybe_data:
+            out["_source"]["layers"]["usb"]["usb.bInterfaceClass"] = maybe_data
         maybe_data = self._get_arg_by_name("data", dw.captured_arguments)
         if maybe_data:
-          out['_source']['layers']["usbhid.data"] = maybe_data
-        print(self._get_arg_by_name("data", dw.captured_arguments))
-        # out["params"] = dw.original_event["params"]
-        # if dw.captured_arguments:
-        #     for i in dw.captured_arguments:
-        #         out["params"][int(i["arg_pos"])] = i["members"][0]
-
-        # return json.dumps(out)
-        raise NotImplementedError
-
+            out["_source"]["layers"]["usbhid.data"] = maybe_data
+        return json.dumps(out)
 
     def handle_event(self, event):
-        proto = event['_source']['layers']['frame']['frame.protocols']
+        proto = event["_source"]["layers"]["frame"]["frame.protocols"]
         if proto.startswith("usb:"):
-          proto = proto.split(":", 1)[1]
+            proto = proto.split(":", 1)[1]
 
-        ## At this point method should be 'usb' or 'usbhid'
+            ## At this point method should be 'usb' or 'usbhid'
 
-          argslist = [
-          event['_source']['layers']['usb']["usb.src"],
-          event['_source']['layers']['usb']["usb.dst"],
-          event['_source']['layers']['usb']["usb.usbpcap_header_len"],
-          event['_source']['layers']['usb']["usb.irp_id"],
-          event['_source']['layers']['usb']["usb.usbd_status"],
-          event['_source']['layers']['usb']["usb.function"],
-          event['_source']['layers']['usb']["usb.irp_info"],
-          event['_source']['layers']['usb']["usb.bus_id"],
-          event['_source']['layers']['usb']["usb.device_address"],
-          event['_source']['layers']['usb']["usb.endpoint_address"],
-          event['_source']['layers']['usb']["usb.transfer_type"],
-          event['_source']['layers']['usb']["usb.data_len"],
-          event['_source']['layers']['usb']["usb.bInterfaceClass"],
-          event['_source']['layers']["usbhid.data"]
-          ]
+            argslist = [
+                event["_source"]["layers"]["usb"]["usb.src"],
+                event["_source"]["layers"]["usb"]["usb.dst"],
+                event["_source"]["layers"]["usb"]["usb.usbpcap_header_len"],
+                event["_source"]["layers"]["usb"]["usb.irp_id"],
+                event["_source"]["layers"]["usb"]["usb.usbd_status"],
+                event["_source"]["layers"]["usb"]["usb.function"],
+                event["_source"]["layers"]["usb"]["usb.irp_info"],
+                event["_source"]["layers"]["usb"]["usb.bus_id"],
+                event["_source"]["layers"]["usb"]["usb.device_address"],
+                event["_source"]["layers"]["usb"]["usb.endpoint_address"],
+                event["_source"]["layers"]["usb"]["usb.transfer_type"],
+                event["_source"]["layers"]["usb"]["usb.data_len"],
+                event["_source"]["layers"]["usb"]["usb.bInterfaceClass"],
+                event["_source"]["layers"]["usbhid.data"],
+            ]
 
         if not any(
             self.containerbuilder.top_level.values()
@@ -106,10 +128,10 @@ class USBJSONToDatawords(object):
         return funcs[out_type](argslist[int(arg_pos)])
 
     def _get_arg_by_name(self, name, members):
-      candidates = tuple(x for x in members if x["arg_name"] == name)
-      assert len(candidates) <= 1, f"Multiple arguments for name {name}: {candidates}"
-      if len(candidates) == 0:
-        return None
-      value = candidates[0]["members"]
-      assert len(value) == 1, f"Multiple values for name {name}"
-      return candidates[0]["members"][0]
+        candidates = tuple(x for x in members if x["arg_name"] == name)
+        assert len(candidates) <= 1, f"Multiple arguments for name {name}: {candidates}"
+        if len(candidates) == 0:
+            return None
+        value = candidates[0]["members"]
+        assert len(value) == 1, f"Multiple values for name {name}"
+        return candidates[0]["members"][0]

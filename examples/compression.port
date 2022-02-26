@@ -1,8 +1,14 @@
-event open { open fd: Numeric@ret } | { openat fd: Numeric@ret};
+event open { open fn: String@0, fd: Numeric@ret } | { openat fn: String@1, fd: Numeric@ret};
 event read { fd: Numeric@0 };
 event write { fd: Numeric@0 };
 event close { fd: Numeric@0 };
 
-open({fd: !storefd});
-read({fd: ?storefd});
-close({fd: ?storefd});
+outname <- "test.pdf";
+inname <- "test.pdf.gz";
+
+open({fn: ?inname, fd: !infd});
+open({fn: ?outname, fd: !outfd});
+read({fd: ?infd});
+write({fd: ?outfd});
+close({fd: ?infd});
+close({fd: ?outfd});

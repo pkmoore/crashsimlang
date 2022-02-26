@@ -704,5 +704,16 @@ in_preamble = None
 lexer = None
 parser = None
 
-if __name__ == "__main__":
+
+# We need this function to be an entry point to call main and exit with
+# a proper exit code.
+# We can't use main for this purpose because tests expect to return objects
+# for inspection and NOT exit
+def run_port():
     main()
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    run_port()
+    sys.exit(0)

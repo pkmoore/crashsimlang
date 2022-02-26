@@ -16,6 +16,6 @@ setup(
                         "posix-omni-parser @ git+https://github.com/pkmoore/posix-omni-parser"],
     packages=['port'],
     entry_points = {
-      "console_scripts": ['port = port.port:main']                     
+      "console_scripts": ['port = port.port:run_port']                     
     }
 )

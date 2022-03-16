@@ -4,6 +4,8 @@ from builtins import object
 from copy import deepcopy
 from copy import copy
 from . import adt
+from .port_error import PORTError
+
 
 
 class RegisterAutomaton(object):
@@ -125,7 +127,7 @@ class SubautomatonTransition(object):
         tmp = ""
         tmp += "Subautomaton: " + str(self.automaton)
         tmp += "Iterations: " + str(self.iterations)
-        return tp
+        return tmp
 
     def match(self, incoming_dataword, registers):
         # Load subautomaton's registers with current values from parent automaton

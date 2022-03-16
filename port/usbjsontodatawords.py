@@ -74,16 +74,22 @@ class USBJSONToDatawords(object):
         maybe_data = self._get_arg_by_name("data", dw.captured_arguments)
         if maybe_data:
             out["_source"]["layers"]["usbhid.data"] = maybe_data
+        maybe_data = self._get_arg_by_name("idVendor", dw.captured_arguments)
+        print(maybe_data)
+        if maybe_data:
+            out["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idVendor"] = maybe_data
+        maybe_data = self._get_arg_by_name("idProduct", dw.captured_arguments)
+        print(maybe_data)
+        if maybe_data:
+            out["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idProduct"] = maybe_data
         return json.dumps(out)
 
     def handle_event(self, event):
         proto = event["_source"]["layers"]["frame"]["frame.protocols"]
-        if proto.startswith("usb:"):
-            proto = proto.split(":", 1)[1]
-
-            ## At this point method should be 'usb' or 'usbhid'
-
-            argslist = [
+        argslist = []
+        if proto.startswith("usb"):
+            proto = "usb"
+            argslist += [
                 event["_source"]["layers"]["usb"]["usb.src"],
                 event["_source"]["layers"]["usb"]["usb.dst"],
                 event["_source"]["layers"]["usb"]["usb.usbpcap_header_len"],
@@ -96,9 +102,18 @@ class USBJSONToDatawords(object):
                 event["_source"]["layers"]["usb"]["usb.endpoint_address"],
                 event["_source"]["layers"]["usb"]["usb.transfer_type"],
                 event["_source"]["layers"]["usb"]["usb.data_len"],
-                event["_source"]["layers"]["usb"]["usb.bInterfaceClass"],
-                event["_source"]["layers"]["usbhid.data"],
+                #event["_source"]["layers"]["usb"]["usb.bInterfaceClass"],
             ]
+        if proto.startswith("usb:usbhid"):
+            proto = "usbhid"
+            argslist.append(event["_source"]["layers"]["usbhid.data"])
+        elif "DEVICE DESCRIPTOR" in event["_source"]["layers"]:
+            proto = "usbreg"
+            argslist += [
+                event["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idVendor"],
+                event["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idProduct"],
+            ]
+        
 
         if not any(
             self.containerbuilder.top_level.values()

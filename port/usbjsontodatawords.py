@@ -78,12 +78,10 @@ class USBJSONToDatawords(object):
 
     def handle_event(self, event):
         proto = event["_source"]["layers"]["frame"]["frame.protocols"]
-        if proto.startswith("usb:"):
-            proto = proto.split(":", 1)[1]
-
-            ## At this point method should be 'usb' or 'usbhid'
-
-            argslist = [
+        arglist = []
+        if proto.startswith("usb"):
+            proto = "usb"
+            argslist += [
                 event["_source"]["layers"]["usb"]["usb.src"],
                 event["_source"]["layers"]["usb"]["usb.dst"],
                 event["_source"]["layers"]["usb"]["usb.usbpcap_header_len"],
@@ -97,8 +95,17 @@ class USBJSONToDatawords(object):
                 event["_source"]["layers"]["usb"]["usb.transfer_type"],
                 event["_source"]["layers"]["usb"]["usb.data_len"],
                 event["_source"]["layers"]["usb"]["usb.bInterfaceClass"],
-                event["_source"]["layers"]["usbhid.data"],
             ]
+        if proto.startswith("usb:usbhid"):
+            proto = "usbhid"
+            arglist.append(event["_source"]["layers"]["usbhid.data"])
+        elif "DEVICE DESCRIPTOR" in event["_source"]["layers"]:
+            proto = "usbreg"
+            arglist += [
+                event["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idVendor"],
+                event["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idProduct"],
+            ]
+        
 
         if not any(
             self.containerbuilder.top_level.values()

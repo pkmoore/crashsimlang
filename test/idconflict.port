@@ -1,0 +1,5 @@
+event usbreg { idVendor: String@12, idProduct: String@13};
+
+usbreg({idVendor: !ven, idProduct: !prod});
+usbreg({}) -> usbreg({idVendor: ->ven, idProduct: ->prod}) ;
+usbreg({}) -> usbreg({idVendor: ->ven, idProduct: ->prod}) ;

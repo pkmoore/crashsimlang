@@ -2,9 +2,9 @@ from builtins import str
 import os
 import unittest
 from argparse import Namespace
-from port.port import main as port_main
-from port.port_error import PORTError
-from port.adt import ContainerBuilder
+from ..port.port import main as port_main
+from ..port.errors.port_error import PORTError
+from ..port.compiler.adt import ContainerBuilder
 
 
 def get_test_data_path(filename):

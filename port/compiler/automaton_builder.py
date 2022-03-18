@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 from builtins import str
-from .register_automaton import RegisterAutomaton
-from .register_automaton import State
-from .register_automaton import Transition
-from .register_automaton import SubautomatonTransition
-from .dataword import DataWord
-from .adt import ContainerBuilder
-from .port_error import PORTError
+from ..compiler.register_automaton import RegisterAutomaton
+from ..compiler.register_automaton import State
+from ..compiler.register_automaton import Transition
+from ..compiler.register_automaton import SubautomatonTransition
+from ..compiler.dataword import DataWord
+from ..compiler.adt import ContainerBuilder
+from ..errors.port_error import PORTError
 import dill as pickle
 
 

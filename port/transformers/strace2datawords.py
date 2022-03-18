@@ -7,11 +7,11 @@ import sys
 import dill as pickle
 import os
 from collections import OrderedDict
-from . import adt
+from ..compiler import adt
 
 from posix_omni_parser import Trace
-from .dataword import DataWord
-from .dataword import UninterestingDataWord
+from ..compiler.dataword import DataWord
+from ..compiler.dataword import UninterestingDataWord
 
 
 class StraceToDatawords(object):

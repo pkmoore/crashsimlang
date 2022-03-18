@@ -6,12 +6,12 @@ import sys
 import dill as pickle
 import os
 from collections import OrderedDict
-from . import adt
+from ..compiler import adt
 from lxml import etree
 
 
-from .dataword import DataWord
-from .dataword import UninterestingDataWord
+from ..compiler.dataword import DataWord
+from ..compiler.dataword import UninterestingDataWord
 
 
 class XMLToDatawords(object):

@@ -3,19 +3,19 @@ from __future__ import absolute_import
 from builtins import str
 from ply import lex
 from ply import yacc
-from .register_automaton import RegisterAutomaton
-from .register_automaton import State
-from .register_automaton import Transition
-from .strace2datawords import StraceToDatawords
-from .jsontodatawords import JSONToDatawords
-from .xmltodatawords import XMLToDatawords
-from .csvtodatawords import CSVToDatawords
-from .usbjsontodatawords import USBJSONToDatawords
+from .compiler.register_automaton import RegisterAutomaton
+from .compiler.register_automaton import State
+from .compiler.register_automaton import Transition
+from .transformers.strace2datawords import StraceToDatawords
+from .transformers.jsontodatawords import JSONToDatawords
+from .transformers.xmltodatawords import XMLToDatawords
+from .transformers.csvtodatawords import CSVToDatawords
+from .transformers.usbjsontodatawords import USBJSONToDatawords
 from posix_omni_parser import Trace
-from .adt import ContainerBuilder
-from . import automaton_builder
-from . import type_checker
-from .port_error import PORTError
+from .compiler.adt import ContainerBuilder
+from .compiler import automaton_builder
+from .compiler import type_checker
+from .errors.port_error import PORTError
 import dill as pickle
 import os
 import sys

@@ -14,8 +14,8 @@ setup(
                         "dill",
                         "lxml",
                         "posix-omni-parser @ git+https://github.com/pkmoore/posix-omni-parser"],
-    packages=['port'],
+    packages=['port', 'port.compiler', 'port.errors', 'port.transformers'],
     entry_points = {
-      "console_scripts": ['port = port.port:run_port']                     
+      "console_scripts": ['port = port.__main__:run_port']                     
     }
 )

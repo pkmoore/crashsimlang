@@ -5,12 +5,12 @@ import sys
 import dill as pickle
 import os
 from collections import OrderedDict
-from . import adt
+from ..compiler import adt
 import json
 import copy
 
-from .dataword import DataWord
-from .dataword import UninterestingDataWord
+from ..compiler.dataword import DataWord
+from ..compiler.dataword import UninterestingDataWord
 
 
 class USBJSONToDatawords(object):
@@ -102,7 +102,7 @@ class USBJSONToDatawords(object):
                 event["_source"]["layers"]["usb"]["usb.endpoint_address"],
                 event["_source"]["layers"]["usb"]["usb.transfer_type"],
                 event["_source"]["layers"]["usb"]["usb.data_len"],
-                #event["_source"]["layers"]["usb"]["usb.bInterfaceClass"],
+                # event["_source"]["layers"]["usb"]["usb.bInterfaceClass"],
             ]
         if proto.startswith("usb:usbhid"):
             proto = "usbhid"
@@ -113,7 +113,6 @@ class USBJSONToDatawords(object):
                 event["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idVendor"],
                 event["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idProduct"],
             ]
-        
 
         if not any(
             self.containerbuilder.top_level.values()

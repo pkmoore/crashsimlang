@@ -2,7 +2,7 @@ import os
 import unittest
 from argparse import Namespace
 from port.port import main as port_main
-from port.port_error import PORTError
+from port.errors.port_error import PORTError
 
 
 def get_test_data_path(filename):

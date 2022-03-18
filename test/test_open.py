@@ -1,7 +1,7 @@
 from builtins import object
 import os
 from argparse import Namespace
-from port.port import main as port_main
+from ..port.port import main as port_main
 
 
 def get_test_data_path(filename):

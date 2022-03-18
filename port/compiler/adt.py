@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import range
 from builtins import object
-from .port_error import PORTError
+from ..errors.port_error import PORTError
 import pprint
 
 

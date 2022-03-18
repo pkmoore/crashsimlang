@@ -4,8 +4,7 @@ from builtins import object
 from copy import deepcopy
 from copy import copy
 from . import adt
-from .port_error import PORTError
-
+from ..errors.port_error import PORTError
 
 
 class RegisterAutomaton(object):

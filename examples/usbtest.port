@@ -1,6 +1,6 @@
 event usbhid { src: String@0,
                dst: String@1,
-               data: String@13,
+               data: String@12,
                transfertype: String@10};
 
 s1 <- "00:00:1e:00:00:00:00:00";
@@ -10,16 +10,16 @@ s4 <- "00:00:21:00:00:00:00:00";
 s5 <- "00:00:22:00:00:00:00:00";
 tt <- "blahblahblah";
 
-src <- "2.1.1";
-dst <- "host";
+fsrc <- "2.1.1";
+fdst <- "host";
 
-usbhid({src: ?src, dst: ?dst, data: ?s1})
+usbhid({src: ?fsrc, dst: ?fdst, data: ?s1})
 -> usbhid({src: ->tt});
-usbhid({src: ?src, dst: ?dst, data: ?s2})
+usbhid({src: ?fsrc, dst: ?fdst, data: ?s2})
 -> usbhid({src: ->tt});
-usbhid({src: ?src, dst: ?dst, data: ?s3})
+usbhid({src: ?fsrc, dst: ?fdst, data: ?s3})
 -> usbhid({src: ->tt});
-usbhid({src: ?src, dst: ?dst, data: ?s4})
+usbhid({src: ?fsrc, dst: ?fdst, data: ?s4})
 -> usbhid({src: ->tt});
-usbhid({src: ?src, dst: ?dst, data: ?s5})
+usbhid({src: ?fsrc, dst: ?fdst, data: ?s5})
 -> usbhid({src: ->tt});

@@ -75,19 +75,17 @@ class USBJSONToDatawords(object):
         if maybe_data:
             out["_source"]["layers"]["usbhid.data"] = maybe_data
         maybe_data = self._get_arg_by_name("idVendor", dw.captured_arguments)
-        print(maybe_data)
         if maybe_data:
             out["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idVendor"] = maybe_data
         maybe_data = self._get_arg_by_name("idProduct", dw.captured_arguments)
-        print(maybe_data)
         if maybe_data:
             out["_source"]["layers"]["DEVICE DESCRIPTOR"]["usb.idProduct"] = maybe_data
         return json.dumps(out)
 
     def handle_event(self, event):
-        proto = event["_source"]["layers"]["frame"]["frame.protocols"]
+        frame_proto = event["_source"]["layers"]["frame"]["frame.protocols"]
         argslist = []
-        if proto.startswith("usb"):
+        if frame_proto.startswith("usb"):
             proto = "usb"
             argslist += [
                 event["_source"]["layers"]["usb"]["usb.src"],
@@ -104,7 +102,7 @@ class USBJSONToDatawords(object):
                 event["_source"]["layers"]["usb"]["usb.data_len"],
                 # event["_source"]["layers"]["usb"]["usb.bInterfaceClass"],
             ]
-        if proto.startswith("usb:usbhid"):
+        if frame_proto == "usb:usbhid" and "usbhid.data" in event["_source"]["layers"]:
             proto = "usbhid"
             argslist.append(event["_source"]["layers"]["usbhid.data"])
         elif "DEVICE DESCRIPTOR" in event["_source"]["layers"]:

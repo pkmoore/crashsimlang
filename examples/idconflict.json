@@ -231,7 +231,7 @@
           "frame.cap_len": "1225",
           "frame.marked": "0",
           "frame.ignored": "0",
-          "frame.protocols": "usb:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo:usbvideo"
+          "frame.protocols": "usb:usbvideo"
         },
         "usb": {
           "usb.src": "2.3.0",

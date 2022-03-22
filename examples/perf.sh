@@ -78,6 +78,17 @@ port build -c ./client.port
 wc -l ./network/telnet_remote.strace
 multitime -n $RUNS port run strace -d ../syscall_definitions.pickle -s ./network/telnet_remote.strace -a ./client.auto
 
+echo "!!!! ---- USB Streams ---- !!!!"
+echo "==== BADUSB ===="
+port build -c ./usbtest.port
+wc -l ./usbjson.json
+multitime -n $RUNS port run usbjson  -u ./usbjson.json -a ./usbtest.auto
+
+echo "==== ID Conflict ===="
+port build -c ./idconflict.port
+wc -l ./idconflict.json
+multitime -n $RUNS port run usbjson -u ./idconflict.json -a ./idconflict.auto
+
 echo "!!!! ---- Teardown ---- !!!!"
 git restore ./compression.port
 rm compression.port.bak
